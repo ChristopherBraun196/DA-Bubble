@@ -16,13 +16,14 @@ html,
 body {
   min-height: 100%;
   margin: 0 auto;
-}
-
-body {
-  margin: 0;
   font-family: 'Nunito', sans-serif;
 }
 
 img {
   display: block;
+}
+
+.mw-1440 {
+  max-width: 1440px;
+  margin: 0 auto;
 }
