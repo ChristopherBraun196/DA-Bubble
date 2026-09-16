@@ -1,0 +1,58 @@
+@font-face {
+  font-family: 'Nunito';
+  src: url('/fonts/Nunito-VariableFont_wght.ttf') format('truetype-variations');
+  font-weight: 200 1000;
+  font-style: normal;
+  font-display: swap;
+}
+
+:host {
+  display: block;
+  height: 100dvh;
+}
+
+.shell {
+  /* Design-Tokens fuer die Main-Ansicht - vererben sich an alle Kind-Components. */
+  --color-bg: #eceefd;
+  --color-surface: #ffffff;
+  --color-primary: #444df2;
+  --color-accent: #797ef3;
+  --color-text: #000000;
+  --color-text-muted: #686868;
+  --color-border: #adb0d9;
+  --radius-panel: 30px;
+  --radius-pill: 100px;
+
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100%;
+  padding: 16px 20px 24px;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+}
+
+.shell__workspace {
+  display: grid;
+  grid-template-columns: 366px minmax(0, 1fr) 366px;
+  gap: 24px;
+  flex: 1;
+  min-height: 0;
+}
+
+.shell__devspace,
+.shell__chat,
+.shell__thread {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
