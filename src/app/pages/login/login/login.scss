@@ -1,0 +1,33 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  min-height: 100svh;
+}
+
+.login-shell {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100svh;
+  overflow: hidden;
+  background-color: #eceefe;
+
+  &__brand {
+    position: absolute;
+    top: 75px;
+    left: 75px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  &__icon {
+    width: 70px;
+    height: 70px;
+  }
+
+  &__wordmark {
+    width: 156.11px;
+    height: 24px;
+  }
+}

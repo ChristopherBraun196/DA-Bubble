@@ -5,19 +5,10 @@
 }
 
 .intro {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position: relative;
   width: 100%;
   min-height: 100vh;
   min-height: 100svh;
   overflow: hidden;
   background: linear-gradient(180deg, #797ef3 0%, #313ae5 100%);
-
-  &__logo {
-    display: block;
-    width: min(187px, 50vw);
-    height: auto;
-    transform: translateX(5px);
-  }
 }
