@@ -12,8 +12,16 @@
   overflow: hidden;
   background-color: #eceefe;
 
+  &__topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 75px;
+  }
+
   &__brand {
-    position: absolute;
     top: 75px;
     left: 75px;
     display: flex;
@@ -29,5 +37,60 @@
   &__wordmark {
     width: 156.11px;
     height: 24px;
+  }
+
+  &__auth {
+    top: 75px;
+    right: 75px;
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+    flex-direction: column;
+    font-size: 18px;
+    font-weight: 400;
+
+    & a {
+      color: #797ef3;
+      text-decoration: none;
+      border: 1px solid transparent;
+      border-radius: 100px;
+      padding: 8px 12px;
+
+      &:hover {
+        color: #444df2;
+        border: 1px solid #adb0d9;
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+.login-formfield {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  form {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    align-items: center;
+    max-width: 500px;
+    height: 700px;
+    width: 100%;
+    background-color: #ffffff;
+    border-radius: 30px;
+  }
+
+  h1 {
+    font-size: 46px;
+    color: #444df2;
+    font-weight: bold;
+  }
+
+  p {
+    text-align: center;
+    font-size: 18px;
+    padding-inline: 40px;
   }
 }

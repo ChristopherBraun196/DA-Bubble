@@ -1,12 +1,48 @@
-<main class="login-shell" aria-label="Login">
-  <div class="login-shell__brand" role="img" aria-label="DABubble">
-    <img class="login-shell__icon" src="img/Logo.png" alt="" width="70" height="70" />
-    <img
-      class="login-shell__wordmark"
-      src="img/dabubble-wordmark.svg"
-      alt=""
-      width="156"
-      height="24"
-    />
-  </div>
+<main class="login-shell">
+  <header>
+    <div class="login-shell__topbar">
+      <div class="login-shell__brand" role="img" aria-label="DABubble">
+        <img class="login-shell__icon" src="img/Logo.png" alt="" width="70" height="70" />
+        <img
+          class="login-shell__wordmark"
+          src="img/dabubble-wordmark.svg"
+          alt=""
+          width="156"
+          height="24"
+        />
+      </div>
+
+      <div class="login-shell__auth">
+        <span>Neu bei DABubble?</span>
+        <a [routerLink]="['/register']">Konto erstellen</a>
+      </div>
+    </div>
+  </header>
+  <section class="login-formfield">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <h1>Anmeldung</h1>
+      <p>Wir empfehlen dir, die E-Mail-Adresse zu nutzen, die du bei der Arbeit verwendest.</p>
+
+      <label class="input-pill">
+        <img src="img/mail-icon.svg" alt="" />
+        <input formControlName="email" type="email" placeholder="beispielname@email.com" />
+      </label>
+
+      <label class="input-pill">
+        <img src="img/lock-icon.svg" alt="" />
+        <input formControlName="password" type="password" placeholder="Passwort" />
+      </label>
+
+      <a [routerLink]="['/password-reset']">Passwort vergessen?</a>
+
+      <div class="divider">ODER</div>
+
+      <button type="button" (click)="loginWithGoogle()">Anmelden mit Google</button>
+
+      <div class="actions">
+        <button type="submit">Anmelden</button>
+        <button type="button" (click)="loginAsGuest()">Gäste-Login</button>
+      </div>
+    </form>
+  </section>
 </main>
