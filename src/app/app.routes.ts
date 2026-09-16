@@ -9,4 +9,5 @@ export const routes: Routes = [
     component: Intro,
     pathMatch: 'full',
   },
+  { path: 'main', component: Shell },
 ];
