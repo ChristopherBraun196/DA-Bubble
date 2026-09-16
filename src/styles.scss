@@ -15,14 +15,15 @@
 html,
 body {
   min-height: 100%;
-  max-width: 1440px;
-}
-
-body {
-  margin: 0;
+  margin: 0 auto;
   font-family: 'Nunito', sans-serif;
 }
 
 img {
   display: block;
+}
+
+.mw-1440 {
+  max-width: 1440px;
+  margin: 0 auto;
 }
