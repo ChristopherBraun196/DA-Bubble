@@ -1,8 +1,11 @@
 import { Component } from '@angular/core';
+import { ChatView } from '../../chat/chat-view/chat-view';
+import { DevspaceNav } from '../../Devspace-nav/devspace-nav/devspace-nav';
+import { ThreadPanel } from '../../thread/thread-panel/thread-panel';
 import { Topbar } from '../topbar/topbar';
 
 @Component({
-  imports: [Topbar],
+  imports: [Topbar, DevspaceNav, ChatView, ThreadPanel],
   selector: 'app-shell',
   styleUrl: './shell.scss',
   templateUrl: './shell.html',

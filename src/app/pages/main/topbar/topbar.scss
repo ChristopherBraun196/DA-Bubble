@@ -14,13 +14,33 @@
 .topbar__logo {
   display: flex;
   align-items: center;
+  gap: 12px;
   flex: 0 0 auto;
+  text-decoration: none;
+  color: var(--color-text);
 
   img {
     height: 48px;
     width: auto;
     object-fit: contain;
+    transition: transform 150ms ease;
   }
+
+  &:hover {
+    color: var(--color-primary);
+
+    img {
+      transform: scale(1.08);
+    }
+  }
+}
+
+.topbar__logo-text {
+  font-family: inherit;
+  font-size: 24px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: color 150ms ease;
 }
 
 .topbar__search {

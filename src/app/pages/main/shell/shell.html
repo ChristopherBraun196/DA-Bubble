@@ -2,13 +2,16 @@
   <app-topbar />
 
   <div class="shell__workspace">
-    <!-- links: app-devspace-nav -->
-    <aside class="shell__devspace"></aside>
+    <aside class="shell__devspace">
+      <app-devspace-nav />
+    </aside>
 
-    <!-- mitte: app-chat-view -->
-    <main class="shell__chat"></main>
+    <main class="shell__chat">
+      <app-chat-view />
+    </main>
 
-    <!-- rechts: app-thread-panel -->
-    <aside class="shell__thread"></aside>
+    <aside class="shell__thread">
+      <app-thread-panel />
+    </aside>
   </div>
 </div>
