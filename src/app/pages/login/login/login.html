@@ -24,12 +24,10 @@
       <p>Wir empfehlen dir, die E-Mail-Adresse zu nutzen, die du bei der Arbeit verwendest.</p>
 
       <label class="input-pill">
-        <img src="img/mail-icon.svg" alt="" />
         <input formControlName="email" type="email" placeholder="beispielname@email.com" />
       </label>
 
       <label class="input-pill">
-        <img src="img/lock-icon.svg" alt="" />
         <input formControlName="password" type="password" placeholder="Passwort" />
       </label>
 
@@ -37,12 +35,20 @@
 
       <div class="divider">ODER</div>
 
-      <button type="button" (click)="loginWithGoogle()">Anmelden mit Google</button>
+      <button type="button" class="btn-google" (click)="loginWithGoogle()">
+        <img src="icons/google.svg" alt="" />
+        Anmelden mit Google
+      </button>
 
       <div class="actions">
-        <button type="submit">Anmelden</button>
-        <button type="button" (click)="loginAsGuest()">Gäste-Login</button>
+        <button class="btn-primary" type="submit">Anmelden</button>
+        <button class="btn-secondary" type="button" (click)="loginAsGuest()">Gäste-Login</button>
       </div>
     </form>
   </section>
+
+  <footer class="login-shell__footer">
+    <a [routerLink]="['/impressum']">Impressum</a>
+    <a [routerLink]="['/datenschutz']">Datenschutz</a>
+  </footer>
 </main>
