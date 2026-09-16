@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
+import { Topbar } from '../topbar/topbar';
 
 @Component({
-  imports: [],
+  imports: [Topbar],
   selector: 'app-shell',
   styleUrl: './shell.scss',
   templateUrl: './shell.html',
