@@ -1,1 +1,9 @@
-<p>channel-list-item works!</p>
+<button
+  class="channel-item"
+  type="button"
+  [class.channel-item--active]="active()"
+  (click)="selected.emit()"
+>
+  <span class="material-symbols-outlined">tag</span>
+  <span class="channel-item__name">{{ name() }}</span>
+</button>

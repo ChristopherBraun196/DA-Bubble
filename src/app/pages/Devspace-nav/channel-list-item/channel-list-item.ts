@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 
 @Component({
   imports: [],
@@ -6,4 +6,8 @@ import { Component } from '@angular/core';
   styleUrl: './channel-list-item.scss',
   templateUrl: './channel-list-item.html',
 })
-export class ChannelListItem {}
+export class ChannelListItem {
+  readonly name = input.required<string>();
+  readonly active = input(false);
+  readonly selected = output<void>();
+}

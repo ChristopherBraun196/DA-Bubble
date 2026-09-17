@@ -1,1 +1,22 @@
-<p>devspace-nav works!</p>
+<nav class="devspace">
+  <header class="devspace__header">
+    <div class="devspace__brand">
+      <img class="devspace__logo" src="/img/Devspace_logo.png" alt="" />
+      <span class="devspace__title">Devspace</span>
+    </div>
+
+    <button class="devspace__compose" type="button" aria-label="Neue Nachricht schreiben">
+      <span class="material-symbols-outlined">edit_square</span>
+    </button>
+  </header>
+
+  <app-channel-list
+    [activeChannelId]="activeChannelId()"
+    (channelSelected)="selectChannel($event)"
+  />
+
+  <app-direct-message-list
+    [activeUserId]="activeUserId()"
+    (userSelected)="selectUser($event)"
+  />
+</nav>

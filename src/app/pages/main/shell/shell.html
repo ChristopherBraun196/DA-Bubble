@@ -1,10 +1,12 @@
 <div class="shell">
   <app-topbar />
 
-  <div class="shell__workspace">
-    <aside class="shell__devspace">
-      <app-devspace-nav />
-    </aside>
+  <div class="shell__workspace" [class.shell__workspace--devspace-closed]="!devspaceOpen()">
+    @if (devspaceOpen()) {
+      <aside class="shell__devspace">
+        <app-devspace-nav />
+      </aside>
+    }
 
     <main class="shell__chat">
       <app-chat-view />
@@ -13,5 +15,14 @@
     <aside class="shell__thread">
       <app-thread-panel />
     </aside>
+
+    <button class="shell__devspace-toggle" type="button" (click)="toggleDevspace()">
+      <span class="material-symbols-outlined">
+        {{ devspaceOpen() ? 'left_panel_close' : 'left_panel_open' }}
+      </span>
+      <span class="shell__devspace-toggle-text">
+        Workspace-Menü {{ devspaceOpen() ? 'schließen' : 'öffnen' }}
+      </span>
+    </button>
   </div>
 </div>

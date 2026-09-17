@@ -43,11 +43,18 @@
 }
 
 .shell__workspace {
+  position: relative;
   display: grid;
   grid-template-columns: 366px minmax(0, 1fr) 366px;
   gap: 24px;
   flex: 1;
   min-height: 0;
+
+  /* Devspace zu: der Chat bekommt den frei gewordenen Platz. */
+  &--devspace-closed {
+    grid-template-columns: minmax(0, 1fr) 366px;
+    padding-left: 44px;
+  }
 }
 
 .shell__devspace,
@@ -57,4 +64,37 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
+}
+
+/* Die Karte am linken Rand zum Ein- und Ausklappen. */
+.shell__devspace-toggle {
+  position: absolute;
+  top: 50%;
+  left: -20px;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 8px;
+  border: none;
+  border-radius: 0 20px 20px 0;
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 150ms ease;
+
+  &:hover {
+    color: var(--color-primary);
+    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.16);
+  }
+}
+
+.shell__devspace-toggle-text {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  white-space: nowrap;
 }

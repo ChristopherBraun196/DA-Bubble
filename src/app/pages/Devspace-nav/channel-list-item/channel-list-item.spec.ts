@@ -12,6 +12,7 @@ describe('ChannelListItem', () => {
 
     fixture = TestBed.createComponent(ChannelListItem);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('name', 'Entwicklerteam');
     await fixture.whenStable();
   });
 

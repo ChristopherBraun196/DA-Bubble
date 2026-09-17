@@ -1,1 +1,12 @@
-<p>user-list-item works!</p>
+<button
+  class="user-item"
+  type="button"
+  [class.user-item--active]="active()"
+  (click)="selected.emit()"
+>
+  <span class="user-item__avatar">
+    <img [src]="avatar()" alt="" />
+    <span class="user-item__status" [class.user-item__status--online]="online()"></span>
+  </span>
+  <span class="user-item__name">{{ name() }}</span>
+</button>
