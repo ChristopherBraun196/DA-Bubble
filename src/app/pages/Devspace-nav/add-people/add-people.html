@@ -1,0 +1,57 @@
+<div
+  class="add-people"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="add-people-title"
+  (click)="$event.stopPropagation()"
+>
+  <header class="add-people__header">
+    <h2 class="add-people__title" id="add-people-title">Leute hinzufügen</h2>
+    <button class="add-people__close" type="button" aria-label="Schließen" (click)="closed.emit()">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+  </header>
+
+  <form class="add-people__form" (submit)="$event.preventDefault(); create()">
+    <label class="add-people__option">
+      <input
+        type="radio"
+        name="add-people-mode"
+        value="all"
+        [checked]="mode() === 'all'"
+        (change)="setMode('all')"
+      />
+      <!-- TODO: spaeter den ausgewaehlten Channel aus Firebase einsetzen. -->
+      <span>
+        Alle Mitglieder von <span class="add-people__channel">Entwicklerteam</span> hinzufügen
+      </span>
+    </label>
+
+    <label class="add-people__option">
+      <input
+        type="radio"
+        name="add-people-mode"
+        value="specific"
+        [checked]="mode() === 'specific'"
+        (change)="setMode('specific')"
+      />
+      <span>Bestimmte Leute hinzufügen</span>
+    </label>
+
+    @if (mode() === 'specific') {
+      <div class="add-people__field">
+        <input
+          class="add-people__input"
+          name="person-name"
+          type="text"
+          placeholder="Name eingeben"
+          required
+          [value]="personName()"
+          (input)="updatePersonName($event)"
+        />
+      </div>
+    }
+
+    <button class="add-people__submit" type="submit" [disabled]="!canCreate()">Erstellen</button>
+  </form>
+</div>

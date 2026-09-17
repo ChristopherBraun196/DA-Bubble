@@ -1,59 +1,66 @@
 <div class="create-channel__backdrop" (click)="closed.emit()">
-  <div
-    class="create-channel"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="create-channel-title"
-    (click)="$event.stopPropagation()"
-  >
-    <header class="create-channel__header">
-      <h2 class="create-channel__title" id="create-channel-title">Channel erstellen</h2>
-      <button
-        class="create-channel__close"
-        type="button"
-        aria-label="Schließen"
-        (click)="closed.emit()"
-      >
-        <span class="material-symbols-outlined">close</span>
-      </button>
-    </header>
+  @if (step() === 'people') {
+    <app-add-people (closed)="closed.emit()" />
+  } @else {
+    <div
+      class="create-channel"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="create-channel-title"
+      (click)="$event.stopPropagation()"
+    >
+      <header class="create-channel__header">
+        <h2 class="create-channel__title" id="create-channel-title">Channel erstellen</h2>
+        <button
+          class="create-channel__close"
+          type="button"
+          aria-label="Schließen"
+          (click)="closed.emit()"
+        >
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </header>
 
-    <p class="create-channel__text">
-      Channels dienen deinem Team zur Kommunikation. Am besten sollten sie themenbezogen sein
-      #marketing zum Beispiel.
-    </p>
+      <p class="create-channel__text">
+        Channels dienen deinem Team zur Kommunikation. Am besten sollten sie themenbezogen sein
+        #marketing zum Beispiel.
+      </p>
 
-    <form class="create-channel__form" (submit)="$event.preventDefault(); create()">
-      <label class="create-channel__label" for="channel-name">Channel-Name</label>
-      <div class="create-channel__field">
-        <span class="material-symbols-outlined create-channel__hash">tag</span>
-        <input
-          class="create-channel__input"
-          id="channel-name"
-          name="channel-name"
-          type="text"
-          placeholder="z.B. Kooperationsprojekte"
-          [value]="channelName()"
-          (input)="updateName($event)"
-        />
-      </div>
+      <form class="create-channel__form" (submit)="$event.preventDefault(); create()">
+        <label class="create-channel__label" for="channel-name">Channel-Name *</label>
+        <div class="create-channel__field">
+          <span class="material-symbols-outlined create-channel__hash">tag</span>
+          <input
+            class="create-channel__input"
+            id="channel-name"
+            name="channel-name"
+            type="text"
+            placeholder="z.B. Kooperationsprojekte"
+            required
+            [value]="channelName()"
+            (input)="updateName($event)"
+          />
+        </div>
 
-      <label class="create-channel__label" for="channel-description">
-        Beschreibung <span class="create-channel__optional">(optional)</span>
-      </label>
-      <div class="create-channel__field">
-        <input
-          class="create-channel__input"
-          id="channel-description"
-          name="channel-description"
-          type="text"
-          placeholder="Dein Text hier"
-          [value]="description()"
-          (input)="updateDescription($event)"
-        />
-      </div>
+        <label class="create-channel__label" for="channel-description">
+          Beschreibung <span class="create-channel__optional">(optional)</span>
+        </label>
+        <div class="create-channel__field">
+          <input
+            class="create-channel__input"
+            id="channel-description"
+            name="channel-description"
+            type="text"
+            placeholder="Dein Text hier"
+            [value]="description()"
+            (input)="updateDescription($event)"
+          />
+        </div>
 
-      <button class="create-channel__submit" type="submit">Erstellen</button>
-    </form>
-  </div>
+        <button class="create-channel__submit" type="submit" [disabled]="!canCreate()">
+          Erstellen
+        </button>
+      </form>
+    </div>
+  }
 </div>

@@ -1,41 +1,33 @@
-
-.create-channel__backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  background-color: rgba(0, 0, 0, 0.2);
+:host {
+  display: block;
+  width: 100%;
+  max-width: 710px;
 }
 
-.create-channel {
+.add-people {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  width: 100%;
-  max-width: 900px;
+  gap: 24px;
   padding: 40px;
   border-radius: 30px;
   background-color: #ffffff;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
 }
 
-.create-channel__header {
+.add-people__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
 }
 
-.create-channel__title {
+.add-people__title {
   margin: 0;
   font-size: 28px;
   font-weight: 700;
 }
 
-.create-channel__close {
+.add-people__close {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -56,33 +48,57 @@
   }
 }
 
-.create-channel__text {
-  margin: 0;
-  font-size: 18px;
-  line-height: 1.4;
-}
-
-.create-channel__form {
+.add-people__form {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 16px;
 }
 
-.create-channel__label {
-  margin-top: 12px;
-  font-size: 18px;
-  font-weight: 700;
-}
-
-.create-channel__optional {
-  color: #686868;
-  font-weight: 400;
-}
-
-.create-channel__field {
+.add-people__option {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
+  font-size: 18px;
+  cursor: pointer;
+
+  input[type='radio'] {
+    appearance: none;
+    flex: 0 0 auto;
+    width: 22px;
+    height: 22px;
+    margin: 0;
+    border: 1px solid #adb0d9;
+    border-radius: 50%;
+    display: grid;
+    place-content: center;
+    cursor: pointer;
+    transition: border-color 150ms ease;
+
+    &:hover {
+      border-color: #444df2;
+    }
+
+    &:checked {
+      border-color: #444df2;
+
+      &::before {
+        content: '';
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background-color: #444df2;
+      }
+    }
+  }
+}
+
+.add-people__channel {
+  color: #535af1;
+}
+
+.add-people__field {
+  display: flex;
+  align-items: center;
   padding: 16px 24px;
   border: 1px solid #adb0d9;
   border-radius: 30px;
@@ -92,11 +108,7 @@
   }
 }
 
-.create-channel__hash {
-  color: #686868;
-}
-
-.create-channel__input {
+.add-people__input {
   flex: 1 1 auto;
   min-width: 0;
   border: none;
@@ -111,9 +123,9 @@
   }
 }
 
-.create-channel__submit {
+.add-people__submit {
   align-self: flex-end;
-  margin-top: 24px;
+  margin-top: 8px;
   padding: 12px 32px;
   border: none;
   border-radius: 30px;
@@ -130,8 +142,7 @@
   }
 
   &:disabled {
-    background-color: #adb0d9;
-    color: #ffffff;
+    background-color: #686868;
     cursor: not-allowed;
   }
 }
