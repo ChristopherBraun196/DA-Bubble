@@ -1,1 +1,20 @@
-<p>chat-header works!</p>
+<header class="chat-header">
+  <button class="chat-header__channel" type="button">
+    <span class="material-symbols-outlined chat-header__hash">tag</span>
+    <span class="chat-header__name">{{ channelName() }}</span>
+    <span class="material-symbols-outlined">expand_more</span>
+  </button>
+
+  <div class="chat-header__members">
+    <button class="chat-header__avatars" type="button" aria-label="Mitglieder anzeigen">
+      @for (member of members(); track member) {
+        <img class="chat-header__avatar" [src]="member" alt="" />
+      }
+      <span class="chat-header__count">{{ members().length }}</span>
+    </button>
+
+    <button class="chat-header__add" type="button" aria-label="Mitglieder hinzufügen">
+      <span class="material-symbols-outlined">person_add</span>
+    </button>
+  </div>
+</header>

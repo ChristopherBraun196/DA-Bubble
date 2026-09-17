@@ -12,6 +12,8 @@ describe('UserListItem', () => {
 
     fixture = TestBed.createComponent(UserListItem);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('name', 'Frederik Beck');
+    fixture.componentRef.setInput('avatar', '/img/Profile_picture_1.png');
     await fixture.whenStable();
   });
 

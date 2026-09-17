@@ -1,7 +1,65 @@
 :host {
   display: block;
   flex: 1;
+  min-height: 0;
   background-color: #ffffff;
   border-radius: 32px;
   padding: 16px;
+}
+
+.devspace {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.devspace__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 4px 0 12px;
+}
+
+.devspace__brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.devspace__logo {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex: 0 0 auto;
+}
+
+.devspace__title {
+  font-size: 24px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.devspace__compose {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: #000000;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #eceefe;
+    color: #444df2;
+  }
 }

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, input } from '@angular/core';
 
 @Component({
   imports: [],
@@ -6,4 +6,6 @@ import { Component } from '@angular/core';
   styleUrl: './message-input.scss',
   templateUrl: './message-input.html',
 })
-export class MessageInput {}
+export class MessageInput {
+  readonly placeholder = input('Nachricht schreiben');
+}

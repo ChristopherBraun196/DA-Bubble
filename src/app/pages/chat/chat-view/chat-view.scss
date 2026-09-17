@@ -1,7 +1,24 @@
 :host {
   display: block;
   flex: 1;
+  min-height: 0;
   background-color: #ffffff;
   border-radius: 32px;
-  padding: 16px;
+}
+
+.chat {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.chat__messages {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 24px 40px;
+}
+
+.chat__input {
+  padding: 0 20px 20px;
 }

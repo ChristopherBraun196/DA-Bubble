@@ -1,18 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ThreadHeader } from './thread-header';
+import { PrivacyPolicy } from './privacy-policy';
 
-describe('ThreadHeader', () => {
-  let component: ThreadHeader;
-  let fixture: ComponentFixture<ThreadHeader>;
+describe('PrivacyPolicy', () => {
+  let component: PrivacyPolicy;
+  let fixture: ComponentFixture<PrivacyPolicy>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ThreadHeader],
+      imports: [PrivacyPolicy],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ThreadHeader);
+    fixture = TestBed.createComponent(PrivacyPolicy);
     component = fixture.componentInstance;
-    fixture.componentRef.setInput('channelName', 'Entwicklerteam');
     await fixture.whenStable();
   });
 

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 
 @Component({
   imports: [],
@@ -6,4 +6,10 @@ import { Component } from '@angular/core';
   styleUrl: './user-list-item.scss',
   templateUrl: './user-list-item.html',
 })
-export class UserListItem {}
+export class UserListItem {
+  readonly name = input.required<string>();
+  readonly avatar = input.required<string>();
+  readonly online = input(false);
+  readonly active = input(false);
+  readonly selected = output<void>();
+}

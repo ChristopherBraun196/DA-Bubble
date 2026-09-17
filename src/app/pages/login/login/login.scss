@@ -119,6 +119,7 @@
   align-items: center;
 
   form {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -153,10 +154,10 @@
     width: 500px;
     height: 60px;
     margin-top: 46px;
+  }
 
-    + .input-pill {
-      margin-top: 40px;
-    }
+  .error-slot + .input-pill {
+    margin-top: 40px;
   }
 
   input {
@@ -197,6 +198,35 @@
   input[type='password'] {
     background-image: url('/icons/lock.svg');
     background-size: 24px 24px;
+  }
+
+  .input-pill--error input {
+    border-color: variables.$error;
+  }
+
+  .error-slot {
+    position: absolute;
+    top: 294px;
+    left: 53px;
+    width: 500px;
+    min-height: 20px;
+    color: variables.$error;
+    font-size: 14px;
+    line-height: 20px;
+    text-align: start;
+    pointer-events: none;
+  }
+
+  .error-slot + .input-pill + .error-slot {
+    top: 394px;
+  }
+
+  .error-text {
+    visibility: hidden;
+
+    &--visible {
+      visibility: visible;
+    }
   }
 
   form > a {

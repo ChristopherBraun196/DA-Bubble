@@ -23,13 +23,37 @@
       <h1>Anmeldung</h1>
       <p>Wir empfehlen dir, die E-Mail-Adresse zu nutzen, die du bei der Arbeit verwendest.</p>
 
-      <label class="input-pill">
+      <label
+        class="input-pill"
+        [class.input-pill--error]="form.get('email')?.invalid && form.get('email')?.touched"
+      >
         <input formControlName="email" type="email" placeholder="beispielname@email.com" />
       </label>
+      <div class="error-slot">
+        <span
+          class="error-text"
+          [class.error-text--visible]="form.get('email')?.invalid && form.get('email')?.touched"
+        >
+          *Diese E-Mail-Adresse ist leider ungültig.
+        </span>
+      </div>
 
-      <label class="input-pill">
+      <label
+        class="input-pill"
+        [class.input-pill--error]="form.get('password')?.invalid && form.get('password')?.touched"
+      >
         <input formControlName="password" type="password" placeholder="Passwort" />
       </label>
+      <div class="error-slot">
+        <span
+          class="error-text"
+          [class.error-text--visible]="
+            form.get('password')?.invalid && form.get('password')?.touched
+          "
+        >
+          Falsches Passwort oder E-Mail.. Bitte noch einmal versuchen.
+        </span>
+      </div>
 
       <a [routerLink]="['/password-reset']">Passwort vergessen?</a>
 

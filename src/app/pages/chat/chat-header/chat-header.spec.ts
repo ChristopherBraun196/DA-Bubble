@@ -12,6 +12,7 @@ describe('ChatHeader', () => {
 
     fixture = TestBed.createComponent(ChatHeader);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('channelName', 'Entwicklerteam');
     await fixture.whenStable();
   });
 

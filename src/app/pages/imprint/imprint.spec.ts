@@ -1,18 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ThreadHeader } from './thread-header';
+import { Imprint } from './imprint';
 
-describe('ThreadHeader', () => {
-  let component: ThreadHeader;
-  let fixture: ComponentFixture<ThreadHeader>;
+describe('Imprint', () => {
+  let component: Imprint;
+  let fixture: ComponentFixture<Imprint>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ThreadHeader],
+      imports: [Imprint],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ThreadHeader);
+    fixture = TestBed.createComponent(Imprint);
     component = fixture.componentInstance;
-    fixture.componentRef.setInput('channelName', 'Entwicklerteam');
     await fixture.whenStable();
   });
 
