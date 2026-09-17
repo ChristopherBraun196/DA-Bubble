@@ -291,7 +291,8 @@
     cursor: pointer;
     transition:
       color 100ms ease-out,
-      border-color 100ms ease-out;
+      border-color 100ms ease-out,
+      font-weight 100ms ease-out;
 
     img {
       width: 38px;
