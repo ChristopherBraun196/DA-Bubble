@@ -1,0 +1,80 @@
+@use '../../../styles/variables' as variables;
+
+:host {
+  display: block;
+}
+
+.imprint-shell {
+  box-sizing: border-box;
+  min-height: 100vh;
+  background-color: variables.$background;
+}
+
+section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 200px;
+
+  div {
+    background-color: white;
+    border-radius: 30px;
+    width: 100%;
+    max-width: 600px;
+    padding-left: 24px;
+  }
+  p {
+    line-height: 0.6;
+    font-size: 20px;
+
+    & a {
+      padding-left: 8px;
+    }
+  }
+
+  h1 {
+    color: variables.$purple-primary;
+    font-size: 48px;
+    font-weight: 700;
+  }
+
+  h2 {
+    padding-top: 24px;
+    padding-left: 24px;
+    font-size: 32px;
+    color: variables.$purple-primary;
+  }
+
+  h2 + p {
+    padding-left: 24px;
+    padding-bottom: 48px;
+  }
+}
+
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  text-decoration: none;
+  margin-left: 24px;
+  margin-top: 48px;
+
+  .material-symbols-outlined {
+    transition: font-variation-settings 0.2s;
+  }
+
+  &:hover {
+    color: variables.$focus-purple;
+    background-color: variables.$background;
+
+    .material-symbols-outlined {
+      font-variation-settings:
+        'FILL' 2,
+        'wght' 500;
+    }
+  }
+}

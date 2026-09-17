@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
 import { Header } from '../login/shared/header/header';
+import { RouterLink } from '@angular/router';
 
 @Component({
-  imports: [Header],
+  imports: [Header, RouterLink],
   selector: 'app-imprint',
   styleUrl: './imprint.scss',
   templateUrl: './imprint.html',
