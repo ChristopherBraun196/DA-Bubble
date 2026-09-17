@@ -1,4 +1,5 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   imports: [],
@@ -7,6 +8,8 @@ import { Component, signal } from '@angular/core';
   templateUrl: './topbar.html',
 })
 export class Topbar {
+  private readonly router = inject(Router);
+
   /** Platzhalter, bis der echte User aus dem Auth-Service kommt. */
   protected readonly userName = signal('Gast');
   protected readonly userAvatar = signal('/img/Profile_Guest.png');
@@ -24,5 +27,6 @@ export class Topbar {
   protected logout(): void {
     // TODO: an den Auth-Service anbinden, sobald Firebase eingerichtet ist.
     this.closeMenu();
+    void this.router.navigateByUrl('/');
   }
 }
