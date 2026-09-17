@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 
 @Component({
   imports: [],
@@ -6,4 +6,7 @@ import { Component } from '@angular/core';
   styleUrl: './thread-header.scss',
   templateUrl: './thread-header.html',
 })
-export class ThreadHeader {}
+export class ThreadHeader {
+  readonly channelName = input.required<string>();
+  readonly closed = output<void>();
+}

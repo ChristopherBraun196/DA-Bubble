@@ -12,8 +12,17 @@ import { Topbar } from '../topbar/topbar';
 })
 export class Shell {
   protected readonly devspaceOpen = signal(true);
+  protected readonly threadOpen = signal(true);
 
   protected toggleDevspace(): void {
     this.devspaceOpen.update((value) => !value);
+  }
+
+  protected toggleThread(): void {
+    this.threadOpen.update((value) => !value);
+  }
+
+  protected closeThread(): void {
+    this.threadOpen.set(false);
   }
 }

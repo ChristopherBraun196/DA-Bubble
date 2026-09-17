@@ -13,7 +13,6 @@
 }
 
 .shell {
-  /* Design-Tokens fuer die Main-Ansicht - vererben sich an alle Kind-Components. */
   --color-bg: #eceefd;
   --color-surface: #ffffff;
   --color-primary: #444df2;
@@ -50,9 +49,17 @@
   flex: 1;
   min-height: 0;
 
-  /* Devspace zu: der Chat bekommt den frei gewordenen Platz. */
+  /* Zugeklappte Spalten fallen weg, der Chat bekommt den Platz. */
   &--devspace-closed {
     grid-template-columns: minmax(0, 1fr) 366px;
+  }
+
+  &--thread-closed {
+    grid-template-columns: 366px minmax(0, 1fr);
+  }
+
+  &--devspace-closed.shell__workspace--thread-closed {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -96,4 +103,30 @@
   writing-mode: vertical-rl;
   transform: rotate(180deg);
   white-space: nowrap;
+}
+
+/* Kleiner Pfeil am rechten Rand, um den Thread wieder aufzuklappen. */
+.shell__thread-toggle {
+  position: absolute;
+  top: 50%;
+  right: -20px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 56px;
+  padding: 0;
+  border: none;
+  border-radius: 20px 0 0 20px;
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+  transition: color 150ms ease, box-shadow 150ms ease;
+
+  &:hover {
+    color: var(--color-primary);
+    box-shadow: -2px 0 12px rgba(0, 0, 0, 0.16);
+  }
 }
