@@ -1,5 +1,6 @@
 import { Component, input, output, signal } from '@angular/core';
 import { ChannelListItem } from '../channel-list-item/channel-list-item';
+import { CreateChannel } from '../create-channel/create-channel';
 
 export interface Channel {
   id: string;
@@ -7,7 +8,7 @@ export interface Channel {
 }
 
 @Component({
-  imports: [ChannelListItem],
+  imports: [ChannelListItem, CreateChannel],
   selector: 'app-channel-list',
   styleUrl: './channel-list.scss',
   templateUrl: './channel-list.html',
@@ -23,7 +24,17 @@ export class ChannelList {
     { id: 'entwicklerteam', name: 'Entwicklerteam' },
   ]);
 
+  protected readonly dialogOpen = signal(false);
+
   protected toggle(): void {
     this.expanded.update((value) => !value);
+  }
+
+  protected openDialog(): void {
+    this.dialogOpen.set(true);
+  }
+
+  protected closeDialog(): void {
+    this.dialogOpen.set(false);
   }
 }

@@ -1,0 +1,131 @@
+/* Dunkelt den Rest der Seite ab und zentriert die Card. */
+.create-channel__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.create-channel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 900px;
+  padding: 40px;
+  border-radius: 30px;
+  background-color: #ffffff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.create-channel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.create-channel__title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.create-channel__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: #000000;
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
+
+  &:hover {
+    background-color: #eceefe;
+    color: #444df2;
+  }
+}
+
+.create-channel__text {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+.create-channel__form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.create-channel__label {
+  margin-top: 12px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.create-channel__optional {
+  color: #686868;
+  font-weight: 400;
+}
+
+.create-channel__field {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 24px;
+  border: 1px solid #adb0d9;
+  border-radius: 30px;
+
+  &:focus-within {
+    border-color: #444df2;
+  }
+}
+
+.create-channel__hash {
+  color: #686868;
+}
+
+.create-channel__input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 18px;
+  color: #000000;
+
+  &::placeholder {
+    color: #686868;
+  }
+}
+
+.create-channel__submit {
+  align-self: flex-end;
+  margin-top: 24px;
+  padding: 12px 32px;
+  border: none;
+  border-radius: 30px;
+  background-color: #444df2;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+
+  &:hover {
+    background-color: #797ef3;
+  }
+}
