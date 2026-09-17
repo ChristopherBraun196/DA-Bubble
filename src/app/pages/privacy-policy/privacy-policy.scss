@@ -1,0 +1,64 @@
+@use '../../../styles/variables' as variable;
+
+:host {
+  display: block;
+  min-height: 100vh;
+  background-color: variable.$background;
+}
+
+.mw-850 {
+  display: flex;
+  justify-content: center;
+  align-items: start;
+
+  padding-left: 300px;
+  margin: 0 auto;
+  margin-top: 100px;
+}
+
+.policy-card {
+  width: 100%;
+  max-height: 60vh;
+
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: variable.$purple-primary;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+
+  scrollbar-width: thin;
+  scrollbar-color: variable.$purple-primary transparent;
+}
+
+h1 {
+  font-size: 46px;
+  font-weight: 700;
+  color: variable.$purple-primary;
+}
+
+h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: variable.$purple-primary;
+  padding-top: 8px;
+}
+
+p {
+  font-size: 20px;
+  font-weight: 400;
+}
+
+.line-small {
+  line-height: 0.6;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
