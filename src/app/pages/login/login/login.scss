@@ -101,7 +101,7 @@
     align-content: center;
     align-items: center;
     max-width: 500px;
-    height: 700px;
+    height: 750px;
     width: 100%;
     background-color: variables.$white;
     border-radius: 30px;
@@ -124,7 +124,7 @@
     width: 400px;
     height: 50px;
     border-radius: 100px;
-    margin-bottom: 36px;
+    margin-bottom: 6px;
     border: none;
     background-color: variables.$background;
 
@@ -158,6 +158,24 @@
   input[type='password'] {
     background-image: url('/icons/lock.svg');
     padding-left: 60px;
+  }
+
+  .error-slot {
+    width: 400px;
+    // padding-left: 24px;
+    min-height: 20px;
+    color: #ed1e79;
+    font-size: 14px;
+    margin-bottom: 36px;
+    text-align: start;
+  }
+
+  .error-text {
+    visibility: hidden;
+
+    &--visible {
+      visibility: visible;
+    }
   }
 
   a {
