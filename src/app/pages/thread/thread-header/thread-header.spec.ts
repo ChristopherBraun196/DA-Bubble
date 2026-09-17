@@ -12,6 +12,7 @@ describe('ThreadHeader', () => {
 
     fixture = TestBed.createComponent(ThreadHeader);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('channelName', 'Entwicklerteam');
     await fixture.whenStable();
   });
 

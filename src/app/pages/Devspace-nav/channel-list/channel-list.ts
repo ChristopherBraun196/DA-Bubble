@@ -13,7 +13,6 @@ export interface Channel {
   templateUrl: './channel-list.html',
 })
 export class ChannelList {
-  /** Kommt aus devspace-nav, damit immer nur ein Eintrag insgesamt aktiv ist. */
   readonly activeChannelId = input<string | null>(null);
   readonly channelSelected = output<string>();
 

@@ -1,0 +1,103 @@
+.chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 24px;
+
+  box-shadow: 0 8px 8px -6px rgba(0, 0, 0, 0.1);
+}
+
+.chat-header__channel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 30px;
+  background: transparent;
+  color: #000000;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
+
+  &:hover {
+    background-color: #eceefe;
+    color: #444df2;
+  }
+}
+
+.chat-header__hash {
+  font-size: 28px;
+}
+
+.chat-header__name {
+  font-size: 24px;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-header__members {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 0 0 auto;
+}
+
+.chat-header__avatars {
+  display: flex;
+  align-items: center;
+  padding: 4px 12px 4px 4px;
+  border: none;
+  border-radius: 30px;
+  background: transparent;
+  color: #000000;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+
+  &:hover {
+    background-color: #eceefe;
+  }
+}
+
+.chat-header__avatar {
+  width: 40px;
+  height: 40px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  object-fit: cover;
+
+  /* Die Avatare ueberlappen sich leicht. */
+  & + & {
+    margin-left: -12px;
+  }
+}
+
+.chat-header__count {
+  margin-left: 12px;
+  font-size: 20px;
+}
+
+.chat-header__add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background-color: #eceefe;
+  color: #000000;
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
+
+  &:hover {
+    background-color: #444df2;
+    color: #ffffff;
+  }
+}

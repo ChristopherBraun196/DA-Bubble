@@ -10,4 +10,19 @@ export class Topbar {
   /** Platzhalter, bis der echte User aus dem Auth-Service kommt. */
   protected readonly userName = signal('Gast');
   protected readonly userAvatar = signal('/img/Profile_Guest.png');
+
+  protected readonly menuOpen = signal(false);
+
+  protected toggleMenu(): void {
+    this.menuOpen.update((value) => !value);
+  }
+
+  protected closeMenu(): void {
+    this.menuOpen.set(false);
+  }
+
+  protected logout(): void {
+    // TODO: an den Auth-Service anbinden, sobald Firebase eingerichtet ist.
+    this.closeMenu();
+  }
 }

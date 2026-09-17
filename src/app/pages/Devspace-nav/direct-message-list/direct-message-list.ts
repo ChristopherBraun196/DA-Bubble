@@ -15,7 +15,6 @@ export interface DirectMessageUser {
   templateUrl: './direct-message-list.html',
 })
 export class DirectMessageList {
-  /** Kommt aus devspace-nav, damit immer nur ein Eintrag insgesamt aktiv ist. */
   readonly activeUserId = input<string | null>(null);
   readonly userSelected = output<string>();
 

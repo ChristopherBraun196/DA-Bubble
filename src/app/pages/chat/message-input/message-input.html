@@ -1,1 +1,22 @@
-<p>message-input works!</p>
+<form class="message-input" (submit)="$event.preventDefault()">
+  <textarea
+    class="message-input__field"
+    name="message"
+    rows="2"
+    [placeholder]="placeholder()"
+    [attr.aria-label]="placeholder()"
+  ></textarea>
+
+  <div class="message-input__actions">
+    <button class="message-input__icon" type="button" aria-label="Emoji einfügen">
+      <span class="material-symbols-outlined">sentiment_satisfied</span>
+    </button>
+    <button class="message-input__icon" type="button" aria-label="Person erwähnen">
+      <span class="material-symbols-outlined">alternate_email</span>
+    </button>
+
+    <button class="message-input__send" type="submit" aria-label="Senden">
+      <span class="material-symbols-outlined">send</span>
+    </button>
+  </div>
+</form>

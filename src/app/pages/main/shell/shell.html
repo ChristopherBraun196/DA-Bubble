@@ -1,7 +1,11 @@
 <div class="shell">
   <app-topbar />
 
-  <div class="shell__workspace" [class.shell__workspace--devspace-closed]="!devspaceOpen()">
+  <div
+    class="shell__workspace"
+    [class.shell__workspace--devspace-closed]="!devspaceOpen()"
+    [class.shell__workspace--thread-closed]="!threadOpen()"
+  >
     @if (devspaceOpen()) {
       <aside class="shell__devspace">
         <app-devspace-nav />
@@ -12,9 +16,11 @@
       <app-chat-view />
     </main>
 
-    <aside class="shell__thread">
-      <app-thread-panel />
-    </aside>
+    @if (threadOpen()) {
+      <aside class="shell__thread">
+        <app-thread-panel (closed)="closeThread()" />
+      </aside>
+    }
 
     <button class="shell__devspace-toggle" type="button" (click)="toggleDevspace()">
       <span class="material-symbols-outlined">
@@ -24,5 +30,16 @@
         Workspace-Menü {{ devspaceOpen() ? 'schließen' : 'öffnen' }}
       </span>
     </button>
+
+    @if (!threadOpen()) {
+      <button
+        class="shell__thread-toggle"
+        type="button"
+        aria-label="Thread öffnen"
+        (click)="toggleThread()"
+      >
+        <span class="material-symbols-outlined">chevron_left</span>
+      </button>
+    }
   </div>
 </div>
