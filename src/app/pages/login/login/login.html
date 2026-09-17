@@ -27,7 +27,12 @@
         class="input-pill"
         [class.input-pill--error]="form.get('email')?.invalid && form.get('email')?.touched"
       >
-        <input formControlName="email" type="email" placeholder="beispielname@email.com" />
+        <input
+          formControlName="email"
+          type="email"
+          placeholder="beispielname@email.com"
+          (input)="clearLoginError()"
+        />
       </label>
       <div class="error-slot">
         <span
@@ -40,18 +45,25 @@
 
       <label
         class="input-pill"
-        [class.input-pill--error]="form.get('password')?.invalid && form.get('password')?.touched"
+        [class.input-pill--error]="
+          (form.get('password')?.invalid && form.get('password')?.touched) || loginError()
+        "
       >
-        <input formControlName="password" type="password" placeholder="Passwort" />
+        <input
+          formControlName="password"
+          type="password"
+          placeholder="Passwort"
+          (input)="clearLoginError()"
+        />
       </label>
       <div class="error-slot">
         <span
           class="error-text"
           [class.error-text--visible]="
-            form.get('password')?.invalid && form.get('password')?.touched
+            (form.get('password')?.invalid && form.get('password')?.touched) || loginError()
           "
         >
-          Falsches Passwort oder E-Mail. Bitte noch einmal versuchen.
+          {{ loginErrorMessage() || 'Falsches Passwort oder E-Mail. Bitte noch einmal versuchen.' }}
         </span>
       </div>
 
@@ -59,14 +71,26 @@
 
       <div class="divider">ODER</div>
 
-      <button type="button" class="btn-google" (click)="loginWithGoogle()">
+      <button
+        type="button"
+        class="btn-google"
+        [disabled]="loginPending()"
+        (click)="loginWithGoogle()"
+      >
         <img src="icons/google.svg" alt="" />
         Anmelden mit Google
       </button>
 
       <div class="actions">
-        <button class="btn-primary" type="submit">Anmelden</button>
-        <button class="btn-secondary" type="button" (click)="loginAsGuest()">Gäste-Login</button>
+        <button class="btn-primary" type="submit" [disabled]="loginPending()">Anmelden</button>
+        <button
+          class="btn-secondary"
+          type="button"
+          [disabled]="loginPending()"
+          (click)="loginAsGuest()"
+        >
+          Gäste-Login
+        </button>
       </div>
     </form>
   </section>

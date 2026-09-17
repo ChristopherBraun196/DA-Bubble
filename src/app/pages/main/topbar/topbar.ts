@@ -1,5 +1,7 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
+
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   imports: [],
@@ -8,11 +10,22 @@ import { Router } from '@angular/router';
   templateUrl: './topbar.html',
 })
 export class Topbar {
+  private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
 
-  /** Platzhalter, bis der echte User aus dem Auth-Service kommt. */
-  protected readonly userName = signal('Gast');
-  protected readonly userAvatar = signal('/img/Profile_Guest.png');
+  protected readonly userName = computed(() => {
+    const user = this.auth.currentUser();
+
+    if (!user || user.isAnonymous) {
+      return 'Gast';
+    }
+
+    return user.displayName || user.email?.split('@')[0] || 'Nutzer';
+  });
+
+  protected readonly userAvatar = computed(
+    () => this.auth.currentUser()?.photoURL || '/img/Profile_Guest.png',
+  );
 
   protected readonly menuOpen = signal(false);
 
@@ -24,9 +37,9 @@ export class Topbar {
     this.menuOpen.set(false);
   }
 
-  protected logout(): void {
-    // TODO: an den Auth-Service anbinden, sobald Firebase eingerichtet ist.
+  protected async logout(): Promise<void> {
     this.closeMenu();
-    void this.router.navigateByUrl('/');
+    await this.auth.logout();
+    await this.router.navigateByUrl('/', { replaceUrl: true });
   }
 }

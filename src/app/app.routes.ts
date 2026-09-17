@@ -1,28 +1,36 @@
 import { Routes } from '@angular/router';
-import { Shell } from './pages/main/shell/shell';
-
-import { Intro } from './pages/intro/intro';
-import { Login } from './pages/login/login/login';
-import { Register } from './pages/login/register/register';
-import { PasswordReset } from './pages/login/password-reset/password-reset';
-import { Imprint } from './pages/imprint/imprint';
-import { PrivacyPolicy } from './pages/privacy-policy/privacy-policy';
 
 export const routes: Routes = [
   {
     path: '',
-    component: Intro,
+    loadComponent: () => import('./pages/intro/intro').then((module) => module.Intro),
     pathMatch: 'full',
   },
   {
     path: 'login',
-    component: Login,
+    loadComponent: () => import('./pages/login/login/login').then((module) => module.Login),
   },
-  { path: 'register', component: Register },
-  { path: 'password-reset', component: PasswordReset },
-
-  { path: 'impressum', component: Imprint },
-  { path: 'datenschutz', component: PrivacyPolicy },
-
-  { path: 'main', component: Shell },
+  {
+    path: 'register',
+    loadComponent: () =>
+      import('./pages/login/register/register').then((module) => module.Register),
+  },
+  {
+    path: 'password-reset',
+    loadComponent: () =>
+      import('./pages/login/password-reset/password-reset').then((module) => module.PasswordReset),
+  },
+  {
+    path: 'impressum',
+    loadComponent: () => import('./pages/imprint/imprint').then((module) => module.Imprint),
+  },
+  {
+    path: 'datenschutz',
+    loadComponent: () =>
+      import('./pages/privacy-policy/privacy-policy').then((module) => module.PrivacyPolicy),
+  },
+  {
+    path: 'main',
+    loadComponent: () => import('./pages/main/shell/shell').then((module) => module.Shell),
+  },
 ];
