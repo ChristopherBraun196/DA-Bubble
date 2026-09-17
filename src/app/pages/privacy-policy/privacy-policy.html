@@ -1,1 +1,101 @@
-<p>privacy-policy works!</p>
+<main>
+  <app-header></app-header>
+  <div class="mw-1440">
+    <section class="mw-850">
+      <div class="policy-card">
+        <a class="back-button" [routerLink]="['/login']">
+          <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+
+        <h1>Datenschutzerklärung</h1>
+
+        <h2>1. Verantwortlicher</h2>
+        <div class="line-small">
+          <p>Christopher Braun</p>
+          <p>Cramerstr. 3A</p>
+          <p>55450 Langenlonsheim</p>
+        </div>
+
+        <p>
+          Email:
+          <a href="mailto:kontakt@christopher-braun-dev.de">kontakt@christopher-braun-dev.de</a>
+        </p>
+
+        <h2>2. Allgemeines zur Datenverarbeitung</h2>
+        <p>
+          Wir verarbeiten personenbezogene Daten unserer Nutzer grundsätzlich nur, soweit dies zur
+          Bereitstellung einer funktionsfähigen Anwendung sowie unserer Inhalte und Leistungen
+          erforderlich ist. Die Verarbeitung erfolgt regelmäßig nur nach Einwilligung des Nutzers
+          (Art. 6 Abs. 1 lit. a DSGVO) oder soweit sie zur Erfüllung eines Vertrags bzw.
+          vorvertraglicher Maßnahmen erforderlich ist (Art. 6 Abs. 1 lit. b DSGVO).
+        </p>
+
+        <h2>3. Registrierung und Login (Firebase Authentication)</h2>
+        <p>
+          DA-Bubble nutzt für die Registrierung und Anmeldung den Dienst „Firebase Authentication"
+          der Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland („Google"). Bei
+          der Registrierung per E-Mail/Passwort werden E-Mail-Adresse, Passwort (verschlüsselt
+          gespeichert) und ein von uns vergebener Anzeigename verarbeitet.
+        </p>
+        <p>
+          Alternativ kann die Anmeldung über „Google-Login" (Firebase Authentication mit
+          Google-Anbieter) erfolgen. Dabei übermittelt Google an uns die mit dem Google-Konto
+          verknüpfte E-Mail-Adresse, den Namen und ggf. ein Profilbild. Es gelten ergänzend die
+          Datenschutzbestimmungen von Google (<a
+            href="https://policies.google.com/privacy"
+            target="_blank"
+            rel="noopener"
+            >https://policies.google.com/privacy</a
+          >).
+        </p>
+        <p>
+          Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Erfüllung des Nutzungsvertrags) sowie bei
+          Google-Login zusätzlich Art. 6 Abs. 1 lit. a DSGVO (Einwilligung durch aktive Auswahl der
+          Login-Methode).
+        </p>
+
+        <h2>4. Speicherung von Chat- und Nutzungsdaten (Cloud Firestore)</h2>
+        <p>
+          Zur Bereitstellung der Chat-Funktionen (Nachrichten, Kanäle, Reaktionen, Profildaten)
+          nutzen wir die Datenbank „Cloud Firestore" von Google. Die von Nutzern erstellten Inhalte
+          (z. B. Nachrichtentexte, Kanalnamen, hochgeladene Profilbilder) werden dort gespeichert
+          und verarbeitet, solange dies zur Bereitstellung der Anwendung erforderlich ist bzw. bis
+          zur Löschung durch den Nutzer.
+        </p>
+        <p>Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO.</p>
+
+        <h2>5. Hosting</h2>
+        <p>
+          Diese Anwendung wird über Firebase Hosting (Google) bereitgestellt. Beim Aufruf werden
+          automatisch technische Verbindungsdaten (u. a. IP-Adresse, Datum und Uhrzeit des Zugriffs,
+          verwendeter Browser) in Server-Logfiles erfasst. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f
+          DSGVO (berechtigtes Interesse an der technischen Bereitstellung und Sicherheit).
+        </p>
+
+        <h2>6. Datenübermittlung in Drittländer</h2>
+        <p>
+          Die genannten Dienste von Google können Daten auch auf Servern außerhalb der EU/des EWR,
+          u. a. in den USA, verarbeiten. Google hat sich zur Einhaltung der EU-Standardvertrags­
+          klauseln verpflichtet; weitere Informationen finden sich in den oben verlinkten
+          Datenschutzbestimmungen von Google.
+        </p>
+
+        <h2>7. Rechte der betroffenen Person</h2>
+        <p>
+          Nutzer haben das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der
+          Verarbeitung, Datenübertragbarkeit sowie Widerspruch gegen die Verarbeitung ihrer
+          personenbezogenen Daten. Zudem besteht ein Beschwerderecht bei einer
+          Datenschutz-Aufsichtsbehörde. Anfragen richten Sie bitte an die oben genannte
+          E-Mail-Adresse.
+        </p>
+
+        <h2>8. Widerruf der Einwilligung</h2>
+        <p>
+          Soweit die Verarbeitung auf einer Einwilligung beruht, kann diese jederzeit mit Wirkung
+          für die Zukunft widerrufen werden, z. B. durch Löschung des Nutzerkontos oder eine
+          formlose Mitteilung an die oben genannte E-Mail-Adresse.
+        </p>
+      </div>
+    </section>
+  </div>
+</main>
