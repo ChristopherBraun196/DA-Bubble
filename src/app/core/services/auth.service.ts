@@ -1,4 +1,4 @@
-import { DestroyRef, inject, Injectable, signal } from '@angular/core';
+import { computed, DestroyRef, inject, Injectable, signal } from '@angular/core';
 import {
   createUserWithEmailAndPassword,
   deleteUser,
@@ -24,6 +24,20 @@ export class AuthService {
 
   readonly currentUser = signal<User | null>(null);
   readonly authInitialized = signal(false);
+
+  readonly displayName = computed(() => {
+    const user = this.currentUser();
+
+    if (!user || user.isAnonymous) {
+      return 'Gast';
+    }
+
+    return user.displayName || user.email?.split('@')[0] || 'Nutzer';
+  });
+
+  readonly photoURL = computed(
+    () => this.currentUser()?.photoURL || '/img/Profile_Guest.png',
+  );
 
   constructor() {
     if (!this.firebase.isBrowser) {
