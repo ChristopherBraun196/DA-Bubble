@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { Header } from '../shared/header/header';
 import { RouterLink } from '@angular/router';
 import { FormGroup, FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -15,4 +15,5 @@ export class PasswordReset {
   });
 
   clearLoginError() {}
+  onSubmit() {}
 }
