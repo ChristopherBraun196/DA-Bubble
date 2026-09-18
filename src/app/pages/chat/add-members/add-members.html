@@ -1,0 +1,36 @@
+<div
+  class="add-members"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="add-members-title"
+  (click)="$event.stopPropagation()"
+>
+  <header class="add-members__header">
+    <h2 class="add-members__title" id="add-members-title">Leute hinzufügen</h2>
+    <button class="add-members__close" type="button" aria-label="Schließen" (click)="closed.emit()">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+  </header>
+
+  <p class="add-members__channel">
+    <span class="material-symbols-outlined">tag</span>
+    {{ channelName() }}
+  </p>
+
+  <form class="add-members__form" (submit)="$event.preventDefault(); add()">
+    <div class="add-members__field">
+      <input
+        class="add-members__input"
+        name="person-name"
+        type="text"
+        placeholder="Name eingeben"
+        aria-label="Name eingeben"
+        required
+        [value]="personName()"
+        (input)="updatePersonName($event)"
+      />
+    </div>
+
+    <button class="add-members__submit" type="submit" [disabled]="!canAdd()">Hinzufügen</button>
+  </form>
+</div>

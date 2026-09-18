@@ -18,4 +18,16 @@ describe('MembersDialog', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should emit addRequested when the add button is clicked', () => {
+    let emitted = false;
+    component.addRequested.subscribe(() => (emitted = true));
+
+    const button = fixture.nativeElement.querySelector('.members-dialog__add') as HTMLButtonElement;
+    expect(button).toBeTruthy();
+
+    button.click();
+
+    expect(emitted).toBe(true);
+  });
 });

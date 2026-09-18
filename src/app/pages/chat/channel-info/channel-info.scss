@@ -1,0 +1,167 @@
+:host {
+  display: block;
+}
+
+.channel-info {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 700px;
+  max-width: 100%;
+  padding: 32px;
+  border-radius: 0 30px 30px 30px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.16);
+}
+
+.channel-info__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.channel-info__title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.channel-info__hash {
+  font-size: 28px;
+}
+
+.channel-info__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: #000000;
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
+
+  &:hover {
+    background-color: #eceefe;
+    color: #444df2;
+  }
+}
+
+.channel-info__section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  border: 1px solid #adb0d9;
+  border-radius: 20px;
+
+  &--editing {
+    padding: 0;
+    border-color: transparent;
+  }
+}
+
+.channel-info__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.channel-info__label {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.channel-info__action {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 20px;
+  background: transparent;
+  color: #535af1;
+  font-family: inherit;
+  font-size: 18px;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+
+  &:hover {
+    background-color: #eceefe;
+  }
+}
+
+.channel-info__value {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+.channel-info__field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 20px;
+  border: 1px solid #adb0d9;
+  border-radius: 30px;
+
+  &:focus-within {
+    border-color: #444df2;
+  }
+}
+
+.channel-info__input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: none;
+  outline: none;
+  resize: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 18px;
+  color: #000000;
+
+  &::placeholder {
+    color: #686868;
+  }
+}
+
+.channel-info__divider {
+  width: 100%;
+  margin: 8px 0;
+  border: none;
+  border-top: 1px solid #adb0d9;
+}
+
+.channel-info__creator {
+  margin: 0;
+  color: #535af1;
+  font-size: 20px;
+}
+
+.channel-info__leave {
+  align-self: flex-end;
+  padding: 12px 32px;
+  border: none;
+  border-radius: 30px;
+  background-color: #444df2;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+
+  &:hover {
+    background-color: #797ef3;
+  }
+}

@@ -1,16 +1,27 @@
 <header class="chat-header">
-  <button class="chat-header__channel" type="button">
+  <button
+    class="chat-header__channel"
+    type="button"
+    [attr.aria-expanded]="dialog() === 'channel'"
+    (click)="toggleChannel()"
+  >
     <span class="material-symbols-outlined chat-header__hash">tag</span>
     <span class="chat-header__name">{{ channelName() }}</span>
     <span class="material-symbols-outlined">expand_more</span>
   </button>
+
+  @if (dialog() === 'channel') {
+    <div class="chat-header__dialog chat-header__dialog--left">
+      <app-channel-info [channelName]="channelName()" (closed)="closeDialog()" />
+    </div>
+  }
 
   <div class="chat-header__members">
     <button
       class="chat-header__avatars"
       type="button"
       aria-label="Mitglieder anzeigen"
-      [attr.aria-expanded]="membersOpen()"
+      [attr.aria-expanded]="dialog() === 'members'"
       (click)="toggleMembers()"
     >
       @for (member of members(); track member) {
@@ -19,18 +30,27 @@
       <span class="chat-header__count">{{ members().length }}</span>
     </button>
 
-    <button class="chat-header__add" type="button" aria-label="Mitglieder hinzufügen">
+    <button
+      class="chat-header__add"
+      type="button"
+      aria-label="Mitglieder hinzufügen"
+      (click)="openAdd()"
+    >
       <span class="material-symbols-outlined">person_add</span>
     </button>
 
-    @if (membersOpen()) {
+    @if (dialog() === 'members' || dialog() === 'add') {
       <div class="chat-header__dialog">
-        <app-members-dialog (closed)="closeMembers()" />
+        @if (dialog() === 'members') {
+          <app-members-dialog (closed)="closeDialog()" (addRequested)="openAdd()" />
+        } @else {
+          <app-add-members [channelName]="channelName()" (closed)="closeDialog()" />
+        }
       </div>
     }
   </div>
 </header>
 
-@if (membersOpen()) {
-  <div class="chat-header__backdrop" (click)="closeMembers()"></div>
+@if (dialog() !== 'none') {
+  <div class="chat-header__backdrop" (click)="closeDialog()"></div>
 }

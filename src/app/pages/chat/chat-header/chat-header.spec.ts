@@ -19,4 +19,18 @@ describe('ChatHeader', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should switch from the members card to the add dialog', async () => {
+    const element = fixture.nativeElement as HTMLElement;
+
+    (element.querySelector('.chat-header__avatars') as HTMLButtonElement).click();
+    await fixture.whenStable();
+    expect(element.querySelector('.members-dialog')).toBeTruthy();
+
+    (element.querySelector('.members-dialog__add') as HTMLButtonElement).click();
+    await fixture.whenStable();
+
+    expect(element.querySelector('.members-dialog')).toBeNull();
+    expect(element.querySelector('.add-members')).toBeTruthy();
+  });
 });

@@ -20,6 +20,7 @@ export class MembersDialog {
   private readonly auth = inject(AuthService);
 
   readonly closed = output<void>();
+  readonly addRequested = output<void>();
 
   /** Der eingeloggte User steht immer an erster Stelle. */
   private readonly currentUser = computed<ChannelMember>(() => ({
@@ -41,7 +42,6 @@ export class MembersDialog {
   ]);
 
   protected addMembers(): void {
-    // TODO: Dialog zum Hinzufuegen oeffnen, sobald Firebase die Mitglieder liefert.
-    this.closed.emit();
+    this.addRequested.emit();
   }
 }

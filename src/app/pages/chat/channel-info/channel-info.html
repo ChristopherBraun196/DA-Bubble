@@ -1,0 +1,95 @@
+<div
+  class="channel-info"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="channel-info-title"
+  (click)="$event.stopPropagation()"
+>
+  <header class="channel-info__header">
+    <h2 class="channel-info__title" id="channel-info-title">
+      <span class="material-symbols-outlined channel-info__hash">tag</span>
+      {{ name() }}
+    </h2>
+    <button class="channel-info__close" type="button" aria-label="Schließen" (click)="closed.emit()">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+  </header>
+
+  <section class="channel-info__section" [class.channel-info__section--editing]="editingName()">
+    <div class="channel-info__row">
+      <span class="channel-info__label">Channel-Name</span>
+
+      @if (editingName()) {
+        <button class="channel-info__action" type="button" (click)="saveName()">Speichern</button>
+      } @else {
+        <button class="channel-info__action" type="button" (click)="startNameEdit()">
+          Bearbeiten
+        </button>
+      }
+    </div>
+
+    @if (editingName()) {
+      <div class="channel-info__field">
+        <span class="material-symbols-outlined channel-info__hash">tag</span>
+        <input
+          class="channel-info__input"
+          name="channel-name"
+          type="text"
+          aria-label="Channel-Name"
+          [placeholder]="name()"
+          [value]="nameDraft()"
+          (input)="updateNameDraft($event)"
+        />
+      </div>
+    } @else {
+      <p class="channel-info__value">
+        <span class="material-symbols-outlined channel-info__hash">tag</span>
+        {{ name() }}
+      </p>
+    }
+  </section>
+
+  <section
+    class="channel-info__section"
+    [class.channel-info__section--editing]="editingDescription()"
+  >
+    <div class="channel-info__row">
+      <span class="channel-info__label">Beschreibung</span>
+
+      @if (editingDescription()) {
+        <button class="channel-info__action" type="button" (click)="saveDescription()">
+          Speichern
+        </button>
+      } @else {
+        <button class="channel-info__action" type="button" (click)="startDescriptionEdit()">
+          Bearbeiten
+        </button>
+      }
+    </div>
+
+    @if (editingDescription()) {
+      <div class="channel-info__field">
+        <textarea
+          class="channel-info__input"
+          name="channel-description"
+          rows="2"
+          aria-label="Beschreibung"
+          placeholder="Dein Text hier"
+          [value]="descriptionDraft()"
+          (input)="updateDescriptionDraft($event)"
+        ></textarea>
+      </div>
+    } @else {
+      <p class="channel-info__value">{{ description() }}</p>
+    }
+
+    <hr class="channel-info__divider" />
+
+    <span class="channel-info__label">Erstellt von</span>
+    <p class="channel-info__creator">{{ createdBy() }}</p>
+  </section>
+
+  <button class="channel-info__leave" type="button" (click)="leaveChannel()">
+    Channel verlassen
+  </button>
+</div>

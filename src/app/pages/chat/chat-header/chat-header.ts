@@ -1,9 +1,14 @@
 import { Component, input, signal } from '@angular/core';
 
+import { AddMembers } from '../add-members/add-members';
+import { ChannelInfo } from '../channel-info/channel-info';
 import { MembersDialog } from '../members-dialog/members-dialog';
 
+/** Es ist immer hoechstens eine Card offen. */
+export type ChatHeaderDialog = 'none' | 'channel' | 'members' | 'add';
+
 @Component({
-  imports: [MembersDialog],
+  imports: [MembersDialog, AddMembers, ChannelInfo],
   selector: 'app-chat-header',
   styleUrl: './chat-header.scss',
   templateUrl: './chat-header.html',
@@ -13,13 +18,22 @@ export class ChatHeader {
   /** Platzhalter-Avatare, kommen spaeter aus Firebase. */
   readonly members = input<string[]>([]);
 
-  protected readonly membersOpen = signal(false);
+  protected readonly dialog = signal<ChatHeaderDialog>('none');
 
-  protected toggleMembers(): void {
-    this.membersOpen.update((value) => !value);
+  protected toggleChannel(): void {
+    this.dialog.update((current) => (current === 'channel' ? 'none' : 'channel'));
   }
 
-  protected closeMembers(): void {
-    this.membersOpen.set(false);
+  protected toggleMembers(): void {
+    this.dialog.update((current) => (current === 'members' ? 'none' : 'members'));
+  }
+
+  /** Wird aus der Mitglieder-Card und ueber den Plus-Button aufgerufen. */
+  protected openAdd(): void {
+    this.dialog.set('add');
+  }
+
+  protected closeDialog(): void {
+    this.dialog.set('none');
   }
 }

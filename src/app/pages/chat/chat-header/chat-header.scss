@@ -1,4 +1,5 @@
 .chat-header {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -60,6 +61,12 @@
   top: calc(100% + 12px);
   right: 0;
   z-index: 11;
+
+  /* Die Channel-Card haengt am linken Rand unter dem Channel-Button. */
+  &--left {
+    right: auto;
+    left: 0;
+  }
 }
 
 .chat-header__avatars {
