@@ -1,25 +1,8 @@
-.login-shell__brand {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.login-shell__icon {
-  width: 70px;
-  height: 70px;
-}
-
-.login-shell__wordmark {
-  width: 156.11px;
-  height: 24px;
-}
-
 .auth-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: 1440px;
-  margin: 0 auto;
+  width: 100%;
   padding: 75px;
 }
 
