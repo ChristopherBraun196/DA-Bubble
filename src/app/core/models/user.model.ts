@@ -7,6 +7,7 @@ export interface AppUser {
   email: string | null;
   photoURL: string;
   isAnonymous: boolean;
+  onboardingCompleted: boolean;
   createdAt: Timestamp | null;
   updatedAt: Timestamp | null;
   lastSeenAt: Timestamp | null;

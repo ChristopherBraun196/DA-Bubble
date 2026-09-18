@@ -17,9 +17,7 @@
   > app-header {
     position: absolute;
     z-index: 2;
-    top: 0;
-    left: 0;
-    width: 100%;
+    inset: 0 0 auto;
   }
 }
 
@@ -81,8 +79,7 @@
 
     h1 {
       width: 329px;
-      margin: 0;
-      margin-left: 79px;
+      margin: 0 0 0 79px;
       color: variables.$purple-primary;
       font-size: 46px;
       font-weight: 700;
@@ -337,17 +334,6 @@
   }
 }
 
-.visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  border: 0;
-  white-space: nowrap;
-}
-
 @media (max-width: 700px) {
   .register-shell {
     min-height: 900px;
@@ -385,9 +371,7 @@
     }
 
     &__fields {
-      right: 24px;
-      left: 24px;
-      width: auto;
+      inset-inline: 24px;
     }
 
     &__submit {

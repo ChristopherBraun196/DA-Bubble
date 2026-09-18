@@ -1,0 +1,61 @@
+<main class="avatar-shell">
+  <app-header />
+
+  @if (registration(); as registrationData) {
+    <section class="avatar-content">
+      <article class="avatar-card" [attr.aria-busy]="registrationPending()">
+        <a class="avatar-card__back" [routerLink]="['/register']" aria-label="Zurück">
+          <span aria-hidden="true"></span>
+        </a>
+
+        <h1>Wähle deinen Avatar</h1>
+
+        <div class="avatar-profile">
+          <img
+            class="avatar-profile__preview"
+            [src]="displayedAvatar()"
+            [alt]="'Profilbild von ' + registrationData.displayName"
+          />
+
+          <div class="avatar-profile__selection">
+            <h2>{{ registrationData.displayName }}</h2>
+            <p>Aus der Liste wählen</p>
+
+            <div class="avatar-list" aria-label="Avatar auswählen">
+              @for (avatarPath of avatarPaths; track avatarPath; let avatarNumber = $index) {
+                <button
+                  class="avatar-option"
+                  type="button"
+                  [class.avatar-option--selected]="selectedAvatar() === avatarPath"
+                  [attr.aria-label]="'Avatar ' + (avatarNumber + 1) + ' auswählen'"
+                  [attr.aria-pressed]="selectedAvatar() === avatarPath"
+                  (click)="selectAvatar(avatarPath)"
+                >
+                  <img [src]="avatarPath" alt="" />
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+
+        @if (registrationError()) {
+          <p class="avatar-card__error" role="alert">{{ registrationError() }}</p>
+        }
+
+        <button
+          class="avatar-card__submit"
+          type="button"
+          [disabled]="registrationPending()"
+          (click)="completeRegistration()"
+        >
+          Weiter
+        </button>
+      </article>
+    </section>
+  }
+
+  <footer class="avatar-footer">
+    <a [routerLink]="['/impressum']">Impressum</a>
+    <a [routerLink]="['/datenschutz']">Datenschutz</a>
+  </footer>
+</main>

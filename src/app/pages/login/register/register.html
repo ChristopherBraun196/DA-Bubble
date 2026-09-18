@@ -34,10 +34,7 @@
           </span>
         </label>
 
-        <label
-          class="register-field"
-          [class.register-field--error]="form.controls.email.invalid && form.controls.email.touched"
-        >
+        <label class="register-field" [class.register-field--error]="emailHasError()">
           <input
             class="register-field__input register-field__input--email"
             formControlName="email"
@@ -47,20 +44,13 @@
           />
           <span
             class="register-field__error"
-            [class.register-field__error--visible]="
-              form.controls.email.invalid && form.controls.email.touched
-            "
+            [class.register-field__error--visible]="emailHasError()"
           >
-            *Diese E-Mail-Adresse ist leider ungültig.
+            {{ emailErrorMessage() }}
           </span>
         </label>
 
-        <label
-          class="register-field"
-          [class.register-field--error]="
-            form.controls.password.invalid && form.controls.password.touched
-          "
-        >
+        <label class="register-field" [class.register-field--error]="passwordHasError()">
           <input
             class="register-field__input register-field__input--password"
             formControlName="password"
@@ -70,11 +60,9 @@
           />
           <span
             class="register-field__error"
-            [class.register-field__error--visible]="
-              form.controls.password.invalid && form.controls.password.touched
-            "
+            [class.register-field__error--visible]="passwordHasError()"
           >
-            Bitte geben Sie ein Passwort ein.
+            {{ passwordErrorMessage() }}
           </span>
         </label>
       </div>

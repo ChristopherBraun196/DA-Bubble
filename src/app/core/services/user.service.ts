@@ -14,6 +14,7 @@ export class UserService {
     const snapshot = await getDoc(userRef);
     const existingUser = snapshot.exists() ? (snapshot.data() as Partial<AppUser>) : null;
     const displayName = this.resolveDisplayName(authUser, existingUser);
+    const onboardingCompleted = this.resolveOnboardingStatus(authUser, existingUser);
 
     await setDoc(
       userRef,
@@ -24,9 +25,14 @@ export class UserService {
         email: authUser.email,
         photoURL: authUser.photoURL || existingUser?.photoURL || '/img/Profile_Guest.png',
         isAnonymous: authUser.isAnonymous,
+        onboardingCompleted,
         lastSeenAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
-        ...(snapshot.exists() ? {} : { createdAt: serverTimestamp() }),
+        ...(snapshot.exists()
+          ? {}
+          : {
+              createdAt: serverTimestamp(),
+            }),
       },
       { merge: true },
     );
@@ -48,5 +54,12 @@ export class UserService {
     }
 
     return authUser.email?.split('@')[0] || 'Nutzer';
+  }
+
+  private resolveOnboardingStatus(authUser: User, existingUser: Partial<AppUser> | null): boolean {
+    const usesGoogle = authUser.providerData.some(({ providerId }) => providerId === 'google.com');
+    return Boolean(
+      existingUser?.onboardingCompleted || authUser.isAnonymous || usesGoogle || authUser.photoURL,
+    );
   }
 }

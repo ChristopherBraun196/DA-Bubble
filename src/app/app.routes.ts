@@ -16,6 +16,11 @@ export const routes: Routes = [
       import('./pages/login/register/register').then((module) => module.Register),
   },
   {
+    path: 'choose-avatar',
+    loadComponent: () =>
+      import('./pages/login/choose-avatar/choose-avatar').then((module) => module.ChooseAvatar),
+  },
+  {
     path: 'password-reset',
     loadComponent: () =>
       import('./pages/login/password-reset/password-reset').then((module) => module.PasswordReset),

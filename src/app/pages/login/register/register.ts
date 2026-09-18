@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
+import { RegistrationDraftService } from '../../../core/services/registration-draft.service';
 import { Header } from '../shared/header/header';
 
 @Component({
@@ -11,10 +12,13 @@ import { Header } from '../shared/header/header';
   templateUrl: './register.html',
 })
 export class Register {
+  private readonly registrationDraft = inject(RegistrationDraftService);
+  private readonly router = inject(Router);
+
   protected readonly form = new FormGroup({
     name: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required],
+      validators: [Validators.required, Validators.pattern(/\S/)],
     }),
     email: new FormControl('', {
       nonNullable: true,
@@ -22,7 +26,7 @@ export class Register {
     }),
     password: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required],
+      validators: [Validators.required, Validators.minLength(6)],
     }),
     privacyAccepted: new FormControl(false, {
       nonNullable: true,
@@ -30,7 +34,56 @@ export class Register {
     }),
   });
 
+  constructor() {
+    const draft = this.registrationDraft.draft();
+
+    if (draft) {
+      this.form.setValue({
+        name: draft.displayName,
+        email: draft.email,
+        password: draft.password,
+        privacyAccepted: draft.privacyAccepted,
+      });
+    }
+  }
+
   protected onSubmit(): void {
-    this.form.markAllAsTouched();
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
+    this.saveRegistrationDraft();
+    void this.router.navigateByUrl('/choose-avatar');
+  }
+
+  protected emailHasError(): boolean {
+    return this.form.controls.email.invalid && this.form.controls.email.touched;
+  }
+
+  protected passwordHasError(): boolean {
+    return this.form.controls.password.invalid && this.form.controls.password.touched;
+  }
+
+  protected emailErrorMessage(): string {
+    return '*Diese E-Mail-Adresse ist leider ungültig.';
+  }
+
+  protected passwordErrorMessage(): string {
+    if (this.form.controls.password.hasError('minlength')) {
+      return 'Das Passwort muss mindestens 6 Zeichen lang sein.';
+    }
+
+    return 'Bitte geben Sie ein Passwort ein.';
+  }
+
+  private saveRegistrationDraft(): void {
+    const { name, email, password, privacyAccepted } = this.form.getRawValue();
+    this.registrationDraft.set({
+      displayName: name.trim(),
+      email: email.trim(),
+      password,
+      privacyAccepted,
+    });
   }
 }

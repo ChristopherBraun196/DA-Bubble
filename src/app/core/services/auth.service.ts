@@ -1,6 +1,7 @@
 import { DestroyRef, inject, Injectable, signal } from '@angular/core';
 import {
   createUserWithEmailAndPassword,
+  deleteUser,
   GoogleAuthProvider,
   onAuthStateChanged,
   sendPasswordResetEmail,
@@ -40,27 +41,34 @@ export class AuthService {
 
   async loginWithEmail(email: string, password: string): Promise<User> {
     const credential = await signInWithEmailAndPassword(this.firebase.auth, email, password);
-    await this.users.ensureUser(credential.user);
-    return credential.user;
+    return this.finishAuthentication(credential.user);
   }
 
   async loginWithGoogle(): Promise<User> {
     const credential = await signInWithPopup(this.firebase.auth, new GoogleAuthProvider());
-    await this.users.ensureUser(credential.user);
-    return credential.user;
+    return this.finishAuthentication(credential.user);
   }
 
   async loginAsGuest(): Promise<User> {
     const credential = await signInAnonymously(this.firebase.auth);
-    await this.users.ensureUser(credential.user);
-    return credential.user;
+    return this.finishAuthentication(credential.user);
   }
 
-  async registerWithEmail(email: string, password: string, displayName: string): Promise<User> {
+  async registerWithEmail(
+    email: string,
+    password: string,
+    displayName: string,
+    photoURL: string,
+  ): Promise<User> {
     const credential = await createUserWithEmailAndPassword(this.firebase.auth, email, password);
-    await updateProfile(credential.user, { displayName: displayName.trim() });
-    await this.users.ensureUser(credential.user);
-    return credential.user;
+
+    try {
+      await updateProfile(credential.user, { displayName: displayName.trim(), photoURL });
+      return await this.finishAuthentication(credential.user);
+    } catch (error) {
+      await deleteUser(credential.user).catch(() => undefined);
+      throw error;
+    }
   }
 
   async sendPasswordReset(email: string): Promise<void> {
@@ -69,5 +77,11 @@ export class AuthService {
 
   async logout(): Promise<void> {
     await signOut(this.firebase.auth);
+  }
+
+  private async finishAuthentication(user: User): Promise<User> {
+    await this.users.ensureUser(user);
+    this.currentUser.set(user);
+    return user;
   }
 }
