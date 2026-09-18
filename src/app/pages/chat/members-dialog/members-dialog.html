@@ -1,0 +1,36 @@
+<div
+  class="members-dialog"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="members-dialog-title"
+  (click)="$event.stopPropagation()"
+>
+  <header class="members-dialog__header">
+    <h2 class="members-dialog__title" id="members-dialog-title">Mitglieder</h2>
+    <button
+      class="members-dialog__close"
+      type="button"
+      aria-label="Schließen"
+      (click)="closed.emit()"
+    >
+      <span class="material-symbols-outlined">close</span>
+    </button>
+  </header>
+
+  <ul class="members-dialog__list">
+    @for (member of members(); track member.id) {
+      <li>
+        <app-user-list-item
+          [name]="member.name"
+          [avatar]="member.avatar"
+          [online]="member.online"
+        />
+      </li>
+    }
+  </ul>
+
+  <button class="members-dialog__add" type="button" (click)="addMembers()">
+    <span class="material-symbols-outlined">person_add</span>
+    <span>Mitglieder hinzufügen</span>
+  </button>
+</div>

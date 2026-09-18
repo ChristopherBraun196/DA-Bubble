@@ -6,7 +6,13 @@
   </button>
 
   <div class="chat-header__members">
-    <button class="chat-header__avatars" type="button" aria-label="Mitglieder anzeigen">
+    <button
+      class="chat-header__avatars"
+      type="button"
+      aria-label="Mitglieder anzeigen"
+      [attr.aria-expanded]="membersOpen()"
+      (click)="toggleMembers()"
+    >
       @for (member of members(); track member) {
         <img class="chat-header__avatar" [src]="member" alt="" />
       }
@@ -16,5 +22,15 @@
     <button class="chat-header__add" type="button" aria-label="Mitglieder hinzufügen">
       <span class="material-symbols-outlined">person_add</span>
     </button>
+
+    @if (membersOpen()) {
+      <div class="chat-header__dialog">
+        <app-members-dialog (closed)="closeMembers()" />
+      </div>
+    }
   </div>
 </header>
+
+@if (membersOpen()) {
+  <div class="chat-header__backdrop" (click)="closeMembers()"></div>
+}

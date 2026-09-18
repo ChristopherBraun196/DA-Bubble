@@ -41,10 +41,25 @@
 }
 
 .chat-header__members {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 12px;
   flex: 0 0 auto;
+}
+
+.chat-header__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.chat-header__dialog {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  z-index: 11;
 }
 
 .chat-header__avatars {
