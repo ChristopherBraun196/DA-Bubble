@@ -17,8 +17,13 @@
           class="register-field"
           [class.register-field--error]="form.controls.name.invalid && form.controls.name.touched"
         >
+          <img
+            class="register-field__icon register-field__icon--name"
+            src="/icons/person.svg"
+            alt=""
+          />
           <input
-            class="register-field__input register-field__input--name"
+            class="register-field__input"
             formControlName="name"
             type="text"
             autocomplete="name"
@@ -35,8 +40,13 @@
         </label>
 
         <label class="register-field" [class.register-field--error]="emailHasError()">
+          <img
+            class="register-field__icon register-field__icon--email"
+            src="/icons/mail.svg"
+            alt=""
+          />
           <input
-            class="register-field__input register-field__input--email"
+            class="register-field__input"
             formControlName="email"
             type="email"
             autocomplete="email"
@@ -51,8 +61,13 @@
         </label>
 
         <label class="register-field" [class.register-field--error]="passwordHasError()">
+          <img
+            class="register-field__icon register-field__icon--password"
+            src="/icons/lock.svg"
+            alt=""
+          />
           <input
-            class="register-field__input register-field__input--password"
+            class="register-field__input"
             formControlName="password"
             type="password"
             autocomplete="new-password"

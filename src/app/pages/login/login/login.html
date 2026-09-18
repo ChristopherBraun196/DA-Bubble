@@ -27,6 +27,7 @@
         class="input-pill"
         [class.input-pill--error]="form.get('email')?.invalid && form.get('email')?.touched"
       >
+        <img class="input-pill__icon input-pill__icon--email" src="/icons/mail.svg" alt="" />
         <input
           formControlName="email"
           type="email"
@@ -49,6 +50,7 @@
           (form.get('password')?.invalid && form.get('password')?.touched) || loginError()
         "
       >
+        <img class="input-pill__icon input-pill__icon--password" src="/icons/lock.svg" alt="" />
         <input
           formControlName="password"
           type="password"

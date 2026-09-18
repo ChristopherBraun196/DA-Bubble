@@ -150,10 +150,30 @@
   }
 
   .input-pill {
+    position: relative;
     display: block;
     width: 500px;
     height: 60px;
     margin-top: 46px;
+
+    &__icon {
+      position: absolute;
+      z-index: 1;
+      top: 50%;
+      left: 32px;
+      transform: translateY(-50%);
+      pointer-events: none;
+
+      &--email {
+        width: 20px;
+        height: 16px;
+      }
+
+      &--password {
+        width: 24px;
+        height: 24px;
+      }
+    }
   }
 
   .error-slot + .input-pill {
@@ -167,8 +187,6 @@
     border: 1px solid transparent;
     border-radius: 100px;
     background-color: variables.$background;
-    background-repeat: no-repeat;
-    background-position: 32px center;
     color: variables.$text-gray;
     font: inherit;
     font-size: 18px;
@@ -188,16 +206,6 @@
       color: variables.$text-gray;
       opacity: 1;
     }
-  }
-
-  input[type='email'] {
-    background-image: url('/icons/mail.svg');
-    background-size: 20px 16px;
-  }
-
-  input[type='password'] {
-    background-image: url('/icons/lock.svg');
-    background-size: 24px 24px;
   }
 
   .input-pill--error input {
