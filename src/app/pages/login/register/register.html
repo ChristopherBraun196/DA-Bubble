@@ -1,1 +1,108 @@
-<app-header></app-header>
+<main class="register-shell">
+  <app-header />
+
+  <section class="register-content">
+    <form class="register-card" [formGroup]="form" (ngSubmit)="onSubmit()">
+      <a class="register-card__back" [routerLink]="['/login']" aria-label="Zurück zur Anmeldung">
+        <span aria-hidden="true"></span>
+      </a>
+
+      <div class="register-card__heading">
+        <h1>Konto erstellen</h1>
+        <p>Mit deinem Namen und deiner E-Mail-Adresse hast du dein neues DABubble-Konto.</p>
+      </div>
+
+      <div class="register-card__fields">
+        <label
+          class="register-field"
+          [class.register-field--error]="form.controls.name.invalid && form.controls.name.touched"
+        >
+          <input
+            class="register-field__input register-field__input--name"
+            formControlName="name"
+            type="text"
+            autocomplete="name"
+            placeholder="Name und Nachname"
+          />
+          <span
+            class="register-field__error"
+            [class.register-field__error--visible]="
+              form.controls.name.invalid && form.controls.name.touched
+            "
+          >
+            Bitte schreiben Sie einen Namen.
+          </span>
+        </label>
+
+        <label
+          class="register-field"
+          [class.register-field--error]="form.controls.email.invalid && form.controls.email.touched"
+        >
+          <input
+            class="register-field__input register-field__input--email"
+            formControlName="email"
+            type="email"
+            autocomplete="email"
+            placeholder="beispielname@email.com"
+          />
+          <span
+            class="register-field__error"
+            [class.register-field__error--visible]="
+              form.controls.email.invalid && form.controls.email.touched
+            "
+          >
+            *Diese E-Mail-Adresse ist leider ungültig.
+          </span>
+        </label>
+
+        <label
+          class="register-field"
+          [class.register-field--error]="
+            form.controls.password.invalid && form.controls.password.touched
+          "
+        >
+          <input
+            class="register-field__input register-field__input--password"
+            formControlName="password"
+            type="password"
+            autocomplete="new-password"
+            placeholder="Passwort"
+          />
+          <span
+            class="register-field__error"
+            [class.register-field__error--visible]="
+              form.controls.password.invalid && form.controls.password.touched
+            "
+          >
+            Bitte geben Sie ein Passwort ein.
+          </span>
+        </label>
+      </div>
+
+      <div
+        class="privacy-consent"
+        [class.privacy-consent--error]="
+          form.controls.privacyAccepted.invalid && form.controls.privacyAccepted.touched
+        "
+      >
+        <label class="privacy-consent__checkbox">
+          <input formControlName="privacyAccepted" type="checkbox" />
+          <span class="visually-hidden">Datenschutzerklärung akzeptieren</span>
+        </label>
+
+        <div class="privacy-consent__text">
+          <span>Ich stimme der</span>
+          <a [routerLink]="['/datenschutz']">Datenschutzerklärung</a>
+          <span>zu.</span>
+        </div>
+      </div>
+
+      <button class="register-card__submit" type="submit">Weiter</button>
+    </form>
+  </section>
+
+  <footer class="register-footer">
+    <a [routerLink]="['/impressum']">Impressum</a>
+    <a [routerLink]="['/datenschutz']">Datenschutz</a>
+  </footer>
+</main>

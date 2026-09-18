@@ -41,3 +41,24 @@
   width: 156.11px;
   height: 24px;
 }
+
+@media (max-width: 700px) {
+  .auth-header {
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .auth-header__brand {
+    gap: 12px;
+  }
+
+  .auth-header__icon {
+    width: 56px;
+    height: 56px;
+  }
+
+  .auth-header__wordmark {
+    width: 136px;
+    height: auto;
+  }
+}
