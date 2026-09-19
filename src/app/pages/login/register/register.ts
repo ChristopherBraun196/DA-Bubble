@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { afterNextRender, Component, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
@@ -44,7 +44,10 @@ export class Register {
         password: draft.password,
         privacyAccepted: draft.privacyAccepted,
       });
+      return;
     }
+
+    afterNextRender(() => this.resetFormAfterReload());
   }
 
   protected onSubmit(): void {
@@ -84,6 +87,23 @@ export class Register {
       email: email.trim(),
       password,
       privacyAccepted,
+    });
+  }
+
+  private resetFormAfterReload(): void {
+    const [navigationEntry] = performance.getEntriesByType(
+      'navigation',
+    ) as PerformanceNavigationTiming[];
+
+    if (navigationEntry?.type !== 'reload') {
+      return;
+    }
+
+    this.form.reset({
+      name: '',
+      email: '',
+      password: '',
+      privacyAccepted: false,
     });
   }
 }
