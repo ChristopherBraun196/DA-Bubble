@@ -58,4 +58,20 @@
     <a [routerLink]="['/impressum']">Impressum</a>
     <a [routerLink]="['/datenschutz']">Datenschutz</a>
   </footer>
+
+  <div
+    class="account-created-overlay"
+    [class.account-created-overlay--visible]="accountCreated()"
+    [attr.aria-hidden]="!accountCreated()"
+    (click)="beginMainTransition()"
+  >
+    <div
+      class="account-created-toast"
+      role="status"
+      aria-live="polite"
+      (click)="$event.stopPropagation()"
+    >
+      Konto erfolgreich erstellt!
+    </div>
+  </div>
 </main>

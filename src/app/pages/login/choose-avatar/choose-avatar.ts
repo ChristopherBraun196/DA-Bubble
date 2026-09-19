@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FirebaseError } from 'firebase/app';
 
@@ -20,6 +20,8 @@ const REGISTRATION_ERROR_MESSAGES: Record<string, string> = {
 
 const DEFAULT_REGISTRATION_ERROR =
   'Die Registrierung ist fehlgeschlagen. Bitte versuche es erneut.';
+const SUCCESS_OVERLAY_DURATION = 1300;
+const MAIN_TRANSITION_DURATION = 200;
 
 @Component({
   imports: [Header, RouterLink],
@@ -29,8 +31,10 @@ const DEFAULT_REGISTRATION_ERROR =
 })
 export class ChooseAvatar {
   private readonly auth = inject(AuthService);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly registrationDraft = inject(RegistrationDraftService);
   private readonly router = inject(Router);
+  private navigationTimerId?: number;
 
   protected readonly registration = this.registrationDraft.draft;
   protected readonly avatarPaths = Array.from(
@@ -43,8 +47,11 @@ export class ChooseAvatar {
   );
   protected readonly registrationPending = signal(false);
   protected readonly registrationError = signal('');
+  protected readonly accountCreated = signal(false);
 
   constructor() {
+    this.destroyRef.onDestroy(() => this.clearNavigationTimer());
+
     if (!this.registration()) {
       void this.router.navigateByUrl('/register', { replaceUrl: true });
     }
@@ -65,18 +72,55 @@ export class ChooseAvatar {
     await this.createAccount(registration);
   }
 
+  protected beginMainTransition(): void {
+    if (!this.accountCreated()) {
+      return;
+    }
+
+    this.accountCreated.set(false);
+    this.clearNavigationTimer();
+    this.navigationTimerId = window.setTimeout(
+      () => void this.navigateToMain(),
+      MAIN_TRANSITION_DURATION,
+    );
+  }
+
   private async createAccount(registration: RegistrationDraft): Promise<void> {
     this.registrationPending.set(true);
     this.registrationError.set('');
 
     try {
       await this.registerWithSelectedAvatar(registration);
-      this.registrationDraft.clear();
-      await this.router.navigateByUrl('/main', { replaceUrl: true });
+      this.showSuccessOverlay();
     } catch (error) {
       this.registrationError.set(this.resolveRegistrationError(error));
-    } finally {
       this.registrationPending.set(false);
+    }
+  }
+
+  private showSuccessOverlay(): void {
+    this.accountCreated.set(true);
+    this.navigationTimerId = window.setTimeout(
+      () => this.beginMainTransition(),
+      SUCCESS_OVERLAY_DURATION,
+    );
+  }
+
+  private async navigateToMain(): Promise<void> {
+    const navigationSucceeded = await this.router.navigateByUrl('/main', { replaceUrl: true });
+
+    if (navigationSucceeded) {
+      this.registrationDraft.clear();
+      return;
+    }
+
+    this.registrationPending.set(false);
+  }
+
+  private clearNavigationTimer(): void {
+    if (this.navigationTimerId !== undefined) {
+      window.clearTimeout(this.navigationTimerId);
+      this.navigationTimerId = undefined;
     }
   }
 
