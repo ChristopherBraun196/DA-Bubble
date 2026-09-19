@@ -1,6 +1,7 @@
 import { computed, DestroyRef, inject, Injectable, signal } from '@angular/core';
 import {
   createUserWithEmailAndPassword,
+  confirmPasswordReset,
   deleteUser,
   GoogleAuthProvider,
   onAuthStateChanged,
@@ -11,6 +12,7 @@ import {
   signOut,
   updateProfile,
   User,
+  verifyPasswordResetCode,
 } from 'firebase/auth';
 
 import { FirebaseService } from '../firebase/firebase.service';
@@ -87,6 +89,14 @@ export class AuthService {
 
   async sendPasswordReset(email: string): Promise<void> {
     await sendPasswordResetEmail(this.firebase.auth, email);
+  }
+
+  verifyPasswordReset(code: string): Promise<string> {
+    return verifyPasswordResetCode(this.firebase.auth, code);
+  }
+
+  async resetPassword(code: string, password: string): Promise<void> {
+    await confirmPasswordReset(this.firebase.auth, code, password);
   }
 
   async logout(): Promise<void> {

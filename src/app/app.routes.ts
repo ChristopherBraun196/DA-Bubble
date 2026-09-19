@@ -26,6 +26,11 @@ export const routes: Routes = [
       import('./pages/login/password-reset/password-reset').then((module) => module.PasswordReset),
   },
   {
+    path: 'reset-password',
+    loadComponent: () =>
+      import('./pages/login/reset-password/reset-password').then((module) => module.ResetPassword),
+  },
+  {
     path: 'impressum',
     loadComponent: () => import('./pages/imprint/imprint').then((module) => module.Imprint),
   },
