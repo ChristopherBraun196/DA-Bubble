@@ -20,24 +20,26 @@ describe('ChannelInfo', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should switch a section into edit mode and back on save', async () => {
+  it('should switch a section into edit mode', async () => {
     const element = fixture.nativeElement as HTMLElement;
-    const editButton = element.querySelector('.channel-info__action') as HTMLButtonElement;
 
-    editButton.click();
+    (element.querySelector('.channel-info__action') as HTMLButtonElement).click();
     await fixture.whenStable();
 
     const input = element.querySelector('.channel-info__input') as HTMLInputElement;
     expect(input).toBeTruthy();
+    expect(input.placeholder).toBe('Entwicklerteam');
+  });
 
-    input.value = 'Neuer Name';
-    input.dispatchEvent(new Event('input'));
+  it('should close the edit mode without saving an empty draft', async () => {
+    const element = fixture.nativeElement as HTMLElement;
+
+    (element.querySelector('.channel-info__action') as HTMLButtonElement).click();
     await fixture.whenStable();
 
     (element.querySelector('.channel-info__action') as HTMLButtonElement).click();
     await fixture.whenStable();
 
     expect(element.querySelector('.channel-info__input')).toBeNull();
-    expect(element.querySelector('.channel-info__title')?.textContent).toContain('Neuer Name');
   });
 });

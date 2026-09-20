@@ -21,9 +21,10 @@
         [checked]="mode() === 'all'"
         (change)="setMode('all')"
       />
-      <!-- TODO: spaeter den ausgewaehlten Channel aus Firebase einsetzen. -->
       <span>
-        Alle Mitglieder von <span class="add-people__channel">Entwicklerteam</span> hinzufügen
+        Alle Mitglieder von
+        <span class="add-people__channel">{{ sourceChannelName() || 'deinem Channel' }}</span>
+        hinzufügen
       </span>
     </label>
 
@@ -52,6 +53,12 @@
       </div>
     }
 
-    <button class="add-people__submit" type="submit" [disabled]="!canCreate()">Erstellen</button>
+    @if (addError()) {
+      <p class="add-people__error">{{ addError() }}</p>
+    }
+
+    <button class="add-people__submit" type="submit" [disabled]="!canCreate() || adding()">
+      {{ adding() ? 'Wird gespeichert …' : 'Erstellen' }}
+    </button>
   </form>
 </div>

@@ -1,5 +1,11 @@
 import { Timestamp } from 'firebase/firestore';
 
+export interface UserSearchResult {
+  uid: string;
+  displayName: string;
+  photoURL: string;
+}
+
 export interface AppUser {
   uid: string;
   displayName: string;

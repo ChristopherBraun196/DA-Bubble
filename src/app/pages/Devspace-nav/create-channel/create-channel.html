@@ -1,6 +1,11 @@
 <div class="create-channel__backdrop" (click)="closed.emit()">
   @if (step() === 'people') {
-    <app-add-people (closed)="closed.emit()" />
+    <app-add-people
+      [chatId]="createdChannelId()"
+      [sourceChannelName]="sourceChannelName"
+      [sourceMemberIds]="sourceMemberIds"
+      (closed)="closed.emit()"
+    />
   } @else {
     <div
       class="create-channel"
@@ -57,8 +62,16 @@
           />
         </div>
 
-        <button class="create-channel__submit" type="submit" [disabled]="!canCreate()">
-          Erstellen
+        @if (createError()) {
+          <p class="create-channel__error">{{ createError() }}</p>
+        }
+
+        <button
+          class="create-channel__submit"
+          type="submit"
+          [disabled]="!canCreate() || creating()"
+        >
+          {{ creating() ? 'Wird angelegt …' : 'Erstellen' }}
         </button>
       </form>
     </div>

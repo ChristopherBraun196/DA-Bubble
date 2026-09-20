@@ -20,7 +20,14 @@
       <span class="channel-info__label">Channel-Name</span>
 
       @if (editingName()) {
-        <button class="channel-info__action" type="button" (click)="saveName()">Speichern</button>
+        <button
+          class="channel-info__action"
+          type="button"
+          [disabled]="saving()"
+          (click)="saveName()"
+        >
+          Speichern
+        </button>
       } @else {
         <button class="channel-info__action" type="button" (click)="startNameEdit()">
           Bearbeiten
@@ -57,7 +64,12 @@
       <span class="channel-info__label">Beschreibung</span>
 
       @if (editingDescription()) {
-        <button class="channel-info__action" type="button" (click)="saveDescription()">
+        <button
+          class="channel-info__action"
+          type="button"
+          [disabled]="saving()"
+          (click)="saveDescription()"
+        >
           Speichern
         </button>
       } @else {
@@ -80,14 +92,18 @@
         ></textarea>
       </div>
     } @else {
-      <p class="channel-info__value">{{ description() }}</p>
+      <p class="channel-info__value">{{ description() || 'Noch keine Beschreibung' }}</p>
     }
 
     <hr class="channel-info__divider" />
 
     <span class="channel-info__label">Erstellt von</span>
-    <p class="channel-info__creator">{{ createdBy() }}</p>
+    <p class="channel-info__creator">{{ createdBy() || 'Wird geladen …' }}</p>
   </section>
+
+  @if (saveError()) {
+    <p class="channel-info__error">{{ saveError() }}</p>
+  }
 
   <button class="channel-info__leave" type="button" (click)="leaveChannel()">
     Channel verlassen

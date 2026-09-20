@@ -1,5 +1,6 @@
 import { inject, Injectable, signal } from '@angular/core';
 import {
+  addDoc,
   arrayUnion,
   collection,
   doc,
@@ -14,6 +15,7 @@ import {
   Timestamp,
   Transaction,
   Unsubscribe,
+  updateDoc,
   where,
 } from 'firebase/firestore';
 
@@ -81,6 +83,46 @@ export class ChatService {
     if (this.chatsState().some(({ id }) => id === chatId)) {
       this.activeChatIdState.set(chatId);
     }
+  }
+
+  /** Legt den Channel an und macht ihn zum aktiven Chat. Gibt die neue Dokument-ID zurueck. */
+  async createChannel(name: string, description: string, userId: string): Promise<string> {
+    const chatsRef = collection(this.firebase.firestore, 'chats');
+    const channelRef = await addDoc(chatsRef, {
+      type: 'channel',
+      name: name.trim(),
+      description: description.trim(),
+      createdBy: userId,
+      memberIds: [userId],
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+
+    this.activeChatIdState.set(channelRef.id);
+    return channelRef.id;
+  }
+
+  async updateChannel(
+    chatId: string,
+    changes: { name?: string; description?: string },
+  ): Promise<void> {
+    await updateDoc(doc(this.firebase.firestore, 'chats', chatId), {
+      ...changes,
+      updatedAt: serverTimestamp(),
+    });
+  }
+
+  async addMembers(chatId: string, userIds: string[]): Promise<void> {
+    const memberIds = [...new Set(userIds.filter(Boolean))];
+
+    if (memberIds.length === 0) {
+      return;
+    }
+
+    await updateDoc(doc(this.firebase.firestore, 'chats', chatId), {
+      memberIds: arrayUnion(...memberIds),
+      updatedAt: serverTimestamp(),
+    });
   }
 
   private listenToUserChats(userId: string): void {
