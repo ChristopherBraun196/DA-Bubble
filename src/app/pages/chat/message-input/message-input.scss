@@ -19,6 +19,10 @@
   &::placeholder {
     color: #686868;
   }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
 }
 
 .message-input__actions {
@@ -39,7 +43,9 @@
   background: transparent;
   color: #686868;
   cursor: pointer;
-  transition: background-color 150ms ease, color 150ms ease;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
 
   &:hover {
     background-color: #eceefe;
@@ -64,5 +70,10 @@
 
   &:hover {
     background-color: #eceefe;
+  }
+
+  &:disabled {
+    color: #adb0d9;
+    cursor: not-allowed;
   }
 }

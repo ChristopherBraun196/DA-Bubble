@@ -1,10 +1,13 @@
-<form class="message-input" (submit)="$event.preventDefault()">
+<form class="message-input" (submit)="$event.preventDefault(); submitMessage()">
   <textarea
     class="message-input__field"
     name="message"
     rows="2"
     [placeholder]="placeholder()"
     [attr.aria-label]="placeholder()"
+    [disabled]="disabled()"
+    [value]="message()"
+    (input)="updateMessage($event)"
   ></textarea>
 
   <div class="message-input__actions">
@@ -15,7 +18,12 @@
       <span class="material-symbols-outlined">alternate_email</span>
     </button>
 
-    <button class="message-input__send" type="submit" aria-label="Senden">
+    <button
+      class="message-input__send"
+      type="submit"
+      aria-label="Senden"
+      [disabled]="disabled() || !message().trim()"
+    >
       <span class="material-symbols-outlined">send</span>
     </button>
   </div>

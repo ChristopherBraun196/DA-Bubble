@@ -1,1 +1,18 @@
-<p>message-item works!</p>
+@if (message(); as message) {
+  <article class="message" [class.message--own]="ownMessage()">
+    <img class="message__avatar" [src]="message.authorPhotoURL" alt="" />
+
+    <div class="message__content">
+      <div class="message__meta">
+        <strong class="message__author">{{ message.authorName }}</strong>
+        @if (message.createdAt; as createdAt) {
+          <time class="message__time" [attr.datetime]="createdAt.toDate().toISOString()">
+            {{ createdAt.toDate() | date: 'HH:mm' }} Uhr
+          </time>
+        }
+      </div>
+
+      <p class="message__bubble">{{ message.text }}</p>
+    </div>
+  </article>
+}

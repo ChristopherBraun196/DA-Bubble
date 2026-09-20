@@ -1,10 +1,30 @@
 <div class="chat">
-  <app-chat-header [channelName]="channelName()" [members]="members()" />
+  @if (activeChat(); as chat) {
+    <app-chat-header [channelName]="chat.name" />
 
-  <!-- Nachrichten kommen spaeter aus Firebase. -->
-  <div class="chat__messages"></div>
+    <div class="chat__messages">
+      <app-message-list
+        [messages]="messages.messages()"
+        [currentUserId]="auth.currentUser()?.uid || null"
+        [loading]="messages.loading()"
+        [error]="messages.error()"
+      />
+    </div>
 
-  <div class="chat__input">
-    <app-message-input [placeholder]="placeholder()" />
-  </div>
+    <div class="chat__input">
+      <app-message-input
+        [placeholder]="placeholder()"
+        [disabled]="sending()"
+        (messageSent)="sendMessage($event)"
+      />
+    </div>
+  } @else {
+    <div class="chat__empty">
+      @if (chats.loading()) {
+        <p>Channels werden geladen …</p>
+      } @else {
+        <p>Wähle einen Channel aus oder erstelle einen neuen.</p>
+      }
+    </div>
+  }
 </div>

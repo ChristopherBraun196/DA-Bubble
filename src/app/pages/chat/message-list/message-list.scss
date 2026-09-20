@@ -1,0 +1,44 @@
+:host {
+  display: block;
+}
+
+.message-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.message-list__status {
+  margin: 0;
+  color: #686868;
+  font-size: 16px;
+  text-align: center;
+}
+
+.message-list__status--error {
+  color: #ed1e79;
+}
+
+.message-list__date {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  color: #000000;
+  font-size: 14px;
+
+  &::before,
+  &::after {
+    height: 1px;
+    flex: 1;
+    background-color: #adb0d9;
+    content: '';
+  }
+
+  span {
+    padding: 4px 12px;
+    border: 1px solid #adb0d9;
+    border-radius: 30px;
+    background-color: #ffffff;
+    white-space: nowrap;
+  }
+}

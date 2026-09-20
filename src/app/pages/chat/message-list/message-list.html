@@ -1,1 +1,22 @@
-<p>message-list works!</p>
+<div class="message-list" aria-live="polite">
+  @if (loading()) {
+    <p class="message-list__status">Nachrichten werden geladen …</p>
+  } @else if (error()) {
+    <p class="message-list__status message-list__status--error">{{ error() }}</p>
+  } @else if (messages().length === 0) {
+    <p class="message-list__status">Noch keine Nachrichten. Schreib die erste Nachricht.</p>
+  } @else {
+    @for (entry of entries(); track entry.id) {
+      @if (entry.type === 'date') {
+        <div class="message-list__date">
+          <span>{{ entry.label }}</span>
+        </div>
+      } @else {
+        <app-message-item
+          [message]="entry.message"
+          [ownMessage]="entry.message.authorId === currentUserId()"
+        />
+      }
+    }
+  }
+</div>

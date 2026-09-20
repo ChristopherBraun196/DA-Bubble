@@ -19,6 +19,20 @@
   padding: 24px 40px;
 }
 
+.chat__empty {
+  display: grid;
+  flex: 1;
+  place-items: center;
+  padding: 40px;
+  color: #686868;
+  font-size: 18px;
+  text-align: center;
+
+  p {
+    margin: 0;
+  }
+}
+
 .chat__input {
   padding: 0 20px 20px;
 }

@@ -1,22 +1,55 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, DestroyRef, effect, inject, signal } from '@angular/core';
+import { AuthService } from '../../../core/services/auth.service';
+import { ChatService } from '../../../core/services/chat.service';
+import { MessageService } from '../../../core/services/message.service';
 import { ChatHeader } from '../chat-header/chat-header';
 import { MessageInput } from '../message-input/message-input';
+import { MessageList } from '../message-list/message-list';
 
 @Component({
-  imports: [ChatHeader, MessageInput],
+  imports: [ChatHeader, MessageInput, MessageList],
   selector: 'app-chat-view',
   styleUrl: './chat-view.scss',
   templateUrl: './chat-view.html',
 })
 export class ChatView {
-  /** Platzhalter, kommt spaeter aus Firebase. */
-  protected readonly channelName = signal('Entwicklerteam');
+  protected readonly auth = inject(AuthService);
+  protected readonly chats = inject(ChatService);
+  protected readonly messages = inject(MessageService);
+  private readonly destroyRef = inject(DestroyRef);
 
-  protected readonly members = signal<string[]>([
-    '/img/Profile_picture_3.png',
-    '/img/Profile_picture_2.png',
-    '/img/Profile_picture_1.png',
-  ]);
+  protected readonly activeChat = computed(() =>
+    this.chats.chats().find(({ id }) => id === this.chats.activeChatId()),
+  );
+  protected readonly placeholder = computed(() =>
+    this.activeChat() ? `Nachricht an #${this.activeChat()?.name}` : 'Nachricht schreiben',
+  );
+  protected readonly sending = signal(false);
 
-  protected readonly placeholder = computed(() => `Nachricht an #${this.channelName()}`);
+  constructor() {
+    effect(() => {
+      const chatId = this.chats.activeChatId();
+
+      if (chatId) {
+        this.messages.connect(chatId);
+      } else {
+        this.messages.disconnect();
+      }
+    });
+
+    this.destroyRef.onDestroy(() => this.messages.disconnect());
+  }
+
+  protected async sendMessage(text: string): Promise<void> {
+    const chatId = this.chats.activeChatId();
+    if (!chatId || this.sending()) {
+      return;
+    }
+    this.sending.set(true);
+    try {
+      await this.messages.sendMessage(chatId, text);
+    } finally {
+      this.sending.set(false);
+    }
+  }
 }
