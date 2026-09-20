@@ -4,7 +4,7 @@
   <div
     class="shell__workspace"
     [class.shell__workspace--devspace-closed]="!devspaceOpen()"
-    [class.shell__workspace--thread-closed]="!threadOpen()"
+    [class.shell__workspace--thread-closed]="!threadVisible()"
   >
     <aside
       id="devspace-navigation"
@@ -23,7 +23,7 @@
       }
     </main>
 
-    @if (threadOpen()) {
+    @if (threadVisible()) {
       <aside class="shell__thread">
         <app-thread-panel (closed)="closeThread()" />
       </aside>
@@ -44,7 +44,7 @@
       </span>
     </button>
 
-    @if (!threadOpen()) {
+    @if (!threadVisible() && !composing()) {
       <button
         class="shell__thread-toggle"
         type="button"

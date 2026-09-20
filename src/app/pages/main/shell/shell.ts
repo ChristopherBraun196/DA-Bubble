@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { AuthService } from '../../../core/services/auth.service';
 import { ChatService } from '../../../core/services/chat.service';
 import { ChatView } from '../../chat/chat-view/chat-view';
@@ -21,6 +21,7 @@ export class Shell {
   protected readonly devspaceOpen = signal(true);
   protected readonly threadOpen = signal(true);
   protected readonly composing = signal(false);
+  protected readonly threadVisible = computed(() => this.threadOpen() && !this.composing());
 
   constructor() {
     const user = this.auth.currentUser();

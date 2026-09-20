@@ -10,6 +10,7 @@ export class MessageInput {
   readonly placeholder = input('Nachricht schreiben');
   readonly disabled = input(false);
   readonly messageSent = output<string>();
+  readonly sendDisabled = input(false);
 
   protected readonly message = signal('');
 
@@ -20,7 +21,7 @@ export class MessageInput {
   protected submitMessage(): void {
     const message = this.message().trim();
 
-    if (!message || this.disabled()) {
+    if (!message || this.disabled() || this.sendDisabled()) {
       return;
     }
 

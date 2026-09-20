@@ -1,1 +1,24 @@
-<p>new-message works!</p>
+<div class="new-message">
+  <header class="new-message__header">
+    <h2 class="new-message__title">Neue Nachricht</h2>
+
+    <input
+      class="new-message__recipient"
+      type="text"
+      name="recipient"
+      [value]="recipient()"
+      (input)="updateRecipient($event)"
+      placeholder="An: #channel, oder @jemand oder E-Mail Adresse"
+      aria-label="Empfänger der neuen Nachricht"
+    />
+  </header>
+
+  <div class="new-message__body"></div>
+
+  <div class="new-message__input">
+    <app-message-input
+      placeholder="Starte eine neue Nachricht"
+      [sendDisabled]="!recipient().trim()"
+    />
+  </div>
+</div>

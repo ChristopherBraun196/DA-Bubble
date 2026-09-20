@@ -22,7 +22,7 @@
       class="message-input__send"
       type="submit"
       aria-label="Senden"
-      [disabled]="disabled() || !message().trim()"
+      [disabled]="disabled() || sendDisabled() || !message().trim()"
     >
       <span class="material-symbols-outlined">send</span>
     </button>
