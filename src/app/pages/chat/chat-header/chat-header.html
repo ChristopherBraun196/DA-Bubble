@@ -24,10 +24,10 @@
       [attr.aria-expanded]="dialog() === 'members'"
       (click)="toggleMembers()"
     >
-      @for (member of members(); track member) {
-        <img class="chat-header__avatar" [src]="member" alt="" />
+      @for (avatar of memberAvatars(); track avatar) {
+        <img class="chat-header__avatar" [src]="avatar" alt="" />
       }
-      <span class="chat-header__count">{{ members().length }}</span>
+      <span class="chat-header__count">{{ memberCount() }}</span>
     </button>
 
     <button
@@ -42,7 +42,12 @@
     @if (dialog() === 'members' || dialog() === 'add') {
       <div class="chat-header__dialog">
         @if (dialog() === 'members') {
-          <app-members-dialog (closed)="closeDialog()" (addRequested)="openAdd()" />
+          <app-members-dialog
+            [channelMembers]="channelMembers.members()"
+            [currentUserId]="auth.currentUser()?.uid || null"
+            (closed)="closeDialog()"
+            (addRequested)="openAdd()"
+          />
         } @else {
           <app-add-members [channelName]="channelName()" (closed)="closeDialog()" />
         }

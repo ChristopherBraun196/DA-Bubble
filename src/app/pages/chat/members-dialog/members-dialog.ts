@@ -1,6 +1,6 @@
-import { Component, computed, inject, output, signal } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 
-import { AuthService } from '../../../core/services/auth.service';
+import { AppUser } from '../../../core/models/user.model';
 import { UserListItem } from '../../Devspace-nav/user-list-item/user-list-item';
 
 export interface ChannelMember {
@@ -17,29 +17,32 @@ export interface ChannelMember {
   templateUrl: './members-dialog.html',
 })
 export class MembersDialog {
-  private readonly auth = inject(AuthService);
-
+  readonly channelMembers = input<AppUser[]>([]);
+  readonly currentUserId = input<string | null>(null);
   readonly closed = output<void>();
   readonly addRequested = output<void>();
 
-  /** Der eingeloggte User steht immer an erster Stelle. */
-  private readonly currentUser = computed<ChannelMember>(() => ({
-    id: this.auth.currentUser()?.uid ?? 'me',
-    name: `${this.auth.displayName()} (Du)`,
-    avatar: this.auth.photoURL(),
-    online: true,
-  }));
+  protected readonly members = computed<ChannelMember[]>(() => this.createMembers());
 
-  /** Platzhalter, kommt spaeter aus Firebase. */
-  private readonly otherMembers = signal<ChannelMember[]>([
-    { id: 'sofia', name: 'Sofia Müller', avatar: '/img/Profile_picture_2.png', online: true },
-    { id: 'noah', name: 'Noah Braun', avatar: '/img/Profile_picture_3.png', online: true },
-  ]);
+  private createMembers(): ChannelMember[] {
+    const currentUserId = this.currentUserId();
+    return [...this.channelMembers()]
+      .sort((first, second) => this.sortCurrentUser(first, second, currentUserId))
+      .map((member) => this.mapMember(member, currentUserId));
+  }
 
-  protected readonly members = computed<ChannelMember[]>(() => [
-    this.currentUser(),
-    ...this.otherMembers(),
-  ]);
+  private sortCurrentUser(first: AppUser, second: AppUser, currentUserId: string | null): number {
+    return Number(second.uid === currentUserId) - Number(first.uid === currentUserId);
+  }
+
+  private mapMember(member: AppUser, currentUserId: string | null): ChannelMember {
+    return {
+      id: member.uid,
+      name: member.uid === currentUserId ? `${member.displayName} (Du)` : member.displayName,
+      avatar: member.photoURL,
+      online: member.uid === currentUserId,
+    };
+  }
 
   protected addMembers(): void {
     this.addRequested.emit();
