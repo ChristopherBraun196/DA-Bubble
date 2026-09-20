@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, output } from '@angular/core';
 import { ChatService } from '../../../core/services/chat.service';
 import { ChannelList } from '../channel-list/channel-list';
 import { DirectMessageList } from '../direct-message-list/direct-message-list';
@@ -14,6 +14,8 @@ export type DevspaceSelection = { kind: 'channel'; id: string } | { kind: 'user'
 })
 export class DevspaceNav {
   private readonly chats = inject(ChatService);
+
+  readonly composingChanged = output<boolean>();
 
   protected readonly selection = signal<DevspaceSelection>({
     kind: 'channel',
@@ -31,11 +33,17 @@ export class DevspaceNav {
   }
 
   protected selectChannel(id: string): void {
+    this.composingChanged.emit(false);
     this.selection.set({ kind: 'channel', id });
     this.chats.selectChat(id);
   }
 
   protected selectUser(id: string): void {
+    this.composingChanged.emit(false);
     this.selection.set({ kind: 'user', id });
+  }
+
+  protected startCompose(): void {
+    this.composingChanged.emit(true);
   }
 }

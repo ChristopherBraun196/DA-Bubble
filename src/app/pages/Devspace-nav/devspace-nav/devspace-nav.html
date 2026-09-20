@@ -5,7 +5,12 @@
       <span class="devspace__title">Devspace</span>
     </div>
 
-    <button class="devspace__compose" type="button" aria-label="Neue Nachricht schreiben">
+    <button
+      class="devspace__compose"
+      type="button"
+      aria-label="Neue Nachricht schreiben"
+      (click)="startCompose()"
+    >
       <span class="material-symbols-outlined">edit_square</span>
     </button>
   </header>
@@ -15,8 +20,5 @@
     (channelSelected)="selectChannel($event)"
   />
 
-  <app-direct-message-list
-    [activeUserId]="activeUserId()"
-    (userSelected)="selectUser($event)"
-  />
+  <app-direct-message-list [activeUserId]="activeUserId()" (userSelected)="selectUser($event)" />
 </nav>

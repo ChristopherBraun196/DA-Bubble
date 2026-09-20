@@ -12,11 +12,15 @@
       [attr.aria-hidden]="!devspaceOpen()"
       [attr.inert]="!devspaceOpen() ? '' : null"
     >
-      <app-devspace-nav />
+      <app-devspace-nav (composingChanged)="composing.set($event)" />
     </aside>
 
     <main class="shell__chat">
-      <app-chat-view />
+      @if (composing()) {
+        <app-new-message />
+      } @else {
+        <app-chat-view />
+      }
     </main>
 
     @if (threadOpen()) {

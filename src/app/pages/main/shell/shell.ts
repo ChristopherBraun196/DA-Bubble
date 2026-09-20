@@ -5,9 +5,10 @@ import { ChatView } from '../../chat/chat-view/chat-view';
 import { DevspaceNav } from '../../Devspace-nav/devspace-nav/devspace-nav';
 import { ThreadPanel } from '../../thread/thread-panel/thread-panel';
 import { Topbar } from '../topbar/topbar';
+import { NewMessage } from '../../chat/new-message/new-message';
 
 @Component({
-  imports: [Topbar, DevspaceNav, ChatView, ThreadPanel],
+  imports: [Topbar, DevspaceNav, ChatView, ThreadPanel, NewMessage],
   selector: 'app-shell',
   styleUrl: './shell.scss',
   templateUrl: './shell.html',
@@ -19,6 +20,7 @@ export class Shell {
 
   protected readonly devspaceOpen = signal(true);
   protected readonly threadOpen = signal(true);
+  protected readonly composing = signal(false);
 
   constructor() {
     const user = this.auth.currentUser();
