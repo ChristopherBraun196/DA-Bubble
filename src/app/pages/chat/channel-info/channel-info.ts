@@ -1,5 +1,6 @@
 import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
 
+import { AuthService } from '../../../core/services/auth.service';
 import { ChatService } from '../../../core/services/chat.service';
 import { UserService } from '../../../core/services/user.service';
 
@@ -10,6 +11,7 @@ import { UserService } from '../../../core/services/user.service';
   templateUrl: './channel-info.html',
 })
 export class ChannelInfo {
+  private readonly auth = inject(AuthService);
   private readonly chats = inject(ChatService);
   private readonly users = inject(UserService);
 
@@ -31,6 +33,7 @@ export class ChannelInfo {
   protected readonly editingDescription = signal(false);
 
   protected readonly saving = signal(false);
+  protected readonly leaving = signal(false);
   protected readonly saveError = signal('');
 
   /** Die Entwuerfe starten leer, der aktuelle Wert steht als Platzhalter im Feld. */
@@ -125,8 +128,30 @@ export class ChannelInfo {
     this.descriptionDraft.set((event.target as HTMLTextAreaElement).value);
   }
 
-  protected leaveChannel(): void {
-    // TODO: Mitgliedschaft in Firebase entfernen, sobald das eingerichtet ist.
-    this.closed.emit();
+  protected async leaveChannel(): Promise<void> {
+    const identifiers = this.getLeaveIdentifiers();
+    if (!identifiers || this.leaving()) {
+      return;
+    }
+    await this.removeMembership(identifiers);
+  }
+
+  private getLeaveIdentifiers(): { chatId: string; userId: string } | null {
+    const chatId = this.activeChat()?.id;
+    const userId = this.auth.currentUser()?.uid;
+    return chatId && userId ? { chatId, userId } : null;
+  }
+
+  private async removeMembership(ids: { chatId: string; userId: string }): Promise<void> {
+    this.leaving.set(true);
+    this.saveError.set('');
+    try {
+      await this.chats.leaveChannel(ids.chatId, ids.userId);
+      this.closed.emit();
+    } catch {
+      this.saveError.set('Der Channel konnte nicht verlassen werden. Versuch es noch einmal.');
+    } finally {
+      this.leaving.set(false);
+    }
   }
 }
