@@ -1,12 +1,11 @@
 <main>
   <app-header></app-header>
   <div class="mw-1440">
-    <a class="back-button" [routerLink]="['/login']">
+    <a class="back-button" role="button" tabindex="0" (click)="goBack()">
       <span class="material-symbols-outlined">arrow_back</span>
     </a>
     <section class="privacy-policy-wrapper">
       <div class="policy-card">
-
         <h1>Datenschutzerklärung</h1>
 
         <h2>1. Verantwortlicher</h2>
@@ -41,8 +40,12 @@
           Alternativ kann die Anmeldung über „Google-Login" (Firebase Authentication mit
           Google-Anbieter) erfolgen. Dabei übermittelt Google an uns die mit dem Google-Konto
           verknüpfte E-Mail-Adresse, den Namen und ggf. ein Profilbild. Es gelten ergänzend die
-          Datenschutzbestimmungen von Google (<a href="https://policies.google.com/privacy" target="_blank"
-            rel="noopener">https://policies.google.com/privacy</a>).
+          Datenschutzbestimmungen von Google (<a
+            href="https://policies.google.com/privacy"
+            target="_blank"
+            rel="noopener"
+            >https://policies.google.com/privacy</a
+          >).
         </p>
         <p>
           Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Erfüllung des Nutzungsvertrags) sowie bei
