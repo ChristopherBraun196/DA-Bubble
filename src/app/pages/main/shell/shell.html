@@ -6,11 +6,14 @@
     [class.shell__workspace--devspace-closed]="!devspaceOpen()"
     [class.shell__workspace--thread-closed]="!threadOpen()"
   >
-    @if (devspaceOpen()) {
-      <aside class="shell__devspace">
-        <app-devspace-nav />
-      </aside>
-    }
+    <aside
+      id="devspace-navigation"
+      class="shell__devspace"
+      [attr.aria-hidden]="!devspaceOpen()"
+      [attr.inert]="!devspaceOpen() ? '' : null"
+    >
+      <app-devspace-nav />
+    </aside>
 
     <main class="shell__chat">
       <app-chat-view />
@@ -22,7 +25,13 @@
       </aside>
     }
 
-    <button class="shell__devspace-toggle" type="button" (click)="toggleDevspace()">
+    <button
+      class="shell__devspace-toggle"
+      type="button"
+      aria-controls="devspace-navigation"
+      [attr.aria-expanded]="devspaceOpen()"
+      (click)="toggleDevspace()"
+    >
       <span class="material-symbols-outlined">
         {{ devspaceOpen() ? 'left_panel_close' : 'left_panel_open' }}
       </span>

@@ -43,23 +43,13 @@
 
 .shell__workspace {
   position: relative;
-  display: grid;
-  grid-template-columns: 366px minmax(0, 1fr) 366px;
-  gap: 24px;
+  display: flex;
   flex: 1;
   min-height: 0;
 
-  /* Zugeklappte Spalten fallen weg, der Chat bekommt den Platz. */
-  &--devspace-closed {
-    grid-template-columns: minmax(0, 1fr) 366px;
-  }
-
-  &--thread-closed {
-    grid-template-columns: 366px minmax(0, 1fr);
-  }
-
-  &--devspace-closed.shell__workspace--thread-closed {
-    grid-template-columns: minmax(0, 1fr);
+  &--devspace-closed .shell__devspace {
+    flex-basis: 1px;
+    margin-right: -1px;
   }
 }
 
@@ -70,6 +60,29 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
+}
+
+.shell__devspace {
+  flex: 0 0 366px;
+  margin-right: 24px;
+  overflow: hidden;
+  transition:
+    flex-basis 100ms ease-in,
+    margin-right 100ms ease-in;
+
+  app-devspace-nav {
+    width: 366px;
+    min-width: 366px;
+  }
+}
+
+.shell__chat {
+  flex: 1 1 auto;
+}
+
+.shell__thread {
+  flex: 0 0 366px;
+  margin-left: 24px;
 }
 
 /* Die Karte am linken Rand zum Ein- und Ausklappen. */
