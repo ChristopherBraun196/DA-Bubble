@@ -17,19 +17,19 @@ export class DevspaceNav {
 
   readonly composingChanged = output<boolean>();
 
-  protected readonly selection = signal<DevspaceSelection>({
+  protected readonly selection = signal<DevspaceSelection | null>({
     kind: 'channel',
     id: 'entwicklerteam',
   });
 
   protected activeChannelId(): string | null {
     const selection = this.selection();
-    return selection.kind === 'channel' ? this.chats.activeChatId() : null;
+    return selection?.kind === 'channel' ? this.chats.activeChatId() : null;
   }
 
   protected activeUserId(): string | null {
     const selection = this.selection();
-    return selection.kind === 'user' ? selection.id : null;
+    return selection?.kind === 'user' ? selection.id : null;
   }
 
   protected selectChannel(id: string): void {
@@ -44,6 +44,7 @@ export class DevspaceNav {
   }
 
   protected startCompose(): void {
+    this.selection.set(null);
     this.composingChanged.emit(true);
   }
 }
