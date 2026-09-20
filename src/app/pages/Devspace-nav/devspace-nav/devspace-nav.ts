@@ -1,11 +1,10 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
+import { ChatService } from '../../../core/services/chat.service';
 import { ChannelList } from '../channel-list/channel-list';
 import { DirectMessageList } from '../direct-message-list/direct-message-list';
 
 /** Was gerade im Chat offen ist: entweder ein Channel oder eine Direktnachricht. */
-export type DevspaceSelection =
-  | { kind: 'channel'; id: string }
-  | { kind: 'user'; id: string };
+export type DevspaceSelection = { kind: 'channel'; id: string } | { kind: 'user'; id: string };
 
 @Component({
   imports: [ChannelList, DirectMessageList],
@@ -14,6 +13,8 @@ export type DevspaceSelection =
   templateUrl: './devspace-nav.html',
 })
 export class DevspaceNav {
+  private readonly chats = inject(ChatService);
+
   protected readonly selection = signal<DevspaceSelection>({
     kind: 'channel',
     id: 'entwicklerteam',
@@ -21,7 +22,7 @@ export class DevspaceNav {
 
   protected activeChannelId(): string | null {
     const selection = this.selection();
-    return selection.kind === 'channel' ? selection.id : null;
+    return selection.kind === 'channel' ? this.chats.activeChatId() : null;
   }
 
   protected activeUserId(): string | null {
@@ -31,6 +32,7 @@ export class DevspaceNav {
 
   protected selectChannel(id: string): void {
     this.selection.set({ kind: 'channel', id });
+    this.chats.selectChat(id);
   }
 
   protected selectUser(id: string): void {
