@@ -26,7 +26,7 @@
     <button
       class="topbar__user"
       type="button"
-      [attr.aria-expanded]="menuOpen()"
+      [attr.aria-expanded]="panel() === 'menu'"
       (click)="toggleMenu()"
     >
       <span class="topbar__user-name">{{ userName() }}</span>
@@ -34,15 +34,21 @@
       <span class="material-symbols-outlined topbar__user-chevron">keyboard_arrow_down</span>
     </button>
 
-    @if (menuOpen()) {
+    @if (panel() === 'menu') {
       <div class="topbar__menu">
-        <button class="topbar__menu-item" type="button" (click)="closeMenu()">Profil</button>
+        <button class="topbar__menu-item" type="button" (click)="openProfile()">Profil</button>
         <button class="topbar__menu-item" type="button" (click)="logout()">Log out</button>
+      </div>
+    }
+
+    @if (panel() === 'profile') {
+      <div class="topbar__profile">
+        <app-profile-dialog (closed)="closePanel()" />
       </div>
     }
   </div>
 </header>
 
-@if (menuOpen()) {
-  <div class="topbar__backdrop" (click)="closeMenu()"></div>
+@if (panel() !== 'none') {
+  <div class="topbar__backdrop" (click)="closePanel()"></div>
 }

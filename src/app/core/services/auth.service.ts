@@ -27,7 +27,10 @@ export class AuthService {
   readonly currentUser = signal<User | null>(null);
   readonly authInitialized = signal(false);
 
+  private readonly profileRevision = signal(0);
+
   readonly displayName = computed(() => {
+    this.profileRevision();
     const user = this.currentUser();
 
     if (!user || user.isAnonymous) {
@@ -37,9 +40,15 @@ export class AuthService {
     return user.displayName || user.email?.split('@')[0] || 'Nutzer';
   });
 
-  readonly photoURL = computed(
-    () => this.currentUser()?.photoURL || '/img/Profile_Guest.png',
-  );
+  readonly photoURL = computed(() => {
+    this.profileRevision();
+    return this.currentUser()?.photoURL || '/img/Profile_Guest.png';
+  });
+
+  readonly email = computed(() => {
+    this.profileRevision();
+    return this.currentUser()?.email ?? null;
+  });
 
   constructor() {
     if (!this.firebase.isBrowser) {
@@ -97,6 +106,19 @@ export class AuthService {
 
   async resetPassword(code: string, password: string): Promise<void> {
     await confirmPasswordReset(this.firebase.auth, code, password);
+  }
+
+  async updateDisplayName(displayName: string): Promise<void> {
+    const user = this.currentUser();
+    const name = displayName.trim();
+
+    if (!user || !name) {
+      return;
+    }
+
+    await updateProfile(user, { displayName: name });
+    await this.users.ensureUser(user);
+    this.profileRevision.update((revision) => revision + 1);
   }
 
   async logout(): Promise<void> {

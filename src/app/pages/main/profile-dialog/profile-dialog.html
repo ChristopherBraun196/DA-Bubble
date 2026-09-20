@@ -1,0 +1,77 @@
+<div
+  class="profile"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="profile-dialog-title"
+  (click)="$event.stopPropagation()"
+>
+  <header class="profile__header">
+    <h2 class="profile__title" id="profile-dialog-title">
+      {{ editing() ? 'Dein Profil bearbeiten' : 'Profil' }}
+    </h2>
+    <button class="profile__close" type="button" aria-label="Schließen" (click)="closed.emit()">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+  </header>
+
+  <img class="profile__avatar" [src]="avatar()" [alt]="name()" />
+
+  @if (editing()) {
+    <form class="profile__form" (submit)="$event.preventDefault(); save()">
+      <label class="profile__label" for="profile-name">
+        <span class="material-symbols-outlined">account_circle</span>
+        Vollständiger Name
+      </label>
+
+      <div class="profile__field">
+        <input
+          class="profile__input"
+          id="profile-name"
+          name="profile-name"
+          type="text"
+          [placeholder]="name()"
+          [value]="nameDraft()"
+          (input)="updateNameDraft($event)"
+        />
+      </div>
+
+      @if (saveError()) {
+        <p class="profile__error">{{ saveError() }}</p>
+      }
+
+      <div class="profile__actions">
+        <button
+          class="profile__button profile__button--ghost"
+          type="button"
+          (click)="cancelEdit()"
+        >
+          Abbrechen
+        </button>
+        <button class="profile__button profile__button--solid" type="submit" [disabled]="saving()">
+          {{ saving() ? 'Speichert …' : 'Speichern' }}
+        </button>
+      </div>
+    </form>
+  } @else {
+    <div class="profile__row">
+      <p class="profile__name">{{ name() }}</p>
+      <button class="profile__edit" type="button" (click)="startEdit()">Bearbeiten</button>
+    </div>
+
+    <p class="profile__status">
+      <span class="profile__dot"></span>
+      Aktive
+    </p>
+
+    <div class="profile__mail">
+      <span class="material-symbols-outlined">mail</span>
+      <span class="profile__mail-label">E-Mail-Adresse</span>
+    </div>
+
+    @if (email()) {
+      <a class="profile__mail-value" [href]="'mailto:' + email()">{{ email() }}</a>
+    } @else {
+      <p class="profile__mail-value profile__mail-value--muted">Als Gast angemeldet</p>
+    }
+  }
+</div>
