@@ -57,6 +57,11 @@ export class CreateChannel {
       return;
     }
 
+    if (this.chats.channelNameExists(this.channelName())) {
+      this.createError.set('Es gibt bereits einen Channel mit diesem Namen.');
+      return;
+    }
+
     this.creating.set(true);
     this.createError.set('');
 

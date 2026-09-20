@@ -67,6 +67,11 @@ export class ChannelInfo {
       return;
     }
 
+    if (this.chats.channelNameExists(name, this.activeChat()?.id)) {
+      this.saveError.set('Es gibt bereits einen Channel mit diesem Namen.');
+      return;
+    }
+
     if (await this.updateChannel({ name })) {
       this.editingName.set(false);
     }

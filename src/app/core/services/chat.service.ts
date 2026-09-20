@@ -85,6 +85,18 @@ export class ChatService {
     }
   }
 
+  // Checkt das kein Channel doppelt angelegt werden kann.
+  channelNameExists(name: string, exceptId?: string): boolean {
+    const normalized = name.trim().toLowerCase();
+
+    return this.chatsState().some(
+      (chat) =>
+        chat.type === 'channel' &&
+        chat.id !== exceptId &&
+        chat.name.trim().toLowerCase() === normalized,
+    );
+  }
+
   /** Legt den Channel an und macht ihn zum aktiven Chat. Gibt die neue Dokument-ID zurueck. */
   async createChannel(name: string, description: string, userId: string): Promise<string> {
     const chatsRef = collection(this.firebase.firestore, 'chats');
