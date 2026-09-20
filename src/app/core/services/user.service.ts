@@ -20,6 +20,14 @@ import { AppUser, UserSearchResult } from '../models/user.model';
 export class UserService {
   private readonly firebase = inject(FirebaseService);
 
+  async getAllUsers(): Promise<UserSearchResult[]> {
+    const snapshot = await getDocs(collection(this.firebase.firestore, 'users'));
+
+    return snapshot.docs
+      .map((userSnapshot) => this.mapSearchResult(userSnapshot))
+      .sort((first, second) => first.displayName.localeCompare(second.displayName, 'de'));
+  }
+
   /** Sucht ueber das Feld nameNormalized, also unabhaengig von Gross- und Kleinschreibung. */
   async findByName(name: string): Promise<UserSearchResult[]> {
     const nameNormalized = name.trim().toLocaleLowerCase('de-DE');

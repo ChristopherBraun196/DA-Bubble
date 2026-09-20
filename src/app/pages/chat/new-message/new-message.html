@@ -13,11 +13,11 @@
         aria-label="Empfänger der neuen Nachricht"
       />
 
-      @if (recipient().startsWith('#') || recipient().startsWith('@')) {
+      @if (mentionOpen()) {
         <app-mention-dropdown
           [entries]="mentionEntries()"
           [search]="mentionSearch()"
-          (selected)="recipient.set($event.label)"
+          (selected)="selectRecipient($event)"
         />
       }
     </div>
