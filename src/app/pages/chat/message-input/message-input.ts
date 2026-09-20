@@ -18,6 +18,15 @@ export class MessageInput {
     this.message.set((event.target as HTMLTextAreaElement).value);
   }
 
+  protected handleKeydown(event: KeyboardEvent): void {
+    if (event.key !== 'Enter' || event.shiftKey || event.isComposing) {
+      return;
+    }
+
+    event.preventDefault();
+    this.submitMessage();
+  }
+
   protected submitMessage(): void {
     const message = this.message().trim();
 

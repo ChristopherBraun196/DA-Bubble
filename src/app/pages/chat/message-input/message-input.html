@@ -8,6 +8,7 @@
     [disabled]="disabled()"
     [value]="message()"
     (input)="updateMessage($event)"
+    (keydown)="handleKeydown($event)"
   ></textarea>
 
   <div class="message-input__actions">
