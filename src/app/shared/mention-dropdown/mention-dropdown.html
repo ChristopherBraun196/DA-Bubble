@@ -1,0 +1,14 @@
+<ul class="mention-dropdown">
+  @for (entry of visibleEntries(); track entry.id) {
+    <li>
+      <button class="mention-dropdown__item" type="button" (click)="selected.emit(entry)">
+        @if (entry.avatar) {
+          <img class="mention-dropdown__avatar" [src]="entry.avatar" alt="" />
+        }
+        <span class="mention-dropdown__label">{{ entry.label }}</span>
+      </button>
+    </li>
+  } @empty {
+    <li class="mention-dropdown__empty">Keine Treffer</li>
+  }
+</ul>
