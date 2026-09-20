@@ -9,6 +9,7 @@
         name="recipient"
         [value]="recipient()"
         (input)="updateRecipient($event)"
+        (keydown)="mentionDropdown()?.handleKeydown($event)"
         placeholder="An: #channel, oder @jemand oder E-Mail Adresse"
         aria-label="Empfänger der neuen Nachricht"
       />

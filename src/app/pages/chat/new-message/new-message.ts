@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, viewChild } from '@angular/core';
 
 import { UserSearchResult } from '../../../core/models/user.model';
 import { ChatService } from '../../../core/services/chat.service';
@@ -21,6 +21,7 @@ export class NewMessage {
   protected readonly recipient = signal('');
   protected readonly mentionOpen = signal(false);
   protected readonly userEntries = signal<MentionEntry[]>([]);
+  protected readonly mentionDropdown = viewChild(MentionDropdown);
 
   protected readonly channelEntries = computed<MentionEntry[]>(() =>
     this.chats

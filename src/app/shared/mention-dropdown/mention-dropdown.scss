@@ -27,7 +27,8 @@
   cursor: pointer;
 
   &:hover,
-  &:focus-visible {
+  &:focus-visible,
+  &--active {
     background-color: variables.$background;
     outline: none;
   }

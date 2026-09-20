@@ -1,7 +1,14 @@
 <ul class="mention-dropdown">
   @for (entry of visibleEntries(); track entry.id) {
     <li>
-      <button class="mention-dropdown__item" type="button" (click)="selected.emit(entry)">
+      <button
+        #option
+        class="mention-dropdown__item"
+        [class.mention-dropdown__item--active]="$index === activeIndex()"
+        type="button"
+        (mouseenter)="setActiveIndex($index)"
+        (click)="selected.emit(entry)"
+      >
         @if (entry.avatar) {
           <img class="mention-dropdown__avatar" [src]="entry.avatar" alt="" />
         }
