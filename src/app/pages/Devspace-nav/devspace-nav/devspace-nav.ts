@@ -1,7 +1,7 @@
 import { Component, inject, signal, output } from '@angular/core';
 import { ChatService } from '../../../core/services/chat.service';
 import { ChannelList } from '../channel-list/channel-list';
-import { DirectMessageList } from '../direct-message-list/direct-message-list';
+import { DirectMessageList, DirectMessageUser } from '../direct-message-list/direct-message-list';
 
 /** Was gerade im Chat offen ist: entweder ein Channel oder eine Direktnachricht. */
 export type DevspaceSelection = { kind: 'channel'; id: string } | { kind: 'user'; id: string };
@@ -16,6 +16,7 @@ export class DevspaceNav {
   private readonly chats = inject(ChatService);
 
   readonly composingChanged = output<boolean>();
+  readonly directMessageSelected = output<DirectMessageUser | null>();
 
   protected readonly selection = signal<DevspaceSelection | null>({
     kind: 'channel',
@@ -34,17 +35,20 @@ export class DevspaceNav {
 
   protected selectChannel(id: string): void {
     this.composingChanged.emit(false);
+    this.directMessageSelected.emit(null);
     this.selection.set({ kind: 'channel', id });
     this.chats.selectChat(id);
   }
 
-  protected selectUser(id: string): void {
+  protected selectUser(user: DirectMessageUser): void {
     this.composingChanged.emit(false);
-    this.selection.set({ kind: 'user', id });
+    this.directMessageSelected.emit(user);
+    this.selection.set({ kind: 'user', id: user.id });
   }
 
   protected startCompose(): void {
     this.selection.set(null);
+    this.directMessageSelected.emit(null);
     this.composingChanged.emit(true);
   }
 }

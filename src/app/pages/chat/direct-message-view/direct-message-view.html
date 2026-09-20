@@ -1,0 +1,39 @@
+<section class="direct-message">
+  <header class="direct-message__header">
+    <div class="direct-message__header-user">
+      <span class="direct-message__header-avatar">
+        <img [src]="user().avatar" alt="" />
+        <span
+          class="direct-message__status"
+          [class.direct-message__status--online]="user().online"
+        ></span>
+      </span>
+      <h1>{{ displayName() }}</h1>
+    </div>
+  </header>
+
+  <div class="direct-message__content">
+    <div class="direct-message__intro">
+      <div class="direct-message__profile">
+        <img [src]="user().avatar" alt="" />
+        <h2>{{ displayName() }}</h2>
+      </div>
+      @if (isCurrentUser()) {
+        <p>
+          Dieser Raum ist nur für dich da. Mache dir Notizen, liste deine To-dos auf oder bewahre
+          Links und Dateien griffbereit auf. Du kannst hier auch gerne Dinge mit dir selbst
+          besprechen.
+        </p>
+      } @else {
+        <p>
+          Diese Unterhaltung findet nur zwischen
+          <span>&#64;{{ displayName() }}</span> und dir statt.
+        </p>
+      }
+    </div>
+  </div>
+
+  <div class="direct-message__input">
+    <app-message-input [placeholder]="placeholder()" />
+  </div>
+</section>

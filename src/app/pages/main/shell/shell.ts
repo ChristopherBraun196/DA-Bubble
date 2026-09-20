@@ -6,9 +6,11 @@ import { DevspaceNav } from '../../Devspace-nav/devspace-nav/devspace-nav';
 import { ThreadPanel } from '../../thread/thread-panel/thread-panel';
 import { Topbar } from '../topbar/topbar';
 import { NewMessage } from '../../chat/new-message/new-message';
+import { DirectMessageView } from '../../chat/direct-message-view/direct-message-view';
+import { DirectMessageUser } from '../../Devspace-nav/direct-message-list/direct-message-list';
 
 @Component({
-  imports: [Topbar, DevspaceNav, ChatView, ThreadPanel, NewMessage],
+  imports: [Topbar, DevspaceNav, ChatView, ThreadPanel, NewMessage, DirectMessageView],
   selector: 'app-shell',
   styleUrl: './shell.scss',
   templateUrl: './shell.html',
@@ -21,7 +23,10 @@ export class Shell {
   protected readonly devspaceOpen = signal(true);
   protected readonly threadOpen = signal(true);
   protected readonly composing = signal(false);
-  protected readonly threadVisible = computed(() => this.threadOpen() && !this.composing());
+  protected readonly activeDirectUser = signal<DirectMessageUser | null>(null);
+  protected readonly threadVisible = computed(
+    () => this.threadOpen() && !this.composing() && !this.activeDirectUser(),
+  );
 
   constructor() {
     const user = this.auth.currentUser();
@@ -43,5 +48,9 @@ export class Shell {
 
   protected closeThread(): void {
     this.threadOpen.set(false);
+  }
+
+  protected showDirectMessage(user: DirectMessageUser | null): void {
+    this.activeDirectUser.set(user);
   }
 }

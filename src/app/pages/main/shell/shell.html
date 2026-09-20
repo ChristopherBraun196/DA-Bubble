@@ -12,12 +12,17 @@
       [attr.aria-hidden]="!devspaceOpen()"
       [attr.inert]="!devspaceOpen() ? '' : null"
     >
-      <app-devspace-nav (composingChanged)="composing.set($event)" />
+      <app-devspace-nav
+        (composingChanged)="composing.set($event)"
+        (directMessageSelected)="showDirectMessage($event)"
+      />
     </aside>
 
     <main class="shell__chat">
       @if (composing()) {
         <app-new-message />
+      } @else if (activeDirectUser(); as user) {
+        <app-direct-message-view [user]="user" />
       } @else {
         <app-chat-view />
       }
@@ -44,7 +49,7 @@
       </span>
     </button>
 
-    @if (!threadVisible() && !composing()) {
+    @if (!threadVisible() && !composing() && !activeDirectUser()) {
       <button
         class="shell__thread-toggle"
         type="button"

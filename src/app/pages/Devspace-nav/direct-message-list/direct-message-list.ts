@@ -8,6 +8,7 @@ export interface DirectMessageUser {
   name: string;
   avatar: string;
   online: boolean;
+  isCurrentUser?: boolean;
 }
 
 @Component({
@@ -20,7 +21,7 @@ export class DirectMessageList {
   private readonly auth = inject(AuthService);
 
   readonly activeUserId = input<string | null>(null);
-  readonly userSelected = output<string>();
+  readonly userSelected = output<DirectMessageUser>();
 
   protected readonly expanded = signal(true);
 
@@ -30,6 +31,7 @@ export class DirectMessageList {
     name: `${this.auth.displayName()} (Du)`,
     avatar: this.auth.photoURL(),
     online: true,
+    isCurrentUser: true,
   }));
 
   /** Platzhalter, kommt spaeter aus Firebase. */

@@ -25,7 +25,7 @@
             [avatar]="user.avatar"
             [online]="user.online"
             [active]="user.id === activeUserId()"
-            (selected)="userSelected.emit(user.id)"
+            (selected)="userSelected.emit(user)"
           />
         </li>
       }
