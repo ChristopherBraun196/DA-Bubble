@@ -1,5 +1,6 @@
 <form class="message-input" (submit)="$event.preventDefault(); submitMessage()">
   <textarea
+    #messageField
     class="message-input__field"
     name="message"
     rows="2"
@@ -12,7 +13,31 @@
   ></textarea>
 
   <div class="message-input__actions">
-    <button class="message-input__icon" type="button" aria-label="Emoji einfügen">
+    @if (emojiPickerOpen()) {
+      <div class="message-input__emoji-picker" role="listbox" aria-label="Emoji auswählen">
+        @for (emoji of emojis; track emoji) {
+          <button
+            class="message-input__emoji"
+            type="button"
+            role="option"
+            [attr.aria-label]="emoji + ' einfügen'"
+            (click)="insertEmoji(emoji)"
+          >
+            {{ emoji }}
+          </button>
+        }
+      </div>
+    }
+
+    <button
+      class="message-input__icon"
+      type="button"
+      aria-label="Emoji einfügen"
+      aria-haspopup="listbox"
+      [attr.aria-expanded]="emojiPickerOpen()"
+      [disabled]="disabled()"
+      (click)="toggleEmojiPicker()"
+    >
       <span class="material-symbols-outlined">sentiment_satisfied</span>
     </button>
     <button class="message-input__icon" type="button" aria-label="Person erwähnen">
