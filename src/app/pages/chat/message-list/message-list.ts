@@ -1,6 +1,11 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { ChatMessage } from '../../../core/models/message.model';
 import { MessageItem } from '../message-item/message-item';
+
+export interface MessageEdit {
+  id: string;
+  text: string;
+}
 
 type MessageListEntry =
   | { type: 'date'; id: string; label: string }
@@ -17,6 +22,7 @@ export class MessageList {
   readonly currentUserId = input<string | null>(null);
   readonly loading = input(false);
   readonly error = input('');
+  readonly messageEdited = output<MessageEdit>();
 
   protected readonly entries = computed(() => this.createEntries(this.messages()));
 

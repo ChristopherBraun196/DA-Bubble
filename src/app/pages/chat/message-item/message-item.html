@@ -12,7 +12,80 @@
         }
       </div>
 
-      <p class="message__bubble">{{ message.text }}</p>
+      @if (editing()) {
+        <div class="message__edit">
+          <textarea
+            class="message__edit-input"
+            rows="3"
+            aria-label="Nachricht bearbeiten"
+            [value]="draft()"
+            (input)="updateDraft($event)"
+          ></textarea>
+
+          <div class="message__edit-actions">
+            <button class="message__edit-emoji" type="button" aria-label="Emoji einfügen">
+              <span class="material-symbols-outlined">sentiment_satisfied</span>
+            </button>
+
+            <button
+              class="message__edit-button message__edit-button--ghost"
+              type="button"
+              (click)="cancelEdit()"
+            >
+              Abbrechen
+            </button>
+            <button
+              class="message__edit-button message__edit-button--solid"
+              type="button"
+              (click)="saveEdit()"
+            >
+              Speichern
+            </button>
+          </div>
+        </div>
+      } @else {
+        <p class="message__bubble">{{ message.text }}</p>
+      }
     </div>
+
+    <!-- Die Reaktionen haben noch keine Funktion, das Bearbeiten schon. -->
+    @if (!editing()) {
+      <div class="message__actions" [class.message__actions--open]="menuOpen()">
+        <button class="message__action" type="button" aria-label="Mit Haken reagieren">
+          <span class="message__emoji">✅</span>
+        </button>
+        <button class="message__action" type="button" aria-label="Mit Daumen hoch reagieren">
+          <span class="message__emoji">👍</span>
+        </button>
+        <button class="message__action" type="button" aria-label="Reaktion hinzufügen">
+          <span class="material-symbols-outlined">add_reaction</span>
+        </button>
+        <button class="message__action" type="button" aria-label="Thread öffnen">
+          <span class="material-symbols-outlined">comment</span>
+        </button>
+
+        @if (ownMessage()) {
+          <div class="message__menu-wrap">
+            <button
+              class="message__action"
+              type="button"
+              aria-label="Weitere Optionen"
+              [attr.aria-expanded]="menuOpen()"
+              (click)="toggleMenu()"
+            >
+              <span class="material-symbols-outlined">more_vert</span>
+            </button>
+
+            @if (menuOpen()) {
+              <div class="message__menu">
+                <button class="message__menu-item" type="button" (click)="startEdit()">
+                  Nachricht bearbeiten
+                </button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
   </article>
 }

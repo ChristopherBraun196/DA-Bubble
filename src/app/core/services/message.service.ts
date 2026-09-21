@@ -13,6 +13,7 @@ import {
   serverTimestamp,
   Timestamp,
   Unsubscribe,
+  updateDoc,
   writeBatch,
 } from 'firebase/firestore';
 
@@ -93,6 +94,17 @@ export class MessageService {
       return;
     }
     await this.persistMessage(chatId, messageText, user);
+  }
+
+  async updateMessage(chatId: string, messageId: string, text: string): Promise<void> {
+    const messageText = text.trim();
+
+    if (!messageText) {
+      return;
+    }
+
+    const messageRef = doc(this.firebase.firestore, 'chats', chatId, 'messages', messageId);
+    await updateDoc(messageRef, { text: messageText, editedAt: serverTimestamp() });
   }
 
   private async persistMessage(chatId: string, text: string, user: User): Promise<void> {

@@ -29,19 +29,13 @@ export class UserService {
       .sort((first, second) => first.displayName.localeCompare(second.displayName, 'de'));
   }
 
-  /**
-   * Sucht Nutzer, deren Name den Suchtext enthaelt - fuer die Autovervollstaendigung.
-   * Die Nutzerliste wird dafuer einmal pro Sitzung geladen und danach im Speicher gefiltert.
-   */
   async searchByName(term: string, maxResults = 8): Promise<UserSearchResult[]> {
     const search = term.trim().toLocaleLowerCase('de-DE');
 
     if (search.length < 3) {
       return [];
     }
-
     const users = await this.getCachedUsers();
-
     return users
       .filter(({ displayName }) => displayName.toLocaleLowerCase('de-DE').includes(search))
       .slice(0, maxResults);
@@ -52,7 +46,6 @@ export class UserService {
     return this.cachedUsers;
   }
 
-  /** Sucht ueber das Feld nameNormalized, also unabhaengig von Gross- und Kleinschreibung. */
   async findByName(name: string): Promise<UserSearchResult[]> {
     const nameNormalized = name.trim().toLocaleLowerCase('de-DE');
 

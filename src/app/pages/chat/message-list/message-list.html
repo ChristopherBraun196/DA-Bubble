@@ -15,6 +15,7 @@
         <app-message-item
           [message]="entry.message"
           [ownMessage]="entry.message.authorId === currentUserId()"
+          (edited)="messageEdited.emit({ id: entry.message.id, text: $event })"
         />
       }
     }

@@ -4,7 +4,7 @@ import { ChatService } from '../../../core/services/chat.service';
 import { MessageService } from '../../../core/services/message.service';
 import { ChatHeader } from '../chat-header/chat-header';
 import { MessageInput } from '../message-input/message-input';
-import { MessageList } from '../message-list/message-list';
+import { MessageEdit, MessageList } from '../message-list/message-list';
 
 @Component({
   imports: [ChatHeader, MessageInput, MessageList],
@@ -51,5 +51,15 @@ export class ChatView {
     } finally {
       this.sending.set(false);
     }
+  }
+
+  protected async editMessage({ id, text }: MessageEdit): Promise<void> {
+    const chatId = this.chats.activeChatId();
+
+    if (!chatId) {
+      return;
+    }
+
+    await this.messages.updateMessage(chatId, id, text);
   }
 }

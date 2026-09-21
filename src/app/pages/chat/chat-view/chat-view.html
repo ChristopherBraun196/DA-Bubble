@@ -8,6 +8,7 @@
         [currentUserId]="auth.currentUser()?.uid || null"
         [loading]="messages.loading()"
         [error]="messages.error()"
+        (messageEdited)="editMessage($event)"
       />
     </div>
 
