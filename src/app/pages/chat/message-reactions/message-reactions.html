@@ -1,0 +1,50 @@
+@if (reactions().length) {
+  <div class="reactions">
+    @for (reaction of visibleReactions(); track reaction.emoji) {
+      <div class="reactions__item">
+        <button
+          class="reactions__chip"
+          type="button"
+          [class.reactions__chip--selected]="reactedByCurrentUser(reaction)"
+          [attr.aria-label]="reaction.emoji + ' Reaktion umschalten'"
+          (click)="toggleReaction(reaction.emoji)"
+        >
+          <span class="reactions__emoji">{{ reaction.emoji }}</span>
+          <span>{{ reaction.users.length }}</span>
+        </button>
+
+        <div class="reactions__tooltip" role="tooltip">
+          <span class="reactions__tooltip-emoji">{{ reaction.emoji }}</span>
+          <strong>{{ reactionNames(reaction) }}</strong>
+          <span>hat reagiert</span>
+        </div>
+      </div>
+    }
+
+    @if (hiddenCount()) {
+      <button class="reactions__more" type="button" (click)="expanded.set(true)">
+        +{{ hiddenCount() }} weitere
+      </button>
+    } @else if (expanded() && reactions().length > visibleLimit()) {
+      <button class="reactions__more" type="button" (click)="expanded.set(false)">
+        Weniger anzeigen
+      </button>
+    }
+
+    <div class="reactions__picker-wrap">
+      <button
+        class="reactions__add"
+        type="button"
+        aria-label="Reaktion hinzufügen"
+        [attr.aria-expanded]="pickerOpen()"
+        (click)="togglePicker()"
+      >
+        <span class="material-symbols-outlined">add_reaction</span>
+      </button>
+
+      @if (pickerOpen()) {
+        <app-emoji-picker class="reactions__picker" (selected)="toggleReaction($event)" />
+      }
+    </div>
+  </div>
+}

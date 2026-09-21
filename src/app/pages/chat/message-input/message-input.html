@@ -30,19 +30,7 @@
     }
 
     @if (emojiPickerOpen()) {
-      <div class="message-input__emoji-picker" role="listbox" aria-label="Emoji auswählen">
-        @for (emoji of emojis; track emoji) {
-          <button
-            class="message-input__emoji"
-            type="button"
-            role="option"
-            [attr.aria-label]="emoji + ' einfügen'"
-            (click)="insertEmoji(emoji)"
-          >
-            {{ emoji }}
-          </button>
-        }
-      </div>
+      <app-emoji-picker class="message-input__emoji-picker" (selected)="insertEmoji($event)" />
     }
 
     <button

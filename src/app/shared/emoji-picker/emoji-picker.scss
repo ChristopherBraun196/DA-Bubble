@@ -1,0 +1,35 @@
+@use '../../../styles/variables' as variables;
+
+.emoji-picker {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  width: 100%;
+  padding: 12px;
+  border: 1px solid variables.$purple-light;
+  border-radius: 20px;
+  background-color: variables.$white;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.emoji-picker__option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  aspect-ratio: 1;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  font-family: 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    outline: none;
+    background-color: variables.$background;
+  }
+}

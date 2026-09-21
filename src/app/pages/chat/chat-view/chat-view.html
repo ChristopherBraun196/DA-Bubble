@@ -9,6 +9,7 @@
         [loading]="messages.loading()"
         [error]="messages.error()"
         (messageEdited)="editMessage($event)"
+        (reactionToggled)="toggleReaction($event)"
       />
     </div>
 

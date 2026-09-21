@@ -1,0 +1,108 @@
+@use '../../../../styles/variables' as variables;
+
+.reactions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+}
+
+.reactions__item,
+.reactions__picker-wrap {
+  position: relative;
+}
+
+.reactions__chip,
+.reactions__more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 34px;
+  padding: 5px 10px;
+  border: 1px solid variables.$purple-light;
+  border-radius: 20px;
+  background-color: variables.$white;
+  color: variables.$black;
+  font-family: inherit;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.reactions__chip {
+  min-width: 64px;
+  gap: 10px;
+
+  &--selected {
+    border-color: variables.$purple-primary;
+    background-color: variables.$background;
+  }
+}
+
+.reactions__emoji {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.reactions__add {
+  display: grid;
+  width: 36px;
+  height: 34px;
+  padding: 0;
+  border: none;
+  border-radius: 20px;
+  background-color: variables.$white;
+  color: variables.$black;
+  place-items: center;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    outline: none;
+    background-color: variables.$background;
+    color: variables.$purple-primary;
+  }
+}
+
+.reactions__tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  z-index: 4;
+  display: none;
+  min-width: 158px;
+  min-height: 112px;
+  padding: 10px;
+  border-radius: 30px 30px 30px 0;
+  background-color: variables.$purple-primary;
+  color: variables.$white;
+  text-align: center;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.reactions__item:hover .reactions__tooltip,
+.reactions__item:focus-within .reactions__tooltip {
+  display: flex;
+}
+
+.reactions__tooltip-emoji {
+  font-size: 30px;
+  line-height: 1;
+}
+
+.reactions__picker {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 8px);
+  z-index: 5;
+  display: block;
+  width: min(304px, calc(100vw - 48px));
+}
+
+@media (max-width: 700px) {
+  .reactions__tooltip {
+    display: none;
+  }
+}

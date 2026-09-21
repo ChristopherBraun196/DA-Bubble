@@ -1,43 +1,59 @@
 import { DatePipe } from '@angular/common';
 import { Component, ElementRef, input, output, signal, viewChild } from '@angular/core';
 import { ChatMessage } from '../../../core/models/message.model';
+import { ReactionEmoji } from '../../../core/models/reaction.model';
 import { AvatarFallback } from '../../../shared/avatar-fallback/avatar-fallback';
+import { EmojiPicker } from '../../../shared/emoji-picker/emoji-picker';
+import { MessageReactions } from '../message-reactions/message-reactions';
 
 @Component({
-  imports: [DatePipe, AvatarFallback],
+  imports: [DatePipe, AvatarFallback, MessageReactions, EmojiPicker],
   selector: 'app-message-item',
   styleUrl: './message-item.scss',
   templateUrl: './message-item.html',
   host: {
-    '(document:click)': 'closeMenuOnOutsideClick($event)',
+    '(document:click)': 'closePopoversOutside($event)',
   },
 })
 export class MessageItem {
   readonly message = input<ChatMessage | null>(null);
   readonly ownMessage = input(false);
+  readonly currentUserId = input<string | null>(null);
 
   readonly edited = output<string>();
+  readonly reactionToggled = output<ReactionEmoji>();
 
   protected readonly menuOpen = signal(false);
+  protected readonly reactionPickerOpen = signal(false);
   protected readonly editing = signal(false);
   protected readonly draft = signal('');
 
   private readonly menuWrap = viewChild<ElementRef<HTMLElement>>('menuWrap');
+  private readonly reactionPickerWrap = viewChild<ElementRef<HTMLElement>>('reactionPickerWrap');
 
   protected toggleMenu(): void {
+    this.reactionPickerOpen.set(false);
     this.menuOpen.update((open) => !open);
   }
 
-  protected closeMenuOnOutsideClick(event: MouseEvent): void {
-    if (!this.menuOpen()) {
-      return;
-    }
+  protected toggleReactionPicker(): void {
+    this.menuOpen.set(false);
+    this.reactionPickerOpen.update((open) => !open);
+  }
 
-    const wrap = this.menuWrap()?.nativeElement;
-
-    if (wrap && !wrap.contains(event.target as Node)) {
+  protected closePopoversOutside(event: MouseEvent): void {
+    const target = event.target as Node;
+    if (this.menuOpen() && !this.menuWrap()?.nativeElement.contains(target)) {
       this.menuOpen.set(false);
     }
+    if (this.reactionPickerOpen() && !this.reactionPickerWrap()?.nativeElement.contains(target)) {
+      this.reactionPickerOpen.set(false);
+    }
+  }
+
+  protected toggleReaction(emoji: ReactionEmoji): void {
+    this.reactionToggled.emit(emoji);
+    this.reactionPickerOpen.set(false);
   }
 
   protected startEdit(): void {

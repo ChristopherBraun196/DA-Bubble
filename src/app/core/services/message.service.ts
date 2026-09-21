@@ -4,14 +4,17 @@ import {
   collection,
   doc,
   DocumentData,
+  DocumentReference,
   limitToLast,
   onSnapshot,
   orderBy,
   query,
   QueryDocumentSnapshot,
   QuerySnapshot,
+  runTransaction,
   serverTimestamp,
   Timestamp,
+  Transaction,
   Unsubscribe,
   updateDoc,
   writeBatch,
@@ -19,6 +22,7 @@ import {
 
 import { FirebaseService } from '../firebase/firebase.service';
 import { ChatMessage, ChatMessageDocument } from '../models/message.model';
+import { MessageReaction, ReactionEmoji, ReactionUser } from '../models/reaction.model';
 import { AuthService } from './auth.service';
 
 const MESSAGE_LIMIT = 50;
@@ -107,6 +111,18 @@ export class MessageService {
     await updateDoc(messageRef, { text: messageText, editedAt: serverTimestamp() });
   }
 
+  async toggleReaction(chatId: string, messageId: string, emoji: ReactionEmoji): Promise<void> {
+    const user = this.auth.currentUser();
+    if (!user) {
+      return;
+    }
+    const messageRef = doc(this.firebase.firestore, 'chats', chatId, 'messages', messageId);
+    const reactingUser = { id: user.uid, name: this.auth.displayName() };
+    await runTransaction(this.firebase.firestore, (transaction) =>
+      this.updateReaction(transaction, messageRef, emoji, reactingUser),
+    );
+  }
+
   private async persistMessage(chatId: string, text: string, user: User): Promise<void> {
     const chatRef = doc(this.firebase.firestore, 'chats', chatId);
     const messageRef = doc(collection(chatRef, 'messages'));
@@ -125,6 +141,7 @@ export class MessageService {
       threadParentId: null,
       createdAt: serverTimestamp(),
       editedAt: null,
+      reactions: [],
     };
   }
 
@@ -140,7 +157,51 @@ export class MessageService {
       threadParentId: data.threadParentId || null,
       createdAt: data.createdAt instanceof Timestamp ? data.createdAt : null,
       editedAt: data.editedAt instanceof Timestamp ? data.editedAt : null,
+      reactions: this.readReactions(data.reactions),
     };
+  }
+
+  private toggleUser(
+    reactions: MessageReaction[],
+    emoji: ReactionEmoji,
+    user: ReactionUser,
+  ): MessageReaction[] {
+    const current = reactions.find((reaction) => reaction.emoji === emoji);
+    if (!current) {
+      return [...reactions, this.createReaction(emoji, user)];
+    }
+    const users = this.toggleReactionUser(current.users, user);
+    return reactions.flatMap((reaction) =>
+      reaction.emoji !== emoji ? [reaction] : users.length ? [{ emoji, users }] : [],
+    );
+  }
+
+  private async updateReaction(
+    transaction: Transaction,
+    messageRef: DocumentReference<DocumentData>,
+    emoji: ReactionEmoji,
+    user: ReactionUser,
+  ): Promise<void> {
+    const snapshot = await transaction.get(messageRef);
+    if (!snapshot.exists()) {
+      return;
+    }
+    const reactions = this.readReactions(snapshot.data()['reactions']);
+    transaction.update(messageRef, { reactions: this.toggleUser(reactions, emoji, user) });
+  }
+
+  private toggleReactionUser(users: ReactionUser[], user: ReactionUser): ReactionUser[] {
+    return users.some(({ id }) => id === user.id)
+      ? users.filter(({ id }) => id !== user.id)
+      : [...users, user];
+  }
+
+  private createReaction(emoji: ReactionEmoji, user: ReactionUser): MessageReaction {
+    return { emoji, users: [user] };
+  }
+
+  private readReactions(value: unknown): MessageReaction[] {
+    return Array.isArray(value) ? (value as MessageReaction[]) : [];
   }
 
   private resolveErrorMessage(error: unknown): string {

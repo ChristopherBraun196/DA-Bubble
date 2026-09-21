@@ -1,0 +1,13 @@
+<div class="emoji-picker" role="listbox" aria-label="Emoji auswählen">
+  @for (emoji of emojis; track emoji) {
+    <button
+      class="emoji-picker__option"
+      type="button"
+      role="option"
+      [attr.aria-label]="emoji + ' auswählen'"
+      (click)="selected.emit(emoji)"
+    >
+      {{ emoji }}
+    </button>
+  }
+</div>

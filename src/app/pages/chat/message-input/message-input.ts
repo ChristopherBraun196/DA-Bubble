@@ -13,18 +13,13 @@ import { UserSearchResult } from '../../../core/models/user.model';
 import { AuthService } from '../../../core/services/auth.service';
 import { ChatService } from '../../../core/services/chat.service';
 import { UserService } from '../../../core/services/user.service';
+import { EmojiPicker } from '../../../shared/emoji-picker/emoji-picker';
 import { MentionDropdown, MentionEntry } from '../../../shared/mention-dropdown/mention-dropdown';
 
-const MESSAGE_EMOJIS = [
-  '😀 😃 😄 😁 😆 😅 😂 🤣',
-  '😊 😍 🥰 😘 😎 🤓 🤔 🙄',
-  '😢 😭 😡 🥳 🤩 🤯 👍 👎',
-  '👏 🙌 🙏 💪 ❤️ 🔥 ✅ 🚀',
-].flatMap((group) => group.split(' '));
 const MENTION_KEYS = ['ArrowDown', 'ArrowUp', 'Enter'];
 
 @Component({
-  imports: [MentionDropdown],
+  imports: [MentionDropdown, EmojiPicker],
   selector: 'app-message-input',
   styleUrl: './message-input.scss',
   templateUrl: './message-input.html',
@@ -57,7 +52,6 @@ export class MessageInput {
       .map(({ id, name }) => ({ id, label: name, value: name, icon: '#' }))
       .sort((first, second) => first.label.localeCompare(second.label, 'de')),
   );
-  protected readonly emojis = MESSAGE_EMOJIS;
   protected readonly messageField = viewChild<ElementRef<HTMLTextAreaElement>>('messageField');
   protected readonly mentionDropdown = viewChild(MentionDropdown);
 

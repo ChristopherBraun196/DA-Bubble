@@ -1,10 +1,16 @@
 import { Component, computed, input, output } from '@angular/core';
 import { ChatMessage } from '../../../core/models/message.model';
+import { ReactionEmoji } from '../../../core/models/reaction.model';
 import { MessageItem } from '../message-item/message-item';
 
 export interface MessageEdit {
   id: string;
   text: string;
+}
+
+export interface MessageReactionToggle {
+  id: string;
+  emoji: ReactionEmoji;
 }
 
 type MessageListEntry =
@@ -23,6 +29,7 @@ export class MessageList {
   readonly loading = input(false);
   readonly error = input('');
   readonly messageEdited = output<MessageEdit>();
+  readonly reactionToggled = output<MessageReactionToggle>();
 
   protected readonly entries = computed(() => this.createEntries(this.messages()));
 

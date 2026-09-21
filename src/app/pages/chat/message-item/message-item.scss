@@ -48,6 +48,11 @@
     background-color: #797ef3;
     color: #ffffff;
   }
+
+  .message__reaction-picker {
+    right: auto;
+    left: 0;
+  }
 }
 
 .message__avatar {
@@ -64,6 +69,11 @@
   align-items: flex-start;
   gap: 8px;
   min-width: 0;
+}
+
+app-message-reactions {
+  display: block;
+  max-width: 100%;
 }
 
 .message__meta {
@@ -134,7 +144,9 @@
   background: transparent;
   color: #686868;
   cursor: pointer;
-  transition: background-color 150ms ease, color 150ms ease;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
 
   &:hover {
     background-color: #eceefe;
@@ -149,7 +161,10 @@
   font-size: 18px;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease,
+    border-color 150ms ease;
 
   &--ghost {
     border: 1px solid #797ef3;
@@ -199,6 +214,20 @@
   display: flex;
 }
 
+.message__reaction-picker-wrap {
+  position: relative;
+  display: flex;
+}
+
+.message__reaction-picker {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 8px);
+  z-index: 4;
+  display: block;
+  width: min(304px, calc(100vw - 48px));
+}
+
 .message__menu {
   position: absolute;
   top: calc(100% + 12px);
@@ -240,7 +269,9 @@
   background: transparent;
   color: #686868;
   cursor: pointer;
-  transition: background-color 150ms ease, color 150ms ease;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
 
   &:hover {
     background-color: #eceefe;

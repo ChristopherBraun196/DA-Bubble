@@ -4,7 +4,7 @@ import { ChatService } from '../../../core/services/chat.service';
 import { MessageService } from '../../../core/services/message.service';
 import { ChatHeader } from '../chat-header/chat-header';
 import { MessageInput } from '../message-input/message-input';
-import { MessageEdit, MessageList } from '../message-list/message-list';
+import { MessageEdit, MessageList, MessageReactionToggle } from '../message-list/message-list';
 
 @Component({
   imports: [ChatHeader, MessageInput, MessageList],
@@ -61,5 +61,13 @@ export class ChatView {
     }
 
     await this.messages.updateMessage(chatId, id, text);
+  }
+
+  protected async toggleReaction({ id, emoji }: MessageReactionToggle): Promise<void> {
+    const chatId = this.chats.activeChatId();
+    if (!chatId) {
+      return;
+    }
+    await this.messages.toggleReaction(chatId, id, emoji);
   }
 }
