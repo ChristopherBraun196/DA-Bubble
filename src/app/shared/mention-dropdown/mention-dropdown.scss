@@ -18,7 +18,7 @@
 .mention-dropdown__item {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--mention-dropdown-item-gap, 12px);
   width: 100%;
   padding: var(--mention-dropdown-item-padding, 8px 12px);
   border: none;
@@ -35,6 +35,19 @@
     background-color: variables.$background;
     outline: none;
   }
+}
+
+.mention-dropdown__icon {
+  width: 24px;
+  color: variables.$black;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+}
+
+.mention-dropdown__item--active .mention-dropdown__icon {
+  color: variables.$purple-primary;
 }
 
 .mention-dropdown__avatar {

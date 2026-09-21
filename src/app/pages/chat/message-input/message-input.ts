@@ -1,5 +1,6 @@
 import {
   Component,
+  computed,
   ElementRef,
   HostListener,
   inject,
@@ -10,6 +11,7 @@ import {
 } from '@angular/core';
 import { UserSearchResult } from '../../../core/models/user.model';
 import { AuthService } from '../../../core/services/auth.service';
+import { ChatService } from '../../../core/services/chat.service';
 import { UserService } from '../../../core/services/user.service';
 import { MentionDropdown, MentionEntry } from '../../../shared/mention-dropdown/mention-dropdown';
 
@@ -30,6 +32,7 @@ const MENTION_KEYS = ['ArrowDown', 'ArrowUp', 'Enter'];
 export class MessageInput {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly auth = inject(AuthService);
+  private readonly chats = inject(ChatService);
   private readonly users = inject(UserService);
   private loadingUsers = false;
 
@@ -43,7 +46,17 @@ export class MessageInput {
   protected readonly mentionOpen = signal(false);
   protected readonly mentionSearch = signal('');
   protected readonly mentionStart = signal<number | null>(null);
+  protected readonly channelOpen = signal(false);
+  protected readonly channelSearch = signal('');
+  protected readonly channelStart = signal<number | null>(null);
   protected readonly userEntries = signal<MentionEntry[]>([]);
+  protected readonly channelEntries = computed<MentionEntry[]>(() =>
+    this.chats
+      .chats()
+      .filter(({ type }) => type === 'channel')
+      .map(({ id, name }) => ({ id, label: name, value: name, icon: '#' }))
+      .sort((first, second) => first.label.localeCompare(second.label, 'de')),
+  );
   protected readonly emojis = MESSAGE_EMOJIS;
   protected readonly messageField = viewChild<ElementRef<HTMLTextAreaElement>>('messageField');
   protected readonly mentionDropdown = viewChild(MentionDropdown);
@@ -52,18 +65,18 @@ export class MessageInput {
   protected closePickersOutside(event: MouseEvent): void {
     if (!this.host.nativeElement.contains(event.target as Node)) {
       this.emojiPickerOpen.set(false);
-      this.closeMentionPicker();
+      this.closeSuggestionPickers();
     }
   }
 
   protected updateMessage(event: Event): void {
     const field = event.target as HTMLTextAreaElement;
     this.message.set(field.value);
-    this.updateMentionState(field.value, field.selectionStart);
+    this.updateSuggestionState(field.value, field.selectionStart);
   }
 
   protected toggleEmojiPicker(): void {
-    this.closeMentionPicker();
+    this.closeSuggestionPickers();
     this.emojiPickerOpen.update((open) => !open);
   }
 
@@ -73,7 +86,7 @@ export class MessageInput {
     const end = field?.selectionEnd ?? start;
     this.message.update((text) => text.slice(0, start) + emoji + text.slice(end));
     this.emojiPickerOpen.set(false);
-    this.closeMentionPicker();
+    this.closeSuggestionPickers();
     this.restoreCursor(field, start + emoji.length);
   }
 
@@ -102,6 +115,18 @@ export class MessageInput {
     this.restoreCursor(field, cursor);
   }
 
+  protected selectChannel(entry: MentionEntry): void {
+    const field = this.messageField()?.nativeElement;
+    const start = this.channelStart();
+    if (!field || start === null) {
+      return;
+    }
+    const channel = `#${entry.value || entry.label} `;
+    const cursor = this.replaceText(start, field.selectionStart, channel);
+    this.closeChannelPicker();
+    this.restoreCursor(field, cursor);
+  }
+
   private restoreCursor(field: HTMLTextAreaElement | undefined, position: number): void {
     requestAnimationFrame(() => {
       field?.focus();
@@ -110,7 +135,7 @@ export class MessageInput {
   }
 
   protected handleKeydown(event: KeyboardEvent): void {
-    if (this.handleMentionKeydown(event)) {
+    if (this.handleSuggestionKeydown(event)) {
       return;
     }
     if (event.key !== 'Enter' || event.shiftKey || event.isComposing) {
@@ -131,34 +156,52 @@ export class MessageInput {
     this.messageSent.emit(message);
     this.message.set('');
     this.emojiPickerOpen.set(false);
-    this.closeMentionPicker();
+    this.closeSuggestionPickers();
   }
 
-  private updateMentionState(text: string, cursor: number): void {
+  private updateSuggestionState(text: string, cursor: number): void {
     const beforeCursor = text.slice(0, cursor);
-    const match = beforeCursor.match(/(?:^|\s)@([^\s@]*)$/);
-    if (!match) {
-      this.closeMentionPicker();
+    const mentionMatch = beforeCursor.match(/(?:^|\s)@([^\s@]*)$/);
+    if (mentionMatch) {
+      this.openTypedMention(beforeCursor, mentionMatch[1]);
       return;
     }
-    this.mentionStart.set(beforeCursor.lastIndexOf('@'));
-    this.openMention(match[1]);
+    const channelMatch = beforeCursor.match(/(?:^|\s)#([^\s#]*)$/);
+    if (channelMatch) {
+      this.openTypedChannel(beforeCursor, channelMatch[1]);
+      return;
+    }
+    this.closeSuggestionPickers();
+  }
+
+  private openTypedMention(text: string, search: string): void {
+    this.mentionStart.set(text.lastIndexOf('@'));
+    this.openMention(search);
+  }
+
+  private openTypedChannel(text: string, search: string): void {
+    this.channelStart.set(text.lastIndexOf('#'));
+    this.channelSearch.set(search);
+    this.channelOpen.set(true);
+    this.closeMentionPicker();
+    this.emojiPickerOpen.set(false);
   }
 
   private openMention(search: string): void {
     this.mentionSearch.set(search);
     this.mentionOpen.set(true);
+    this.closeChannelPicker();
     this.emojiPickerOpen.set(false);
     void this.loadUsers();
   }
 
-  private handleMentionKeydown(event: KeyboardEvent): boolean {
-    if (!this.mentionOpen()) {
+  private handleSuggestionKeydown(event: KeyboardEvent): boolean {
+    if (!this.mentionOpen() && !this.channelOpen()) {
       return false;
     }
     if (event.key === 'Escape') {
       event.preventDefault();
-      this.closeMentionPicker();
+      this.closeSuggestionPickers();
       return true;
     }
     if (!event.shiftKey && MENTION_KEYS.includes(event.key)) {
@@ -169,10 +212,21 @@ export class MessageInput {
     return false;
   }
 
+  private closeSuggestionPickers(): void {
+    this.closeMentionPicker();
+    this.closeChannelPicker();
+  }
+
   private closeMentionPicker(): void {
     this.mentionOpen.set(false);
     this.mentionSearch.set('');
     this.mentionStart.set(null);
+  }
+
+  private closeChannelPicker(): void {
+    this.channelOpen.set(false);
+    this.channelSearch.set('');
+    this.channelStart.set(null);
   }
 
   private replaceText(start: number, end: number, value: string): number {

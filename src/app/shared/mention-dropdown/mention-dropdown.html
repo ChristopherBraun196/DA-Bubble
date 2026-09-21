@@ -11,6 +11,8 @@
       >
         @if (entry.avatar) {
           <img appAvatarFallback class="mention-dropdown__avatar" [src]="entry.avatar" alt="" />
+        } @else if (entry.icon) {
+          <span class="mention-dropdown__icon" aria-hidden="true">{{ entry.icon }}</span>
         }
         <span class="mention-dropdown__label">{{ entry.label }}</span>
       </button>

@@ -14,6 +14,7 @@ export interface MentionEntry {
   label: string;
   value?: string;
   avatar?: string;
+  icon?: string;
 }
 
 @Component({

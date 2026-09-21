@@ -20,6 +20,13 @@
         [search]="mentionSearch()"
         (selected)="selectMention($event)"
       />
+    } @else if (channelOpen()) {
+      <app-mention-dropdown
+        class="message-input__mention-dropdown message-input__mention-dropdown--channels"
+        [entries]="channelEntries()"
+        [search]="channelSearch()"
+        (selected)="selectChannel($event)"
+      />
     }
 
     @if (emojiPickerOpen()) {
