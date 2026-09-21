@@ -1,14 +1,17 @@
 @use '../../../styles/variables' as variables;
 
 .mention-dropdown {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mention-dropdown-gap, 0);
   margin: 0;
-  padding: 8px;
+  padding: var(--mention-dropdown-padding, 8px);
   list-style: none;
   border: 1px solid variables.$purple-light;
   border-radius: 20px;
   background-color: variables.$white;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  max-height: 280px;
+  max-height: var(--mention-dropdown-max-height, 280px);
   overflow-y: auto;
 }
 
@@ -17,12 +20,12 @@
   align-items: center;
   gap: 12px;
   width: 100%;
-  padding: 8px 12px;
+  padding: var(--mention-dropdown-item-padding, 8px 12px);
   border: none;
   border-radius: 25px;
   background: transparent;
   font-family: inherit;
-  font-size: 16px;
+  font-size: var(--mention-dropdown-font-size, 16px);
   text-align: left;
   cursor: pointer;
 
@@ -35,8 +38,8 @@
 }
 
 .mention-dropdown__avatar {
-  width: 40px;
-  height: 40px;
+  width: var(--mention-dropdown-avatar-size, 40px);
+  height: var(--mention-dropdown-avatar-size, 40px);
   border-radius: 50%;
   object-fit: cover;
 }

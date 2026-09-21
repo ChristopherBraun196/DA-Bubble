@@ -8,6 +8,10 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { UserSearchResult } from '../../../core/models/user.model';
+import { AuthService } from '../../../core/services/auth.service';
+import { UserService } from '../../../core/services/user.service';
+import { MentionDropdown, MentionEntry } from '../../../shared/mention-dropdown/mention-dropdown';
 
 const MESSAGE_EMOJIS = [
   '😀 😃 😄 😁 😆 😅 😂 🤣',
@@ -15,15 +19,19 @@ const MESSAGE_EMOJIS = [
   '😢 😭 😡 🥳 🤩 🤯 👍 👎',
   '👏 🙌 🙏 💪 ❤️ 🔥 ✅ 🚀',
 ].flatMap((group) => group.split(' '));
+const MENTION_KEYS = ['ArrowDown', 'ArrowUp', 'Enter'];
 
 @Component({
-  imports: [],
+  imports: [MentionDropdown],
   selector: 'app-message-input',
   styleUrl: './message-input.scss',
   templateUrl: './message-input.html',
 })
 export class MessageInput {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly auth = inject(AuthService);
+  private readonly users = inject(UserService);
+  private loadingUsers = false;
 
   readonly placeholder = input('Nachricht schreiben');
   readonly disabled = input(false);
@@ -32,21 +40,30 @@ export class MessageInput {
 
   protected readonly message = signal('');
   protected readonly emojiPickerOpen = signal(false);
+  protected readonly mentionOpen = signal(false);
+  protected readonly mentionSearch = signal('');
+  protected readonly mentionStart = signal<number | null>(null);
+  protected readonly userEntries = signal<MentionEntry[]>([]);
   protected readonly emojis = MESSAGE_EMOJIS;
   protected readonly messageField = viewChild<ElementRef<HTMLTextAreaElement>>('messageField');
+  protected readonly mentionDropdown = viewChild(MentionDropdown);
 
   @HostListener('document:click', ['$event'])
-  protected closeEmojiPickerOutside(event: MouseEvent): void {
+  protected closePickersOutside(event: MouseEvent): void {
     if (!this.host.nativeElement.contains(event.target as Node)) {
       this.emojiPickerOpen.set(false);
+      this.closeMentionPicker();
     }
   }
 
   protected updateMessage(event: Event): void {
-    this.message.set((event.target as HTMLTextAreaElement).value);
+    const field = event.target as HTMLTextAreaElement;
+    this.message.set(field.value);
+    this.updateMentionState(field.value, field.selectionStart);
   }
 
   protected toggleEmojiPicker(): void {
+    this.closeMentionPicker();
     this.emojiPickerOpen.update((open) => !open);
   }
 
@@ -56,7 +73,33 @@ export class MessageInput {
     const end = field?.selectionEnd ?? start;
     this.message.update((text) => text.slice(0, start) + emoji + text.slice(end));
     this.emojiPickerOpen.set(false);
+    this.closeMentionPicker();
     this.restoreCursor(field, start + emoji.length);
+  }
+
+  protected openMentionPicker(): void {
+    const field = this.messageField()?.nativeElement;
+    if (!field) {
+      return;
+    }
+    const start = field.selectionStart;
+    const marker = start > 0 && !/\s/.test(this.message()[start - 1]) ? ' @' : '@';
+    this.replaceText(start, field.selectionEnd, marker);
+    this.mentionStart.set(start + marker.length - 1);
+    this.openMention('');
+    this.restoreCursor(field, start + marker.length);
+  }
+
+  protected selectMention(entry: MentionEntry): void {
+    const field = this.messageField()?.nativeElement;
+    const start = this.mentionStart();
+    if (!field || start === null) {
+      return;
+    }
+    const mention = `@${entry.value || entry.label} `;
+    const cursor = this.replaceText(start, field.selectionStart, mention);
+    this.closeMentionPicker();
+    this.restoreCursor(field, cursor);
   }
 
   private restoreCursor(field: HTMLTextAreaElement | undefined, position: number): void {
@@ -67,6 +110,9 @@ export class MessageInput {
   }
 
   protected handleKeydown(event: KeyboardEvent): void {
+    if (this.handleMentionKeydown(event)) {
+      return;
+    }
     if (event.key !== 'Enter' || event.shiftKey || event.isComposing) {
       return;
     }
@@ -85,5 +131,80 @@ export class MessageInput {
     this.messageSent.emit(message);
     this.message.set('');
     this.emojiPickerOpen.set(false);
+    this.closeMentionPicker();
+  }
+
+  private updateMentionState(text: string, cursor: number): void {
+    const beforeCursor = text.slice(0, cursor);
+    const match = beforeCursor.match(/(?:^|\s)@([^\s@]*)$/);
+    if (!match) {
+      this.closeMentionPicker();
+      return;
+    }
+    this.mentionStart.set(beforeCursor.lastIndexOf('@'));
+    this.openMention(match[1]);
+  }
+
+  private openMention(search: string): void {
+    this.mentionSearch.set(search);
+    this.mentionOpen.set(true);
+    this.emojiPickerOpen.set(false);
+    void this.loadUsers();
+  }
+
+  private handleMentionKeydown(event: KeyboardEvent): boolean {
+    if (!this.mentionOpen()) {
+      return false;
+    }
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      this.closeMentionPicker();
+      return true;
+    }
+    if (!event.shiftKey && MENTION_KEYS.includes(event.key)) {
+      event.preventDefault();
+      this.mentionDropdown()?.handleKeydown(event);
+      return true;
+    }
+    return false;
+  }
+
+  private closeMentionPicker(): void {
+    this.mentionOpen.set(false);
+    this.mentionSearch.set('');
+    this.mentionStart.set(null);
+  }
+
+  private replaceText(start: number, end: number, value: string): number {
+    this.message.update((text) => text.slice(0, start) + value + text.slice(end));
+    return start + value.length;
+  }
+
+  private async loadUsers(): Promise<void> {
+    if (this.loadingUsers || this.userEntries().length) {
+      return;
+    }
+    this.loadingUsers = true;
+    try {
+      this.userEntries.set(this.toMentionEntries(await this.users.getAllUsers()));
+    } catch {
+      this.userEntries.set([]);
+    } finally {
+      this.loadingUsers = false;
+    }
+  }
+
+  private toMentionEntries(users: UserSearchResult[]): MentionEntry[] {
+    const currentUserId = this.auth.currentUser()?.uid;
+    return users
+      .map(({ uid, displayName, photoURL }) => ({
+        id: uid,
+        label: uid === currentUserId ? `${displayName} (Du)` : displayName,
+        value: displayName,
+        avatar: photoURL,
+      }))
+      .sort(
+        (first, second) => Number(second.id === currentUserId) - Number(first.id === currentUserId),
+      );
   }
 }

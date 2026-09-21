@@ -13,6 +13,15 @@
   ></textarea>
 
   <div class="message-input__actions">
+    @if (mentionOpen()) {
+      <app-mention-dropdown
+        class="message-input__mention-dropdown"
+        [entries]="userEntries()"
+        [search]="mentionSearch()"
+        (selected)="selectMention($event)"
+      />
+    }
+
     @if (emojiPickerOpen()) {
       <div class="message-input__emoji-picker" role="listbox" aria-label="Emoji auswählen">
         @for (emoji of emojis; track emoji) {
@@ -40,7 +49,15 @@
     >
       <span class="material-symbols-outlined">sentiment_satisfied</span>
     </button>
-    <button class="message-input__icon" type="button" aria-label="Person erwähnen">
+    <button
+      class="message-input__icon"
+      type="button"
+      aria-label="Person erwähnen"
+      aria-haspopup="listbox"
+      [attr.aria-expanded]="mentionOpen()"
+      [disabled]="disabled()"
+      (click)="openMentionPicker()"
+    >
       <span class="material-symbols-outlined">alternate_email</span>
     </button>
 

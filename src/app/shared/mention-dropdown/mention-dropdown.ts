@@ -12,6 +12,7 @@ import { AvatarFallback } from '../avatar-fallback/avatar-fallback';
 export interface MentionEntry {
   id: string;
   label: string;
+  value?: string;
   avatar?: string;
 }
 

@@ -32,6 +32,22 @@
   gap: 8px;
 }
 
+.message-input__mention-dropdown {
+  --mention-dropdown-avatar-size: 50px;
+  --mention-dropdown-font-size: 18px;
+  --mention-dropdown-gap: 14px;
+  --mention-dropdown-item-padding: 4px 0;
+  --mention-dropdown-max-height: 466px;
+  --mention-dropdown-padding: 20px 28px;
+
+  position: absolute;
+  bottom: calc(100% - 16px);
+  left: 20px;
+  z-index: 11;
+  display: block;
+  width: min(350px, calc(100% - 40px));
+}
+
 .message-input__emoji-picker {
   position: absolute;
   bottom: 58px;
