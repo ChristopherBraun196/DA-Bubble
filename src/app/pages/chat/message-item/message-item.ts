@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, input, output, signal } from '@angular/core';
+import { Component, ElementRef, input, output, signal, viewChild } from '@angular/core';
 import { ChatMessage } from '../../../core/models/message.model';
 
 @Component({
@@ -7,6 +7,9 @@ import { ChatMessage } from '../../../core/models/message.model';
   selector: 'app-message-item',
   styleUrl: './message-item.scss',
   templateUrl: './message-item.html',
+  host: {
+    '(document:click)': 'closeMenuOnOutsideClick($event)',
+  },
 })
 export class MessageItem {
   readonly message = input<ChatMessage | null>(null);
@@ -18,8 +21,22 @@ export class MessageItem {
   protected readonly editing = signal(false);
   protected readonly draft = signal('');
 
+  private readonly menuWrap = viewChild<ElementRef<HTMLElement>>('menuWrap');
+
   protected toggleMenu(): void {
     this.menuOpen.update((open) => !open);
+  }
+
+  protected closeMenuOnOutsideClick(event: MouseEvent): void {
+    if (!this.menuOpen()) {
+      return;
+    }
+
+    const wrap = this.menuWrap()?.nativeElement;
+
+    if (wrap && !wrap.contains(event.target as Node)) {
+      this.menuOpen.set(false);
+    }
   }
 
   protected startEdit(): void {
