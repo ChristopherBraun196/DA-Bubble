@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, signal, viewChild } from '@angular/core';
 import { AuthService } from '../../../core/services/auth.service';
 import { ChatService } from '../../../core/services/chat.service';
 import { ChatView } from '../../chat/chat-view/chat-view';
@@ -24,6 +24,7 @@ export class Shell {
   protected readonly threadOpen = signal(true);
   protected readonly composing = signal(false);
   protected readonly activeDirectUser = signal<DirectMessageUser | null>(null);
+  protected readonly devspaceNav = viewChild(DevspaceNav);
   protected readonly threadVisible = computed(
     () => this.threadOpen() && !this.composing() && !this.activeDirectUser(),
   );
@@ -52,5 +53,9 @@ export class Shell {
 
   protected showDirectMessage(user: DirectMessageUser | null): void {
     this.activeDirectUser.set(user);
+  }
+
+  protected showChannel(channelId: string): void {
+    this.devspaceNav()?.selectChannel(channelId);
   }
 }

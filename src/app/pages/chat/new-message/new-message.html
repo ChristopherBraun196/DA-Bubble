@@ -29,7 +29,9 @@
   <div class="new-message__input">
     <app-message-input
       placeholder="Starte eine neue Nachricht"
-      [sendDisabled]="!recipient().trim()"
+      [disabled]="sending()"
+      [sendDisabled]="!selectedChannelId()"
+      (messageSent)="sendMessage($event)"
     />
   </div>
 </div>

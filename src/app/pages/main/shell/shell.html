@@ -20,7 +20,7 @@
 
     <main class="shell__chat">
       @if (composing()) {
-        <app-new-message />
+        <app-new-message (channelSelected)="showChannel($event)" />
       } @else if (activeDirectUser(); as user) {
         <app-direct-message-view [user]="user" />
       } @else {

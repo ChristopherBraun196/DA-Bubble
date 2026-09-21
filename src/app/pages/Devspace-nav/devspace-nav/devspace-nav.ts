@@ -33,7 +33,7 @@ export class DevspaceNav {
     return selection?.kind === 'user' ? selection.id : null;
   }
 
-  protected selectChannel(id: string): void {
+  public selectChannel(id: string): void {
     this.composingChanged.emit(false);
     this.directMessageSelected.emit(null);
     this.selection.set({ kind: 'channel', id });
