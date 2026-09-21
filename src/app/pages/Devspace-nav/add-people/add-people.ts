@@ -3,13 +3,14 @@ import { Component, computed, inject, input, output, signal } from '@angular/cor
 import { UserSearchResult } from '../../../core/models/user.model';
 import { ChatService } from '../../../core/services/chat.service';
 import { UserService } from '../../../core/services/user.service';
+import { AvatarFallback } from '../../../shared/avatar-fallback/avatar-fallback';
 
 export type AddPeopleMode = 'all' | 'specific';
 
 const SEARCH_MIN_LENGTH = 3;
 
 @Component({
-  imports: [],
+  imports: [AvatarFallback],
   selector: 'app-add-people',
   styleUrl: './add-people.scss',
   templateUrl: './add-people.html',
@@ -99,8 +100,6 @@ export class AddPeople {
   }
 
   private memberIdsToAdd(): string[] {
-    return this.mode() === 'all'
-      ? this.sourceMemberIds()
-      : this.selected().map(({ uid }) => uid);
+    return this.mode() === 'all' ? this.sourceMemberIds() : this.selected().map(({ uid }) => uid);
   }
 }

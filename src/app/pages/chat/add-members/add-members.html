@@ -19,7 +19,12 @@
       <div class="add-members__field" [class.add-members__field--selected]="selected().length">
         @for (person of selected(); track person.uid) {
           <span class="add-members__chip">
-            <img class="add-members__chip-avatar" [src]="person.photoURL" alt="" />
+            <img
+              appAvatarFallback
+              class="add-members__chip-avatar"
+              [src]="person.photoURL"
+              alt=""
+            />
             <span class="add-members__chip-name">{{ person.displayName }}</span>
             <button
               class="add-members__chip-remove"
@@ -50,7 +55,7 @@
             <li>
               <button class="add-members__suggestion" type="button" (click)="selectPerson(person)">
                 <span class="add-members__suggestion-avatar">
-                  <img [src]="person.photoURL" alt="" />
+                  <img appAvatarFallback [src]="person.photoURL" alt="" />
                   <span class="add-members__suggestion-status" aria-hidden="true"></span>
                 </span>
                 <span>{{ person.displayName }}</span>

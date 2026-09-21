@@ -1,6 +1,6 @@
 @if (message(); as message) {
   <article class="message" [class.message--own]="ownMessage()">
-    <img class="message__avatar" [src]="message.authorPhotoURL" alt="" />
+    <img appAvatarFallback class="message__avatar" [src]="message.authorPhotoURL" alt="" />
 
     <div class="message__content">
       <div class="message__meta">

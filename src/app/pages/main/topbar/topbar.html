@@ -30,7 +30,7 @@
       (click)="toggleMenu()"
     >
       <span class="topbar__user-name">{{ userName() }}</span>
-      <img class="topbar__user-avatar" [src]="userAvatar()" [alt]="userName()" />
+      <img appAvatarFallback class="topbar__user-avatar" [src]="userAvatar()" [alt]="userName()" />
       <span class="material-symbols-outlined topbar__user-chevron">keyboard_arrow_down</span>
     </button>
 

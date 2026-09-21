@@ -10,7 +10,7 @@
         (click)="selected.emit(entry)"
       >
         @if (entry.avatar) {
-          <img class="mention-dropdown__avatar" [src]="entry.avatar" alt="" />
+          <img appAvatarFallback class="mention-dropdown__avatar" [src]="entry.avatar" alt="" />
         }
         <span class="mention-dropdown__label">{{ entry.label }}</span>
       </button>

@@ -14,7 +14,7 @@
     </button>
   </header>
 
-  <img class="profile__avatar" [src]="avatar()" [alt]="name()" />
+  <img appAvatarFallback class="profile__avatar" [src]="avatar()" [alt]="name()" />
 
   @if (editing()) {
     <form class="profile__form" (submit)="$event.preventDefault(); save()">
@@ -40,11 +40,7 @@
       }
 
       <div class="profile__actions">
-        <button
-          class="profile__button profile__button--ghost"
-          type="button"
-          (click)="cancelEdit()"
-        >
+        <button class="profile__button profile__button--ghost" type="button" (click)="cancelEdit()">
           Abbrechen
         </button>
         <button class="profile__button profile__button--solid" type="submit" [disabled]="saving()">

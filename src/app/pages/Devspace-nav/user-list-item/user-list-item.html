@@ -5,7 +5,7 @@
   (click)="selected.emit()"
 >
   <span class="user-item__avatar">
-    <img [src]="avatar()" alt="" />
+    <img appAvatarFallback [src]="avatar()" alt="" />
     <span class="user-item__status" [class.user-item__status--online]="online()"></span>
   </span>
   <span class="user-item__name">{{ name() }}</span>

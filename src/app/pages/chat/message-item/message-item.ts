@@ -1,9 +1,10 @@
 import { DatePipe } from '@angular/common';
 import { Component, ElementRef, input, output, signal, viewChild } from '@angular/core';
 import { ChatMessage } from '../../../core/models/message.model';
+import { AvatarFallback } from '../../../shared/avatar-fallback/avatar-fallback';
 
 @Component({
-  imports: [DatePipe],
+  imports: [DatePipe, AvatarFallback],
   selector: 'app-message-item',
   styleUrl: './message-item.scss',
   templateUrl: './message-item.html',

@@ -1,9 +1,10 @@
 import { Component, computed, inject, output, signal } from '@angular/core';
 
 import { AuthService } from '../../../core/services/auth.service';
+import { AvatarFallback } from '../../../shared/avatar-fallback/avatar-fallback';
 
 @Component({
-  imports: [],
+  imports: [AvatarFallback],
   selector: 'app-profile-dialog',
   styleUrl: './profile-dialog.scss',
   templateUrl: './profile-dialog.html',

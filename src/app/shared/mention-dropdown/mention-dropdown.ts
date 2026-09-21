@@ -1,4 +1,13 @@
-import { Component, computed, ElementRef, input, output, signal, viewChildren } from '@angular/core';
+import {
+  Component,
+  computed,
+  ElementRef,
+  input,
+  output,
+  signal,
+  viewChildren,
+} from '@angular/core';
+import { AvatarFallback } from '../avatar-fallback/avatar-fallback';
 
 export interface MentionEntry {
   id: string;
@@ -7,7 +16,7 @@ export interface MentionEntry {
 }
 
 @Component({
-  imports: [],
+  imports: [AvatarFallback],
   selector: 'app-mention-dropdown',
   styleUrl: './mention-dropdown.scss',
   templateUrl: './mention-dropdown.html',

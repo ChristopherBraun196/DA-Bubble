@@ -1,7 +1,8 @@
 import { Component, input, output } from '@angular/core';
+import { AvatarFallback } from '../../../shared/avatar-fallback/avatar-fallback';
 
 @Component({
-  imports: [],
+  imports: [AvatarFallback],
   selector: 'app-user-list-item',
   styleUrl: './user-list-item.scss',
   templateUrl: './user-list-item.html',

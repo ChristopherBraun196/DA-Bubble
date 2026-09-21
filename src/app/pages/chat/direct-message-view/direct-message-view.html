@@ -2,7 +2,7 @@
   <header class="direct-message__header">
     <div class="direct-message__header-user">
       <span class="direct-message__header-avatar">
-        <img [src]="user().avatar" alt="" />
+        <img appAvatarFallback [src]="user().avatar" alt="" />
         <span
           class="direct-message__status"
           [class.direct-message__status--online]="user().online"
@@ -15,7 +15,7 @@
   <div class="direct-message__content">
     <div class="direct-message__intro">
       <div class="direct-message__profile">
-        <img [src]="user().avatar" alt="" />
+        <img appAvatarFallback [src]="user().avatar" alt="" />
         <h2>{{ displayName() }}</h2>
       </div>
       @if (isCurrentUser()) {

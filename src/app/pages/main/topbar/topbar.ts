@@ -3,13 +3,14 @@ import { Router } from '@angular/router';
 
 import { AuthService } from '../../../core/services/auth.service';
 import { GuestMembershipService } from '../../../core/services/guest-membership.service';
+import { AvatarFallback } from '../../../shared/avatar-fallback/avatar-fallback';
 import { ProfileDialog } from '../profile-dialog/profile-dialog';
 
 /** Es ist immer hoechstens eine Card offen. */
 export type TopbarPanel = 'none' | 'menu' | 'profile';
 
 @Component({
-  imports: [ProfileDialog],
+  imports: [ProfileDialog, AvatarFallback],
   selector: 'app-topbar',
   styleUrl: './topbar.scss',
   templateUrl: './topbar.html',

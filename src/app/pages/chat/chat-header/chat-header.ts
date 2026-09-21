@@ -3,6 +3,7 @@ import { Component, computed, DestroyRef, effect, inject, input, signal } from '
 import { AuthService } from '../../../core/services/auth.service';
 import { ChannelMemberService } from '../../../core/services/channel-member.service';
 import { ChatService } from '../../../core/services/chat.service';
+import { AvatarFallback } from '../../../shared/avatar-fallback/avatar-fallback';
 import { AddMembers } from '../add-members/add-members';
 import { ChannelInfo } from '../channel-info/channel-info';
 import { MembersDialog } from '../members-dialog/members-dialog';
@@ -11,7 +12,7 @@ import { MembersDialog } from '../members-dialog/members-dialog';
 export type ChatHeaderDialog = 'none' | 'channel' | 'members' | 'add';
 
 @Component({
-  imports: [MembersDialog, AddMembers, ChannelInfo],
+  imports: [MembersDialog, AddMembers, ChannelInfo, AvatarFallback],
   selector: 'app-chat-header',
   styleUrl: './chat-header.scss',
   templateUrl: './chat-header.html',
