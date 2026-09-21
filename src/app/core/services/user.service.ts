@@ -19,6 +19,7 @@ import { AppUser, UserSearchResult } from '../models/user.model';
 @Injectable({ providedIn: 'root' })
 export class UserService {
   private readonly firebase = inject(FirebaseService);
+  private cachedUsers?: Promise<UserSearchResult[]>;
 
   async getAllUsers(): Promise<UserSearchResult[]> {
     const snapshot = await getDocs(collection(this.firebase.firestore, 'users'));
@@ -26,6 +27,29 @@ export class UserService {
     return snapshot.docs
       .map((userSnapshot) => this.mapSearchResult(userSnapshot))
       .sort((first, second) => first.displayName.localeCompare(second.displayName, 'de'));
+  }
+
+  /**
+   * Sucht Nutzer, deren Name den Suchtext enthaelt - fuer die Autovervollstaendigung.
+   * Die Nutzerliste wird dafuer einmal pro Sitzung geladen und danach im Speicher gefiltert.
+   */
+  async searchByName(term: string, maxResults = 8): Promise<UserSearchResult[]> {
+    const search = term.trim().toLocaleLowerCase('de-DE');
+
+    if (search.length < 3) {
+      return [];
+    }
+
+    const users = await this.getCachedUsers();
+
+    return users
+      .filter(({ displayName }) => displayName.toLocaleLowerCase('de-DE').includes(search))
+      .slice(0, maxResults);
+  }
+
+  private getCachedUsers(): Promise<UserSearchResult[]> {
+    this.cachedUsers ??= this.getAllUsers();
+    return this.cachedUsers;
   }
 
   /** Sucht ueber das Feld nameNormalized, also unabhaengig von Gross- und Kleinschreibung. */

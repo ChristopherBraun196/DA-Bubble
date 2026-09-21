@@ -18,19 +18,55 @@
   </p>
 
   <form class="add-members__form" (submit)="$event.preventDefault(); add()">
-    <div class="add-members__field">
-      <input
-        class="add-members__input"
-        name="person-name"
-        type="text"
-        placeholder="Name eingeben"
-        aria-label="Name eingeben"
-        required
-        [value]="personName()"
-        (input)="updatePersonName($event)"
-      />
+    <div class="add-members__search">
+      <div class="add-members__field">
+        @for (person of selected(); track person.uid) {
+          <span class="add-members__chip">
+            <img class="add-members__chip-avatar" [src]="person.photoURL" alt="" />
+            <span class="add-members__chip-name">{{ person.displayName }}</span>
+            <button
+              class="add-members__chip-remove"
+              type="button"
+              [attr.aria-label]="person.displayName + ' entfernen'"
+              (click)="removePerson(person.uid)"
+            >
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </span>
+        }
+
+        <input
+          class="add-members__input"
+          name="person-name"
+          type="text"
+          autocomplete="off"
+          aria-label="Name eingeben"
+          [placeholder]="selected().length ? '' : 'Name eingeben'"
+          [value]="searchTerm()"
+          (input)="updateSearchTerm($event)"
+        />
+      </div>
+
+      @if (suggestions().length) {
+        <ul class="add-members__suggestions">
+          @for (person of suggestions(); track person.uid) {
+            <li>
+              <button class="add-members__suggestion" type="button" (click)="selectPerson(person)">
+                <img class="add-members__suggestion-avatar" [src]="person.photoURL" alt="" />
+                <span>{{ person.displayName }}</span>
+              </button>
+            </li>
+          }
+        </ul>
+      }
     </div>
 
-    <button class="add-members__submit" type="submit" [disabled]="!canAdd()">Hinzufügen</button>
+    @if (addError()) {
+      <p class="add-members__error">{{ addError() }}</p>
+    }
+
+    <button class="add-members__submit" type="submit" [disabled]="!canAdd() || adding()">
+      {{ adding() ? 'Wird gespeichert …' : 'Hinzufügen' }}
+    </button>
   </form>
 </div>

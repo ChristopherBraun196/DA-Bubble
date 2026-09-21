@@ -40,16 +40,51 @@
     </label>
 
     @if (mode() === 'specific') {
-      <div class="add-people__field">
-        <input
-          class="add-people__input"
-          name="person-name"
-          type="text"
-          placeholder="Name eingeben"
-          required
-          [value]="personName()"
-          (input)="updatePersonName($event)"
-        />
+      <div class="add-people__search">
+        <div class="add-people__field">
+          @for (person of selected(); track person.uid) {
+            <span class="add-people__chip">
+              <img class="add-people__chip-avatar" [src]="person.photoURL" alt="" />
+              <span class="add-people__chip-name">{{ person.displayName }}</span>
+              <button
+                class="add-people__chip-remove"
+                type="button"
+                [attr.aria-label]="person.displayName + ' entfernen'"
+                (click)="removePerson(person.uid)"
+              >
+                <span class="material-symbols-outlined">close</span>
+              </button>
+            </span>
+          }
+
+          <input
+            class="add-people__input"
+            name="person-name"
+            type="text"
+            autocomplete="off"
+            aria-label="Name eingeben"
+            [placeholder]="selected().length ? '' : 'Name eingeben'"
+            [value]="searchTerm()"
+            (input)="updateSearchTerm($event)"
+          />
+        </div>
+
+        @if (suggestions().length) {
+          <ul class="add-people__suggestions">
+            @for (person of suggestions(); track person.uid) {
+              <li>
+                <button
+                  class="add-people__suggestion"
+                  type="button"
+                  (click)="selectPerson(person)"
+                >
+                  <img class="add-people__suggestion-avatar" [src]="person.photoURL" alt="" />
+                  <span>{{ person.displayName }}</span>
+                </button>
+              </li>
+            }
+          </ul>
+        }
       </div>
     }
 

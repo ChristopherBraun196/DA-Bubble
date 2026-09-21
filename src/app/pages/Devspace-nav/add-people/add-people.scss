@@ -96,10 +96,16 @@
   color: #535af1;
 }
 
+.add-people__search {
+  position: relative;
+}
+
 .add-people__field {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  padding: 16px 24px;
+  gap: 8px;
+  padding: 12px 24px;
   border: 1px solid #adb0d9;
   border-radius: 30px;
 
@@ -108,9 +114,99 @@
   }
 }
 
+/* Eine ausgewaehlte Person im Eingabefeld. */
+.add-people__chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px 4px 4px;
+  border-radius: 30px;
+  background-color: #eceefe;
+  font-size: 18px;
+}
+
+.add-people__chip-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.add-people__chip-name {
+  white-space: nowrap;
+}
+
+.add-people__chip-remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #686868;
+  cursor: pointer;
+  transition: color 150ms ease;
+
+  .material-symbols-outlined {
+    font-size: 20px;
+  }
+
+  &:hover {
+    color: #444df2;
+  }
+}
+
+/* Die Vorschlaege haengen unter dem Eingabefeld. */
+.add-people__suggestions {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 12px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: calc(100% - 24px);
+  max-height: 260px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 12px;
+  border-radius: 20px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.16);
+  list-style: none;
+}
+
+.add-people__suggestion {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 30px;
+  background: transparent;
+  color: #000000;
+  font-family: inherit;
+  font-size: 18px;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+
+  &:hover {
+    background-color: #eceefe;
+  }
+}
+
+.add-people__suggestion-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
 .add-people__input {
-  flex: 1 1 auto;
-  min-width: 0;
+  flex: 1 1 120px;
+  min-width: 120px;
   border: none;
   outline: none;
   background: transparent;
