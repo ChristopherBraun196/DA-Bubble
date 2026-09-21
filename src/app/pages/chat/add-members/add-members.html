@@ -5,6 +5,8 @@
   aria-labelledby="add-members-title"
   (click)="$event.stopPropagation()"
 >
+  <div class="add-members__handle" aria-hidden="true"><span></span></div>
+
   <header class="add-members__header">
     <h2 class="add-members__title" id="add-members-title">Leute hinzufügen</h2>
     <button class="add-members__close" type="button" aria-label="Schließen" (click)="closed.emit()">
@@ -12,14 +14,9 @@
     </button>
   </header>
 
-  <p class="add-members__channel">
-    <span class="material-symbols-outlined">tag</span>
-    {{ channelName() }}
-  </p>
-
   <form class="add-members__form" (submit)="$event.preventDefault(); add()">
     <div class="add-members__search">
-      <div class="add-members__field">
+      <div class="add-members__field" [class.add-members__field--selected]="selected().length">
         @for (person of selected(); track person.uid) {
           <span class="add-members__chip">
             <img class="add-members__chip-avatar" [src]="person.photoURL" alt="" />
@@ -52,7 +49,10 @@
           @for (person of suggestions(); track person.uid) {
             <li>
               <button class="add-members__suggestion" type="button" (click)="selectPerson(person)">
-                <img class="add-members__suggestion-avatar" [src]="person.photoURL" alt="" />
+                <span class="add-members__suggestion-avatar">
+                  <img [src]="person.photoURL" alt="" />
+                  <span class="add-members__suggestion-status" aria-hidden="true"></span>
+                </span>
                 <span>{{ person.displayName }}</span>
               </button>
             </li>
