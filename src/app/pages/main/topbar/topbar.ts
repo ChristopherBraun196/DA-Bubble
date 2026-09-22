@@ -1,4 +1,6 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, output, signal } from '@angular/core';
+import { AppUser } from '../../../core/models/user.model';
+import { WorkspaceSearch } from '../workspace-search/workspace-search';
 import { Router } from '@angular/router';
 
 import { AuthService } from '../../../core/services/auth.service';
@@ -10,12 +12,15 @@ import { ProfileDialog } from '../profile-dialog/profile-dialog';
 export type TopbarPanel = 'none' | 'menu' | 'profile';
 
 @Component({
-  imports: [ProfileDialog, AvatarFallback],
+  imports: [ProfileDialog, AvatarFallback, WorkspaceSearch],
   selector: 'app-topbar',
   styleUrl: './topbar.scss',
   templateUrl: './topbar.html',
 })
 export class Topbar {
+  readonly channelSelected = output<string>();
+  readonly directMessageRequested = output<AppUser>();
+
   private readonly auth = inject(AuthService);
   private readonly guestMemberships = inject(GuestMembershipService);
   private readonly router = inject(Router);

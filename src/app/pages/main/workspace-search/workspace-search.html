@@ -1,0 +1,43 @@
+<div class="workspace-search" (keydown)="handleKeydown($event)">
+  <input
+    #searchField
+    type="search"
+    name="devspace-search"
+    autocomplete="off"
+    placeholder="Devspace durchsuchen"
+    aria-label="Devspace durchsuchen"
+    [value]="query()"
+    [attr.aria-expanded]="opened()"
+    aria-controls="workspace-results"
+    (input)="updateQuery($event)"
+    (focus)="openSearch()"
+  />
+  <button type="button" aria-label="Suchen" (click)="searchClicked()">
+    <span class="material-symbols-outlined" aria-hidden="true">search</span>
+  </button>
+  @if (opened()) {
+    <div id="workspace-results" class="workspace-search__results">
+      @if (loading() && !query().trim().startsWith('#')) {
+        <p role="status">Mitglieder werden geladen…</p>
+      }
+      @if (error()) {
+        <p role="alert">{{ error() }}</p>
+      }
+      <app-mention-dropdown
+        [entries]="entries()"
+        [search]="search()"
+        (selected)="selectEntry($event)"
+      />
+    </div>
+  }
+  @if (profile(); as member) {
+    <div class="workspace-search__backdrop" (click)="close()"></div>
+    <div class="workspace-search__profile">
+      <app-profile-dialog
+        [user]="member"
+        (closed)="close()"
+        (messageRequested)="openDirectMessage($event)"
+      />
+    </div>
+  }
+</div>

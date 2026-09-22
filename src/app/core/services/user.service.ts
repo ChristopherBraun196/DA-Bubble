@@ -72,6 +72,11 @@ export class UserService {
     return snapshot.exists() ? this.mapSearchResult(snapshot) : null;
   }
 
+  async getProfile(uid: string): Promise<AppUser | null> {
+    const snapshot = await getDoc(doc(this.firebase.firestore, 'users', uid));
+    return snapshot.exists() ? { ...snapshot.data(), uid: snapshot.id } as AppUser : null;
+  }
+
   private mapSearchResult(snapshot: DocumentSnapshot<DocumentData>): UserSearchResult {
     const data = (snapshot.data() ?? {}) as Partial<AppUser>;
 

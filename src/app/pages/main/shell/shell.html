@@ -1,5 +1,8 @@
 <div class="shell">
-  <app-topbar />
+  <app-topbar
+    (channelSelected)="showChannel($event)"
+    (directMessageRequested)="showMemberDirectMessage($event)"
+  />
 
   <div
     class="shell__workspace"
