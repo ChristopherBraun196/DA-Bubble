@@ -32,11 +32,14 @@ export class MessageItem {
 
   protected readonly menuOpen = signal(false);
   protected readonly reactionPickerOpen = signal(false);
+  protected readonly editEmojiOpen = signal(false);
   protected readonly editing = signal(false);
   protected readonly draft = signal('');
 
   private readonly menuWrap = viewChild<ElementRef<HTMLElement>>('menuWrap');
   private readonly reactionPickerWrap = viewChild<ElementRef<HTMLElement>>('reactionPickerWrap');
+  private readonly editEmojiWrap = viewChild<ElementRef<HTMLElement>>('editEmojiWrap');
+  private readonly editField = viewChild<ElementRef<HTMLTextAreaElement>>('editField');
 
   protected toggleMenu(): void {
     this.reactionPickerOpen.set(false);
@@ -56,6 +59,25 @@ export class MessageItem {
     if (this.reactionPickerOpen() && !this.reactionPickerWrap()?.nativeElement.contains(target)) {
       this.reactionPickerOpen.set(false);
     }
+    if (this.editEmojiOpen() && !this.editEmojiWrap()?.nativeElement.contains(target)) {
+      this.editEmojiOpen.set(false);
+    }
+  }
+
+  protected toggleEditEmojiPicker(): void {
+    this.editEmojiOpen.update((open) => !open);
+  }
+
+  protected insertEmoji(emoji: string): void {
+    const field = this.editField()?.nativeElement;
+    const start = field?.selectionStart ?? this.draft().length;
+    const end = field?.selectionEnd ?? start;
+    this.draft.update((text) => text.slice(0, start) + emoji + text.slice(end));
+    this.editEmojiOpen.set(false);
+    requestAnimationFrame(() => {
+      field?.focus();
+      field?.setSelectionRange(start + emoji.length, start + emoji.length);
+    });
   }
 
   protected toggleReaction(emoji: ReactionEmoji): void {
@@ -70,6 +92,7 @@ export class MessageItem {
   }
 
   protected cancelEdit(): void {
+    this.editEmojiOpen.set(false);
     this.editing.set(false);
   }
 
@@ -84,6 +107,7 @@ export class MessageItem {
       this.edited.emit(text);
     }
 
+    this.editEmojiOpen.set(false);
     this.editing.set(false);
   }
 }

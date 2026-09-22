@@ -157,13 +157,27 @@ app-message-reactions {
   gap: 16px;
 }
 
+.message__edit-emoji-wrap {
+  position: relative;
+  display: flex;
+  margin-right: auto;
+}
+
+.message__edit-emoji-picker {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  z-index: 5;
+  display: block;
+  width: min(304px, calc(100vw - 48px));
+}
+
 .message__edit-emoji {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 36px;
   height: 36px;
-  margin-right: auto;
   padding: 0;
   border: none;
   border-radius: 50%;

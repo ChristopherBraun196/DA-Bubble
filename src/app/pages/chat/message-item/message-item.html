@@ -15,6 +15,7 @@
       @if (editing()) {
         <div class="message__edit">
           <textarea
+            #editField
             class="message__edit-input"
             rows="3"
             aria-label="Nachricht bearbeiten"
@@ -23,9 +24,25 @@
           ></textarea>
 
           <div class="message__edit-actions">
-            <button class="message__edit-emoji" type="button" aria-label="Emoji einfügen">
-              <span class="material-symbols-outlined">sentiment_satisfied</span>
-            </button>
+            <div class="message__edit-emoji-wrap" #editEmojiWrap>
+              <button
+                class="message__edit-emoji"
+                type="button"
+                aria-label="Emoji einfügen"
+                aria-haspopup="listbox"
+                [attr.aria-expanded]="editEmojiOpen()"
+                (click)="toggleEditEmojiPicker()"
+              >
+                <span class="material-symbols-outlined">sentiment_satisfied</span>
+              </button>
+
+              @if (editEmojiOpen()) {
+                <app-emoji-picker
+                  class="message__edit-emoji-picker"
+                  (selected)="insertEmoji($event)"
+                />
+              }
+            </div>
 
             <button
               class="message__edit-button message__edit-button--ghost"
