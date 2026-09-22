@@ -26,7 +26,17 @@
   align-items: center;
   gap: 15px;
   padding: 4px 8px;
+  border: none;
   border-radius: 30px;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+
+  &:hover {
+    background-color: #eceefe;
+  }
 
   h1 {
     margin: 0;
@@ -105,4 +115,14 @@
 
 .direct-message__input {
   padding: 0 45px 40px;
+}
+
+.direct-message__profile-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 12;
+  display: grid;
+  padding: 24px;
+  background-color: rgba(0, 0, 0, 0.45);
+  place-items: center;
 }

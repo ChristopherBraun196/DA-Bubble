@@ -1,6 +1,6 @@
 <section class="direct-message">
   <header class="direct-message__header">
-    <div class="direct-message__header-user">
+    <button class="direct-message__header-user" type="button" (click)="openProfile()">
       <span class="direct-message__header-avatar">
         <img appAvatarFallback [src]="user().avatar" alt="" />
         <span
@@ -9,7 +9,7 @@
         ></span>
       </span>
       <h1>{{ displayName() }}</h1>
-    </div>
+    </button>
   </header>
 
   <div class="direct-message__content">
@@ -37,3 +37,13 @@
     <app-message-input [placeholder]="placeholder()" />
   </div>
 </section>
+
+@if (profileOpen()) {
+  <div class="direct-message__profile-overlay" (click)="closeProfile()">
+    <app-profile-dialog
+      [user]="profileUser()"
+      (closed)="closeProfile()"
+      (messageRequested)="closeProfile()"
+    />
+  </div>
+}
