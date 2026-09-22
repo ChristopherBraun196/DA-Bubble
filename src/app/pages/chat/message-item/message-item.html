@@ -50,6 +50,17 @@
           [currentUserId]="currentUserId()"
           (toggled)="toggleReaction($event)"
         />
+
+        @if (!inThread() && message.replyCount > 0) {
+          <button class="message__thread" type="button" (click)="threadOpened.emit()">
+            <span class="message__thread-count">{{ replyLabel() }}</span>
+            @if (message.lastReplyAt; as lastReplyAt) {
+              <span class="message__thread-time">
+                Letzte Antwort {{ lastReplyAt.toDate() | date: 'HH:mm' }} Uhr
+              </span>
+            }
+          </button>
+        }
       }
     </div>
 
@@ -94,9 +105,16 @@
           }
         </div>
 
-        <button class="message__action" type="button" aria-label="Thread öffnen">
-          <span class="material-symbols-outlined">comment</span>
-        </button>
+        @if (!inThread()) {
+          <button
+            class="message__action"
+            type="button"
+            aria-label="Thread öffnen"
+            (click)="threadOpened.emit()"
+          >
+            <span class="material-symbols-outlined">comment</span>
+          </button>
+        }
 
         @if (ownMessage()) {
           <div class="message__menu-wrap" #menuWrap>

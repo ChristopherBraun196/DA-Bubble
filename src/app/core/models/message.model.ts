@@ -11,6 +11,8 @@ export interface ChatMessage {
   createdAt: Timestamp | null;
   editedAt: Timestamp | null;
   reactions: MessageReaction[];
+  replyCount: number;
+  lastReplyAt: Timestamp | null;
 }
 
 export type ChatMessageDocument = Omit<ChatMessage, 'id'>;

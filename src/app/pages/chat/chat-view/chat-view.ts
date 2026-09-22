@@ -8,11 +8,13 @@ import {
   input,
   output,
   signal,
+  untracked,
 } from '@angular/core';
 import { AppUser } from '../../../core/models/user.model';
 import { AuthService } from '../../../core/services/auth.service';
 import { ChatService } from '../../../core/services/chat.service';
 import { MessageService } from '../../../core/services/message.service';
+import { ThreadService } from '../../../core/services/thread.service';
 import { ChatHeader } from '../chat-header/chat-header';
 import { MessageInput } from '../message-input/message-input';
 import { MessageEdit, MessageList, MessageReactionToggle } from '../message-list/message-list';
@@ -30,6 +32,7 @@ export class ChatView {
   protected readonly auth = inject(AuthService);
   protected readonly chats = inject(ChatService);
   protected readonly messages = inject(MessageService);
+  private readonly thread = inject(ThreadService);
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly activeChat = computed(() =>
@@ -52,6 +55,8 @@ export class ChatView {
       } else {
         this.messages.disconnect();
       }
+
+      this.closeForeignThread(chatId);
     });
 
     this.destroyRef.onDestroy(() => this.messages.disconnect());
@@ -78,6 +83,20 @@ export class ChatView {
     }
 
     await this.messages.updateMessage(chatId, id, text);
+  }
+
+  protected openThread(messageId: string): void {
+    const chatId = this.chats.activeChatId();
+    if (chatId) {
+      this.thread.open(chatId, messageId);
+    }
+  }
+
+  private closeForeignThread(chatId: string | null): void {
+    const target = untracked(() => this.thread.target());
+    if (target && target.chatId !== chatId) {
+      this.thread.close();
+    }
   }
 
   protected async toggleReaction({ id, emoji }: MessageReactionToggle): Promise<void> {

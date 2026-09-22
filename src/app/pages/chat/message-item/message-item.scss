@@ -103,6 +103,32 @@ app-message-reactions {
   transition: background-color 150ms ease;
 }
 
+.message__thread {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.message__thread-count {
+  color: #535af1;
+  font-size: 18px;
+  font-weight: 600;
+
+  .message__thread:hover & {
+    text-decoration: underline;
+  }
+}
+
+.message__thread-time {
+  color: #686868;
+  font-size: 14px;
+}
+
 .message__edit {
   display: flex;
   flex-direction: column;

@@ -55,16 +55,5 @@
         Workspace-Menü {{ devspaceOpen() ? 'schließen' : 'öffnen' }}
       </span>
     </button>
-
-    @if (!threadVisible() && !composing() && !activeDirectUser()) {
-      <button
-        class="shell__thread-toggle"
-        type="button"
-        aria-label="Thread öffnen"
-        (click)="toggleThread()"
-      >
-        <span class="material-symbols-outlined">chevron_left</span>
-      </button>
-    }
   </div>
 </div>

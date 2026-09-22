@@ -3,7 +3,9 @@ import {
   afterRenderEffect,
   Component,
   computed,
+  DestroyRef,
   ElementRef,
+  inject,
   input,
   output,
   viewChildren,
@@ -21,6 +23,9 @@ export interface MessageReactionToggle {
   id: string;
   emoji: ReactionEmoji;
 }
+
+/** Ab diesem Abstand zum Ende gilt die Liste als "unten" und folgt neuen Nachrichten. */
+const BOTTOM_THRESHOLD = 120;
 
 type MessageListEntry =
   | { type: 'date'; id: string; label: string }
@@ -42,12 +47,22 @@ export class MessageList {
     },
   );
   private lastScrolledTarget: MessageSearchResult | null = null;
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly destroyRef = inject(DestroyRef);
+  private scrollContainer: HTMLElement | null = null;
+  private latestRenderedId = '';
+  private firstRender = true;
+  private pinnedToBottom = true;
+  private readonly handleScroll = () => this.updatePinnedState();
 
   readonly currentUserId = input<string | null>(null);
   readonly loading = input(false);
   readonly error = input('');
+  readonly inThread = input(false);
+  readonly emptyText = input('Noch keine Nachrichten. Schreib die erste Nachricht.');
   readonly messageEdited = output<MessageEdit>();
   readonly reactionToggled = output<MessageReactionToggle>();
+  readonly threadOpened = output<string>();
 
   protected readonly targetMissing = computed(
     () =>
@@ -59,19 +74,93 @@ export class MessageList {
   protected readonly entries = computed(() => this.createEntries(this.messages()));
 
   constructor() {
-    afterRenderEffect(() => this.scrollToSearchTarget());
+    afterRenderEffect(() => this.updateScrollPosition());
+    this.destroyRef.onDestroy(() => this.detachScrollListener());
   }
 
-  private scrollToSearchTarget(): void {
+  /** Springt zum Suchtreffer, sonst bleibt die Liste am unteren Ende. */
+  private updateScrollPosition(): void {
+    const messages = this.messages();
+    const container = this.resolveScrollContainer();
+    if (!container) return;
+    const jumpedToSearchHit = this.scrollToSearchTarget();
+    if (!this.trackLatestMessage(messages) || jumpedToSearchHit) return;
+    if (this.firstRender || this.pinnedToBottom || this.isOwnMessage(messages.at(-1))) {
+      this.scrollToBottom(container);
+    }
+  }
+
+  private trackLatestMessage(messages: ChatMessage[]): boolean {
+    if (messages.length === 0) {
+      this.resetScrollState();
+      return false;
+    }
+    const latestId = messages[messages.length - 1].id;
+    if (latestId === this.latestRenderedId) return false;
+    this.firstRender = this.latestRenderedId === '';
+    this.latestRenderedId = latestId;
+    return true;
+  }
+
+  private resetScrollState(): void {
+    this.latestRenderedId = '';
+    this.firstRender = true;
+    this.pinnedToBottom = true;
+  }
+
+  private isOwnMessage(message: ChatMessage | undefined): boolean {
+    return !!message && !!this.currentUserId() && message.authorId === this.currentUserId();
+  }
+
+  private scrollToBottom(container: HTMLElement): void {
+    container.scrollTo({
+      top: container.scrollHeight,
+      behavior: this.firstRender ? 'auto' : 'smooth',
+    });
+    this.pinnedToBottom = true;
+  }
+
+  private updatePinnedState(): void {
+    const container = this.scrollContainer;
+    if (!container) return;
+    const distance = container.scrollHeight - container.scrollTop - container.clientHeight;
+    this.pinnedToBottom = distance <= BOTTOM_THRESHOLD;
+  }
+
+  private resolveScrollContainer(): HTMLElement | null {
+    if (this.scrollContainer?.isConnected) return this.scrollContainer;
+    this.detachScrollListener();
+    this.scrollContainer = this.findScrollContainer();
+    this.scrollContainer?.addEventListener('scroll', this.handleScroll, { passive: true });
+    return this.scrollContainer;
+  }
+
+  private findScrollContainer(): HTMLElement | null {
+    let element = this.host.nativeElement.parentElement;
+    while (element) {
+      const overflow = getComputedStyle(element).overflowY;
+      if (overflow === 'auto' || overflow === 'scroll') return element;
+      element = element.parentElement;
+    }
+    return null;
+  }
+
+  private detachScrollListener(): void {
+    this.scrollContainer?.removeEventListener('scroll', this.handleScroll);
+    this.scrollContainer = null;
+  }
+
+  private scrollToSearchTarget(): boolean {
     const target = this.searchTarget();
     const elements = this.messageElements();
-    if (!target || target === this.lastScrolledTarget) return;
+    if (!target || target === this.lastScrolledTarget) return false;
     const element = elements.find(
       (item) => item.nativeElement.dataset['messageId'] === target.messageId,
     );
-    if (!element) return;
+    if (!element) return false;
     element.nativeElement.scrollIntoView({ block: 'center', behavior: 'smooth' });
     this.lastScrolledTarget = target;
+    return true;
   }
 
   private createEntries(messages: ChatMessage[]): MessageListEntry[] {

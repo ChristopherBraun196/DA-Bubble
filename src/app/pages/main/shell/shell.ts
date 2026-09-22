@@ -3,6 +3,7 @@ import { Component, computed, DestroyRef, inject, signal, viewChild } from '@ang
 import { AuthService } from '../../../core/services/auth.service';
 import { AppUser } from '../../../core/models/user.model';
 import { ChatService } from '../../../core/services/chat.service';
+import { ThreadService } from '../../../core/services/thread.service';
 import { ChatView } from '../../chat/chat-view/chat-view';
 import { DevspaceNav } from '../../Devspace-nav/devspace-nav/devspace-nav';
 import { ThreadPanel } from '../../thread/thread-panel/thread-panel';
@@ -22,14 +23,14 @@ export class Shell {
   private readonly chats = inject(ChatService);
   private readonly destroyRef = inject(DestroyRef);
 
+  protected readonly thread = inject(ThreadService);
   protected readonly devspaceOpen = signal(true);
-  protected readonly threadOpen = signal(true);
   protected readonly searchTarget = signal<MessageSearchResult | null>(null);
   protected readonly composing = signal(false);
   protected readonly activeDirectUser = signal<DirectMessageUser | null>(null);
   protected readonly devspaceNav = viewChild(DevspaceNav);
   protected readonly threadVisible = computed(
-    () => this.threadOpen() && !this.composing() && !this.activeDirectUser(),
+    () => !!this.thread.target() && !this.composing() && !this.activeDirectUser(),
   );
 
   constructor() {
@@ -46,12 +47,8 @@ export class Shell {
     this.devspaceOpen.update((value) => !value);
   }
 
-  protected toggleThread(): void {
-    this.threadOpen.update((value) => !value);
-  }
-
   protected closeThread(): void {
-    this.threadOpen.set(false);
+    this.thread.close();
   }
 
   protected showDirectMessage(user: DirectMessageUser | null): void {

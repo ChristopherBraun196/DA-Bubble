@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, ElementRef, input, output, signal, viewChild } from '@angular/core';
+import { Component, computed, ElementRef, input, output, signal, viewChild } from '@angular/core';
 import { ChatMessage } from '../../../core/models/message.model';
 import { ReactionEmoji } from '../../../core/models/reaction.model';
 import { AvatarFallback } from '../../../shared/avatar-fallback/avatar-fallback';
@@ -19,9 +19,16 @@ export class MessageItem {
   readonly message = input<ChatMessage | null>(null);
   readonly ownMessage = input(false);
   readonly currentUserId = input<string | null>(null);
+  readonly inThread = input(false);
 
   readonly edited = output<string>();
   readonly reactionToggled = output<ReactionEmoji>();
+  readonly threadOpened = output<void>();
+
+  protected readonly replyLabel = computed(() => {
+    const count = this.message()?.replyCount || 0;
+    return count === 1 ? '1 Antwort' : `${count} Antworten`;
+  });
 
   protected readonly menuOpen = signal(false);
   protected readonly reactionPickerOpen = signal(false);

@@ -1,29 +1,45 @@
 <div class="thread">
   <app-thread-header [channelName]="channelName()" (closed)="closed.emit()" />
 
-  <!-- Nachrichten kommen spaeter aus Firebase. -->
-  <div class="thread__messages"></div>
+  <div class="thread__messages">
+    @if (thread.parent(); as parent) {
+      <app-message-item
+        [message]="parent"
+        [ownMessage]="parent.authorId === currentUserId()"
+        [currentUserId]="currentUserId()"
+        [inThread]="true"
+        (edited)="editMessage({ id: parent.id, text: $event })"
+        (reactionToggled)="toggleReaction({ id: parent.id, emoji: $event })"
+      />
 
-  <form class="thread__reply" (submit)="$event.preventDefault()">
-    <textarea
-      class="thread__reply-input"
-      name="thread-reply"
-      rows="2"
+      <div class="thread__divider">
+        <span>{{ replyLabel() }}</span>
+      </div>
+
+      <app-message-list
+        [messages]="thread.replies()"
+        [currentUserId]="currentUserId()"
+        [loading]="thread.loading()"
+        [error]="thread.error()"
+        [inThread]="true"
+        emptyText=""
+        (messageEdited)="editMessage($event)"
+        (reactionToggled)="toggleReaction($event)"
+      />
+    } @else if (thread.error()) {
+      <p class="thread__status thread__status--error">{{ thread.error() }}</p>
+    } @else if (thread.loading()) {
+      <p class="thread__status">Thread wird geladen …</p>
+    } @else {
+      <p class="thread__status">Diese Nachricht ist nicht mehr verfügbar.</p>
+    }
+  </div>
+
+  <div class="thread__input">
+    <app-message-input
       placeholder="Antworten..."
-      aria-label="Antwort schreiben"
-    ></textarea>
-
-    <div class="thread__reply-actions">
-      <button class="thread__reply-icon" type="button" aria-label="Emoji einfügen">
-        <span class="material-symbols-outlined">sentiment_satisfied</span>
-      </button>
-      <button class="thread__reply-icon" type="button" aria-label="Person erwähnen">
-        <span class="material-symbols-outlined">alternate_email</span>
-      </button>
-
-      <button class="thread__reply-send" type="submit" aria-label="Senden">
-        <span class="material-symbols-outlined">send</span>
-      </button>
-    </div>
-  </form>
+      [disabled]="sending()"
+      (messageSent)="sendReply($event)"
+    />
+  </div>
 </div>

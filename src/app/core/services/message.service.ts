@@ -5,6 +5,7 @@ import {
   doc,
   DocumentData,
   DocumentReference,
+  increment,
   limitToLast,
   onSnapshot,
   orderBy,
@@ -18,11 +19,13 @@ import {
   Transaction,
   Unsubscribe,
   updateDoc,
+  where,
   writeBatch,
 } from 'firebase/firestore';
 
 import { FirebaseService } from '../firebase/firebase.service';
-import { ChatMessage, ChatMessageDocument } from '../models/message.model';
+import { mapChatMessage, readReactions } from '../models/message.mapper';
+import { ChatMessage } from '../models/message.model';
 import { MessageReaction, ReactionEmoji, ReactionUser } from '../models/reaction.model';
 import { AuthService } from './auth.service';
 
@@ -65,6 +68,7 @@ export class MessageService {
   private createMessagesQuery(chatId: string) {
     return query(
       collection(this.firebase.firestore, 'chats', chatId, 'messages'),
+      where('threadParentId', '==', null),
       orderBy('createdAt', 'asc'),
       this.historyStart ? startAt(this.historyStart) : limitToLast(MESSAGE_LIMIT),
     );
@@ -115,6 +119,16 @@ export class MessageService {
     await this.persistMessage(chatId, messageText, user);
   }
 
+  /** Legt eine Thread-Antwort an und zaehlt sie an der Ursprungsnachricht mit. */
+  async sendReply(chatId: string, parentId: string, text: string): Promise<void> {
+    const user = this.auth.currentUser();
+    const messageText = text.trim();
+    if (!user || !messageText) {
+      return;
+    }
+    await this.persistReply(chatId, parentId, messageText, user);
+  }
+
   async updateMessage(chatId: string, messageId: string, text: string): Promise<void> {
     const messageText = text.trim();
 
@@ -147,33 +161,39 @@ export class MessageService {
     await batch.commit();
   }
 
-  private createMessageDocument(user: User, text: string) {
+  private async persistReply(
+    chatId: string,
+    parentId: string,
+    text: string,
+    user: User,
+  ): Promise<void> {
+    const messagesRef = collection(this.firebase.firestore, 'chats', chatId, 'messages');
+    const batch = writeBatch(this.firebase.firestore);
+    batch.set(doc(messagesRef), this.createMessageDocument(user, text, parentId));
+    batch.update(doc(messagesRef, parentId), {
+      replyCount: increment(1),
+      lastReplyAt: serverTimestamp(),
+    });
+    await batch.commit();
+  }
+
+  private createMessageDocument(user: User, text: string, threadParentId: string | null = null) {
     return {
       authorId: user.uid,
       authorName: this.auth.displayName(),
       authorPhotoURL: this.auth.photoURL(),
       text,
-      threadParentId: null,
+      threadParentId,
       createdAt: serverTimestamp(),
       editedAt: null,
       reactions: [],
+      replyCount: 0,
+      lastReplyAt: null,
     };
   }
 
   private mapMessage(snapshot: QueryDocumentSnapshot<DocumentData>): ChatMessage {
-    const data = snapshot.data() as Partial<ChatMessageDocument>;
-
-    return {
-      id: snapshot.id,
-      authorId: data.authorId || '',
-      authorName: data.authorName || 'Unbekannter Nutzer',
-      authorPhotoURL: data.authorPhotoURL || '/img/Profile_Guest.png',
-      text: data.text || '',
-      threadParentId: data.threadParentId || null,
-      createdAt: data.createdAt instanceof Timestamp ? data.createdAt : null,
-      editedAt: data.editedAt instanceof Timestamp ? data.editedAt : null,
-      reactions: this.readReactions(data.reactions),
-    };
+    return mapChatMessage(snapshot.id, snapshot.data());
   }
 
   private toggleUser(
@@ -201,7 +221,7 @@ export class MessageService {
     if (!snapshot.exists()) {
       return;
     }
-    const reactions = this.readReactions(snapshot.data()['reactions']);
+    const reactions = readReactions(snapshot.data()['reactions']);
     transaction.update(messageRef, { reactions: this.toggleUser(reactions, emoji, user) });
   }
 
@@ -213,10 +233,6 @@ export class MessageService {
 
   private createReaction(emoji: ReactionEmoji, user: ReactionUser): MessageReaction {
     return { emoji, users: [user] };
-  }
-
-  private readReactions(value: unknown): MessageReaction[] {
-    return Array.isArray(value) ? (value as MessageReaction[]) : [];
   }
 
   private resolveErrorMessage(error: unknown): string {

@@ -7,7 +7,7 @@
   } @else if (error()) {
     <p class="message-list__status message-list__status--error">{{ error() }}</p>
   } @else if (messages().length === 0) {
-    <p class="message-list__status">Noch keine Nachrichten. Schreib die erste Nachricht.</p>
+    <p class="message-list__status">{{ emptyText() }}</p>
   } @else {
     @for (entry of entries(); track entry.id) {
       @if (entry.type === 'date') {
@@ -22,8 +22,10 @@
           [message]="entry.message"
           [ownMessage]="entry.message.authorId === currentUserId()"
           [currentUserId]="currentUserId()"
+          [inThread]="inThread()"
           (edited)="messageEdited.emit({ id: entry.message.id, text: $event })"
           (reactionToggled)="reactionToggled.emit({ id: entry.message.id, emoji: $event })"
+          (threadOpened)="threadOpened.emit(entry.message.id)"
         />
       }
     }
