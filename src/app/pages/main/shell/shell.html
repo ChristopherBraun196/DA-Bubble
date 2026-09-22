@@ -17,7 +17,7 @@
       [attr.inert]="!devspaceOpen() ? '' : null"
     >
       <app-devspace-nav
-        (composingChanged)="composing.set($event)"
+        (composingChanged)="showCompose($event)"
         (directMessageSelected)="showDirectMessage($event)"
       />
     </aside>

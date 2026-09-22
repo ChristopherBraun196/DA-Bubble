@@ -40,7 +40,7 @@ export class Shell {
       void this.chats.connect(user.uid);
     }
 
-    this.destroyRef.onDestroy(() => this.chats.disconnect());
+    this.destroyRef.onDestroy(() => this.disconnect());
   }
 
   protected toggleDevspace(): void {
@@ -51,9 +51,19 @@ export class Shell {
     this.thread.close();
   }
 
+  protected showCompose(composing: boolean): void {
+    this.composing.set(composing);
+    if (composing) {
+      this.thread.close();
+    }
+  }
+
   protected showDirectMessage(user: DirectMessageUser | null): void {
     this.searchTarget.set(null);
     this.activeDirectUser.set(user);
+    if (user) {
+      this.thread.close();
+    }
   }
 
   protected showMemberDirectMessage(user: AppUser): void {
@@ -72,5 +82,10 @@ export class Shell {
 
   protected showChannel(channelId: string): void {
     this.devspaceNav()?.selectChannel(channelId);
+  }
+
+  private disconnect(): void {
+    this.chats.disconnect();
+    this.thread.close();
   }
 }
