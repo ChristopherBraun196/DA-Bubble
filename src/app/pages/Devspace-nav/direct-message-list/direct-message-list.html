@@ -17,6 +17,10 @@
   </header>
 
   @if (expanded()) {
+    @if (error()) {
+      <p class="dm-list__status">{{ error() }}</p>
+    }
+
     <ul class="dm-list__items">
       @for (user of users(); track user.id) {
         <li>
