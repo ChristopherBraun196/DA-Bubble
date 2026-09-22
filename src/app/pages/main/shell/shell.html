@@ -24,7 +24,7 @@
       } @else if (activeDirectUser(); as user) {
         <app-direct-message-view [user]="user" />
       } @else {
-        <app-chat-view />
+        <app-chat-view (directMessageRequested)="showMemberDirectMessage($event)" />
       }
     </main>
 

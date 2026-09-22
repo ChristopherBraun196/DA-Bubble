@@ -1,6 +1,9 @@
 <div class="chat">
   @if (activeChat(); as chat) {
-    <app-chat-header [channelName]="chat.name" />
+    <app-chat-header
+      [channelName]="chat.name"
+      (directMessageRequested)="directMessageRequested.emit($event)"
+    />
 
     <div class="chat__messages">
       <app-message-list

@@ -21,7 +21,9 @@
   color: #000000;
   font-family: inherit;
   cursor: pointer;
-  transition: background-color 150ms ease, color 150ms ease;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
 
   &:hover {
     background-color: #eceefe;
@@ -67,6 +69,16 @@
     right: auto;
     left: 0;
   }
+}
+
+.chat-header__profile-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 12;
+  display: grid;
+  padding: 24px;
+  background-color: rgba(0, 0, 0, 0.45);
+  place-items: center;
 }
 
 .chat-header__avatars {
@@ -116,7 +128,9 @@
   background-color: #eceefe;
   color: #000000;
   cursor: pointer;
-  transition: background-color 150ms ease, color 150ms ease;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
 
   &:hover {
     background-color: #444df2;

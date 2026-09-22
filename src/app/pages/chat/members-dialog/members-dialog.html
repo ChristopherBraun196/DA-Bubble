@@ -24,6 +24,7 @@
           [name]="member.name"
           [avatar]="member.avatar"
           [online]="member.online"
+          (selected)="memberSelected.emit(member.user)"
         />
       </li>
     }

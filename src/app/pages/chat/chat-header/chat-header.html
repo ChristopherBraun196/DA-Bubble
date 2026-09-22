@@ -47,6 +47,7 @@
             [currentUserId]="auth.currentUser()?.uid || null"
             (closed)="closeDialog()"
             (addRequested)="openAdd()"
+            (memberSelected)="openProfile($event)"
           />
         } @else {
           <app-add-members [channelName]="channelName()" (closed)="closeDialog()" />
@@ -55,6 +56,16 @@
     }
   </div>
 </header>
+
+@if (selectedMember(); as member) {
+  <div class="chat-header__profile-overlay" (click)="closeProfile()">
+    <app-profile-dialog
+      [user]="member"
+      (closed)="closeProfile()"
+      (messageRequested)="openDirectMessage($event)"
+    />
+  </div>
+}
 
 @if (dialog() !== 'none') {
   <div class="chat-header__backdrop" (click)="closeDialog()"></div>

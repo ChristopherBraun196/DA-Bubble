@@ -1,4 +1,5 @@
-import { Component, computed, DestroyRef, effect, inject, signal } from '@angular/core';
+import { Component, computed, DestroyRef, effect, inject, output, signal } from '@angular/core';
+import { AppUser } from '../../../core/models/user.model';
 import { AuthService } from '../../../core/services/auth.service';
 import { ChatService } from '../../../core/services/chat.service';
 import { MessageService } from '../../../core/services/message.service';
@@ -13,6 +14,8 @@ import { MessageEdit, MessageList, MessageReactionToggle } from '../message-list
   templateUrl: './chat-view.html',
 })
 export class ChatView {
+  readonly directMessageRequested = output<AppUser>();
+
   protected readonly auth = inject(AuthService);
   protected readonly chats = inject(ChatService);
   protected readonly messages = inject(MessageService);

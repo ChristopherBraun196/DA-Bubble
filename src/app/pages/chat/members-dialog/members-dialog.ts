@@ -8,6 +8,7 @@ export interface ChannelMember {
   name: string;
   avatar: string;
   online: boolean;
+  user: AppUser;
 }
 
 @Component({
@@ -21,6 +22,7 @@ export class MembersDialog {
   readonly currentUserId = input<string | null>(null);
   readonly closed = output<void>();
   readonly addRequested = output<void>();
+  readonly memberSelected = output<AppUser>();
 
   protected readonly members = computed<ChannelMember[]>(() => this.createMembers());
 
@@ -41,6 +43,7 @@ export class MembersDialog {
       name: member.uid === currentUserId ? `${member.displayName} (Du)` : member.displayName,
       avatar: member.photoURL,
       online: member.uid === currentUserId,
+      user: member,
     };
   }
 

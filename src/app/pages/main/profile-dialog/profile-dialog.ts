@@ -1,5 +1,6 @@
-import { Component, computed, inject, output, signal } from '@angular/core';
+import { Component, computed, inject, input, output, signal } from '@angular/core';
 
+import { AppUser } from '../../../core/models/user.model';
 import { AuthService } from '../../../core/services/auth.service';
 import { AvatarFallback } from '../../../shared/avatar-fallback/avatar-fallback';
 
@@ -12,11 +13,22 @@ import { AvatarFallback } from '../../../shared/avatar-fallback/avatar-fallback'
 export class ProfileDialog {
   private readonly auth = inject(AuthService);
 
+  readonly user = input<AppUser | null>(null);
   readonly closed = output<void>();
+  readonly messageRequested = output<AppUser>();
 
-  protected readonly name = computed(() => this.auth.displayName());
-  protected readonly avatar = computed(() => this.auth.photoURL());
-  protected readonly email = computed(() => this.auth.email());
+  protected readonly isOwnProfile = computed(
+    () => !this.user() || this.user()?.uid === this.auth.currentUser()?.uid,
+  );
+  protected readonly name = computed(() =>
+    this.isOwnProfile() ? this.auth.displayName() : this.user()?.displayName || '',
+  );
+  protected readonly avatar = computed(() =>
+    this.isOwnProfile() ? this.auth.photoURL() : this.user()?.photoURL || '',
+  );
+  protected readonly email = computed(() =>
+    this.isOwnProfile() ? this.auth.email() : this.user()?.email || null,
+  );
 
   protected readonly editing = signal(false);
   protected readonly saving = signal(false);

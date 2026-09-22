@@ -1,5 +1,6 @@
 <div
   class="profile"
+  [class.profile--member]="user()"
   role="dialog"
   aria-modal="true"
   aria-labelledby="profile-dialog-title"
@@ -51,12 +52,14 @@
   } @else {
     <div class="profile__row">
       <p class="profile__name">{{ name() }}</p>
-      <button class="profile__edit" type="button" (click)="startEdit()">Bearbeiten</button>
+      @if (isOwnProfile()) {
+        <button class="profile__edit" type="button" (click)="startEdit()">Bearbeiten</button>
+      }
     </div>
 
     <p class="profile__status">
       <span class="profile__dot"></span>
-      Aktive
+      Aktiv
     </p>
 
     <div class="profile__mail">
@@ -68,6 +71,13 @@
       <a class="profile__mail-value" [href]="'mailto:' + email()">{{ email() }}</a>
     } @else {
       <p class="profile__mail-value profile__mail-value--muted">Als Gast angemeldet</p>
+    }
+
+    @if (!isOwnProfile() && user(); as selectedUser) {
+      <button class="profile__message" type="button" (click)="messageRequested.emit(selectedUser)">
+        <span class="material-symbols-outlined">mode_comment</span>
+        Nachricht
+      </button>
     }
   }
 </div>

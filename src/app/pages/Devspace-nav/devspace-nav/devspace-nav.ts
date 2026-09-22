@@ -40,7 +40,7 @@ export class DevspaceNav {
     this.chats.selectChat(id);
   }
 
-  protected selectUser(user: DirectMessageUser): void {
+  public selectUser(user: DirectMessageUser): void {
     this.composingChanged.emit(false);
     this.directMessageSelected.emit(user);
     this.selection.set({ kind: 'user', id: user.id });

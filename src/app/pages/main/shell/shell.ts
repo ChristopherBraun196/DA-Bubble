@@ -1,5 +1,6 @@
 import { Component, computed, DestroyRef, inject, signal, viewChild } from '@angular/core';
 import { AuthService } from '../../../core/services/auth.service';
+import { AppUser } from '../../../core/models/user.model';
 import { ChatService } from '../../../core/services/chat.service';
 import { ChatView } from '../../chat/chat-view/chat-view';
 import { DevspaceNav } from '../../Devspace-nav/devspace-nav/devspace-nav';
@@ -53,6 +54,15 @@ export class Shell {
 
   protected showDirectMessage(user: DirectMessageUser | null): void {
     this.activeDirectUser.set(user);
+  }
+
+  protected showMemberDirectMessage(user: AppUser): void {
+    this.devspaceNav()?.selectUser({
+      id: user.uid,
+      name: user.displayName,
+      avatar: user.photoURL,
+      online: true,
+    });
   }
 
   protected showChannel(channelId: string): void {
