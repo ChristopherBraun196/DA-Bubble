@@ -1,4 +1,7 @@
 <div class="message-list" aria-live="polite">
+  @if (targetMissing() && !error()) {
+    <p class="message-list__status">Die gesuchte Nachricht ist nicht mehr verfügbar.</p>
+  }
   @if (loading()) {
     <p class="message-list__status">Nachrichten werden geladen …</p>
   } @else if (error()) {
@@ -13,6 +16,9 @@
         </div>
       } @else {
         <app-message-item
+          #messageElement
+          [attr.data-message-id]="entry.message.id"
+          [class.message-list__search-hit]="entry.message.id === searchTarget()?.messageId"
           [message]="entry.message"
           [ownMessage]="entry.message.authorId === currentUserId()"
           [currentUserId]="currentUserId()"

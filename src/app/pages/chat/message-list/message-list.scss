@@ -42,3 +42,12 @@
     white-space: nowrap;
   }
 }
+
+.message-list__search-hit {
+  display: block;
+  border-radius: 16px;
+  outline: 2px solid #797ef3;
+  outline-offset: -2px;
+  background: #eceefe;
+  scroll-margin-block: 24px;
+}

@@ -1,5 +1,6 @@
 <div class="shell">
   <app-topbar
+    (messageSelected)="showSearchMessage($event)"
     (channelSelected)="showChannel($event)"
     (directMessageRequested)="showMemberDirectMessage($event)"
   />
@@ -27,7 +28,10 @@
       } @else if (activeDirectUser(); as user) {
         <app-direct-message-view [user]="user" />
       } @else {
-        <app-chat-view (directMessageRequested)="showMemberDirectMessage($event)" />
+        <app-chat-view
+          [searchTarget]="searchTarget()"
+          (directMessageRequested)="showMemberDirectMessage($event)"
+        />
       }
     </main>
 

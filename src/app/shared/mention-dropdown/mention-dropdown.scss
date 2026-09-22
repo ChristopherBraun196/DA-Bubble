@@ -61,3 +61,14 @@
   padding: 12px;
   color: variables.$text-gray;
 }
+
+.mention-dropdown__label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  small {
+    display: block;
+    margin-top: 4px;
+    font-size: 13px;
+    color: #686868;
+  }
+}

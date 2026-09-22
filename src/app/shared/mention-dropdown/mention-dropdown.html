@@ -14,7 +14,12 @@
         } @else if (entry.icon) {
           <span class="mention-dropdown__icon" aria-hidden="true">{{ entry.icon }}</span>
         }
-        <span class="mention-dropdown__label">{{ entry.label }}</span>
+        <span class="mention-dropdown__label">
+          {{ entry.label }}
+          @if (entry.description) {
+            <small>{{ entry.description }}</small>
+          }
+        </span>
       </button>
     </li>
   } @empty {

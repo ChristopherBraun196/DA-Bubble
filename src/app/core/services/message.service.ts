@@ -13,6 +13,7 @@ import {
   QuerySnapshot,
   runTransaction,
   serverTimestamp,
+  startAt,
   Timestamp,
   Transaction,
   Unsubscribe,
@@ -34,16 +35,23 @@ export class MessageService {
   private readonly messagesState = signal<ChatMessage[]>([]);
   private unsubscribeFromMessages?: Unsubscribe;
   private connectedChatId: string | null = null;
+  private historyStart: Timestamp | null = null;
+  private connectionVersion = 0;
 
   readonly messages = this.messagesState.asReadonly();
   readonly loading = signal(false);
   readonly error = signal('');
 
-  connect(chatId: string): void {
-    if (chatId === this.connectedChatId && this.unsubscribeFromMessages) {
+  connect(chatId: string, since: Timestamp | null = null): void {
+    if (
+      chatId === this.connectedChatId &&
+      this.historyStart === since &&
+      this.unsubscribeFromMessages
+    ) {
       return;
     }
     this.prepareConnection(chatId);
+    this.historyStart = since;
     this.subscribeToMessages(chatId);
   }
 
@@ -58,16 +66,21 @@ export class MessageService {
     return query(
       collection(this.firebase.firestore, 'chats', chatId, 'messages'),
       orderBy('createdAt', 'asc'),
-      limitToLast(MESSAGE_LIMIT),
+      this.historyStart ? startAt(this.historyStart) : limitToLast(MESSAGE_LIMIT),
     );
   }
 
   private subscribeToMessages(chatId: string): void {
     const messagesQuery = this.createMessagesQuery(chatId);
+    const version = this.connectionVersion;
     this.unsubscribeFromMessages = onSnapshot(
       messagesQuery,
-      (snapshot) => this.handleMessagesSnapshot(snapshot),
-      (error) => this.handleListenError(error),
+      (snapshot) => {
+        if (version === this.connectionVersion) this.handleMessagesSnapshot(snapshot);
+      },
+      (error) => {
+        if (version === this.connectionVersion) this.handleListenError(error);
+      },
     );
   }
 
@@ -83,6 +96,8 @@ export class MessageService {
   }
 
   disconnect(): void {
+    this.connectionVersion++;
+    this.historyStart = null;
     this.unsubscribeFromMessages?.();
     this.unsubscribeFromMessages = undefined;
     this.connectedChatId = null;

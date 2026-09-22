@@ -5,6 +5,7 @@
   </a>
 
   <app-workspace-search
+    (messageSelected)="messageSelected.emit($event)"
     (channelSelected)="channelSelected.emit($event)"
     (directMessageRequested)="directMessageRequested.emit($event)"
   />

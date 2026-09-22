@@ -1,3 +1,4 @@
+import { MessageSearchResult } from '../../../core/models/message-search.model';
 import { Component, computed, DestroyRef, inject, signal, viewChild } from '@angular/core';
 import { AuthService } from '../../../core/services/auth.service';
 import { AppUser } from '../../../core/models/user.model';
@@ -23,6 +24,7 @@ export class Shell {
 
   protected readonly devspaceOpen = signal(true);
   protected readonly threadOpen = signal(true);
+  protected readonly searchTarget = signal<MessageSearchResult | null>(null);
   protected readonly composing = signal(false);
   protected readonly activeDirectUser = signal<DirectMessageUser | null>(null);
   protected readonly devspaceNav = viewChild(DevspaceNav);
@@ -53,6 +55,7 @@ export class Shell {
   }
 
   protected showDirectMessage(user: DirectMessageUser | null): void {
+    this.searchTarget.set(null);
     this.activeDirectUser.set(user);
   }
 
@@ -63,6 +66,11 @@ export class Shell {
       avatar: user.photoURL,
       online: true,
     });
+  }
+
+  protected showSearchMessage(message: MessageSearchResult): void {
+    this.showChannel(message.chatId);
+    this.searchTarget.set(message);
   }
 
   protected showChannel(channelId: string): void {

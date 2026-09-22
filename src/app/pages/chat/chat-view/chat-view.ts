@@ -1,4 +1,14 @@
-import { Component, computed, DestroyRef, effect, inject, output, signal } from '@angular/core';
+import { MessageSearchResult } from '../../../core/models/message-search.model';
+import {
+  Component,
+  computed,
+  DestroyRef,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { AppUser } from '../../../core/models/user.model';
 import { AuthService } from '../../../core/services/auth.service';
 import { ChatService } from '../../../core/services/chat.service';
@@ -14,6 +24,7 @@ import { MessageEdit, MessageList, MessageReactionToggle } from '../message-list
   templateUrl: './chat-view.html',
 })
 export class ChatView {
+  readonly searchTarget = input<MessageSearchResult | null>(null);
   readonly directMessageRequested = output<AppUser>();
 
   protected readonly auth = inject(AuthService);
@@ -28,13 +39,16 @@ export class ChatView {
     this.activeChat() ? `Nachricht an #${this.activeChat()?.name}` : 'Nachricht schreiben',
   );
   protected readonly sending = signal(false);
+  protected readonly activeSearchTarget = computed(() =>
+    this.searchTarget()?.chatId === this.chats.activeChatId() ? this.searchTarget() : null,
+  );
 
   constructor() {
     effect(() => {
       const chatId = this.chats.activeChatId();
 
       if (chatId) {
-        this.messages.connect(chatId);
+        this.messages.connect(chatId, this.activeSearchTarget()?.createdAt ?? null);
       } else {
         this.messages.disconnect();
       }

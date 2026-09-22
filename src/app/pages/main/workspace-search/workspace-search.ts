@@ -1,6 +1,7 @@
 import {
   Component,
   computed,
+  effect,
   ElementRef,
   HostListener,
   inject,
@@ -13,10 +14,13 @@ import { AuthService } from '../../../core/services/auth.service';
 import { ChatService } from '../../../core/services/chat.service';
 import { UserService } from '../../../core/services/user.service';
 import { MentionDropdown, MentionEntry } from '../../../shared/mention-dropdown/mention-dropdown';
+import { MessageSearchService } from '../../../core/services/message-search.service';
+import { MessageSearchResult } from '../../../core/models/message-search.model';
 import { ProfileDialog } from '../profile-dialog/profile-dialog';
 
 @Component({
   selector: 'app-workspace-search',
+  providers: [MessageSearchService],
   imports: [MentionDropdown, ProfileDialog],
   templateUrl: './workspace-search.html',
   styleUrl: './workspace-search.scss',
@@ -27,10 +31,12 @@ export class WorkspaceSearch {
   private readonly users = inject(UserService);
   private readonly auth = inject(AuthService);
   private readonly members = signal<UserSearchResult[]>([]);
+  protected readonly messageSearch = inject(MessageSearchService);
   private usersLoaded = false;
   private selectionVersion = 0;
 
   readonly channelSelected = output<string>();
+  readonly messageSelected = output<MessageSearchResult>();
   readonly directMessageRequested = output<AppUser>();
   protected readonly query = signal('');
   protected readonly opened = signal(false);
@@ -42,6 +48,29 @@ export class WorkspaceSearch {
   protected readonly search = computed(() => this.query().trim().replace(/^[#@]/, ''));
   protected readonly entries = computed(() => this.createEntries());
 
+  private readonly searchableIds = computed(() =>
+    this.chats
+      .chats()
+      .filter(
+        (chat) =>
+          chat.type === 'channel' && chat.memberIds?.includes(this.auth.currentUser()?.uid || ''),
+      )
+      .map((chat) => chat.id)
+      .sort()
+      .join(','),
+  );
+  private readonly searchingMessages = computed(
+    () => this.opened() && Boolean(this.query().trim()) && !/^[#@]/.test(this.query().trim()),
+  );
+
+  constructor() {
+    effect(() => {
+      const ids = this.searchableIds();
+      if (this.searchingMessages()) this.messageSearch.connect(ids ? ids.split(',') : []);
+      else this.messageSearch.disconnect();
+    });
+  }
+
   private createEntries(): MentionEntry[] {
     const query = this.query().trim();
     const channels = this.chats
@@ -51,7 +80,33 @@ export class WorkspaceSearch {
     const members = this.members().map((user) => this.memberEntry(user));
     if (query.startsWith('#')) return channels;
     if (query.startsWith('@')) return members;
-    return [...channels, ...members];
+    return [...channels, ...members, ...this.messageEntries()];
+  }
+
+  private messageEntries(): MentionEntry[] {
+    const term = this.search().toLowerCase();
+    return this.messageSearch
+      .messages()
+      .filter((message) => message.text.toLowerCase().includes(term))
+      .map((message) => this.messageEntry(message));
+  }
+
+  private messageEntry(message: MessageSearchResult): MentionEntry {
+    const channel = this.chats.chats().find((chat) => chat.id === message.chatId);
+    return {
+      id: `message:${message.chatId}/${message.messageId}`,
+      icon: '↳',
+      label: this.messageExcerpt(message.text),
+      searchText: message.text,
+      description: `${message.authorName} · #${channel?.name || ''} · ${message.createdAt.toDate().toLocaleDateString('de-DE')}`,
+    };
+  }
+
+  private messageExcerpt(text: string): string {
+    const position = text.toLowerCase().indexOf(this.search().toLowerCase());
+    const start = Math.max(0, position - 35);
+    const end = Math.min(text.length, Math.max(start + 120, position + this.search().length));
+    return `${start ? '…' : ''}${text.slice(start, end)}${end < text.length ? '…' : ''}`;
   }
 
   private memberEntry(user: UserSearchResult): MentionEntry {
@@ -90,6 +145,10 @@ export class WorkspaceSearch {
   }
 
   protected selectEntry(entry: MentionEntry): void {
+    if (entry.id.startsWith('message:')) {
+      this.selectMessage(entry.id);
+      return;
+    }
     this.opened.set(false);
     if (entry.id.startsWith('channel:')) {
       this.query.set('');
@@ -97,6 +156,16 @@ export class WorkspaceSearch {
       return;
     }
     void this.openProfile(entry.id.slice(5), ++this.selectionVersion);
+  }
+
+  private selectMessage(id: string): void {
+    const message = this.messageSearch
+      .messages()
+      .find((item) => `message:${item.chatId}/${item.messageId}` === id);
+    if (!message) return;
+    this.messageSelected.emit(message);
+    this.query.set('');
+    this.close();
   }
 
   private async openProfile(uid: string, version: number): Promise<void> {

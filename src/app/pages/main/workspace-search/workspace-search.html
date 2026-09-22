@@ -23,6 +23,12 @@
       @if (error()) {
         <p role="alert">{{ error() }}</p>
       }
+      @if (messageSearch.loading()) {
+        <p role="status">Nachrichten werden geladen…</p>
+      }
+      @if (messageSearch.error()) {
+        <p role="alert">{{ messageSearch.error() }}</p>
+      }
       <app-mention-dropdown
         [entries]="entries()"
         [search]="search()"

@@ -1,3 +1,4 @@
+import { MessageSearchResult } from '../../../core/models/message-search.model';
 import { Component, computed, inject, output, signal } from '@angular/core';
 import { AppUser } from '../../../core/models/user.model';
 import { WorkspaceSearch } from '../workspace-search/workspace-search';
@@ -18,6 +19,7 @@ export type TopbarPanel = 'none' | 'menu' | 'profile';
   templateUrl: './topbar.html',
 })
 export class Topbar {
+  readonly messageSelected = output<MessageSearchResult>();
   readonly channelSelected = output<string>();
   readonly directMessageRequested = output<AppUser>();
 

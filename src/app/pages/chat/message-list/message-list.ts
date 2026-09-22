@@ -1,4 +1,13 @@
-import { Component, computed, input, output } from '@angular/core';
+import { MessageSearchResult } from '../../../core/models/message-search.model';
+import {
+  afterRenderEffect,
+  Component,
+  computed,
+  ElementRef,
+  input,
+  output,
+  viewChildren,
+} from '@angular/core';
 import { ChatMessage } from '../../../core/models/message.model';
 import { ReactionEmoji } from '../../../core/models/reaction.model';
 import { MessageItem } from '../message-item/message-item';
@@ -25,13 +34,45 @@ type MessageListEntry =
 })
 export class MessageList {
   readonly messages = input<ChatMessage[]>([]);
+  readonly searchTarget = input<MessageSearchResult | null>(null);
+  private readonly messageElements = viewChildren<unknown, ElementRef<HTMLElement>>(
+    'messageElement',
+    {
+      read: ElementRef,
+    },
+  );
+  private lastScrolledTarget: MessageSearchResult | null = null;
+
   readonly currentUserId = input<string | null>(null);
   readonly loading = input(false);
   readonly error = input('');
   readonly messageEdited = output<MessageEdit>();
   readonly reactionToggled = output<MessageReactionToggle>();
 
+  protected readonly targetMissing = computed(
+    () =>
+      this.searchTarget() &&
+      !this.loading() &&
+      !this.messages().some((message) => message.id === this.searchTarget()?.messageId),
+  );
+
   protected readonly entries = computed(() => this.createEntries(this.messages()));
+
+  constructor() {
+    afterRenderEffect(() => this.scrollToSearchTarget());
+  }
+
+  private scrollToSearchTarget(): void {
+    const target = this.searchTarget();
+    const elements = this.messageElements();
+    if (!target || target === this.lastScrolledTarget) return;
+    const element = elements.find(
+      (item) => item.nativeElement.dataset['messageId'] === target.messageId,
+    );
+    if (!element) return;
+    element.nativeElement.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    this.lastScrolledTarget = target;
+  }
 
   private createEntries(messages: ChatMessage[]): MessageListEntry[] {
     const entries: MessageListEntry[] = [];
