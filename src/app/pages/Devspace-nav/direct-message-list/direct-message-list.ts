@@ -6,6 +6,7 @@ import { ChatService } from '../../../core/services/chat.service';
 import { UserService } from '../../../core/services/user.service';
 import { UserListItem } from '../user-list-item/user-list-item';
 
+/** A person shown in the direct message list. */
 export interface DirectMessageUser {
   id: string;
   name: string;
@@ -20,6 +21,13 @@ export interface DirectMessageUser {
   styleUrl: './direct-message-list.scss',
   templateUrl: './direct-message-list.html',
 })
+/**
+ * Collapsible list of direct message conversations.
+ *
+ * @remarks
+ * Shows only partners an actual conversation exists with, plus one temporary
+ * entry for a person the user just started writing to.
+ */
 export class DirectMessageList {
   private readonly auth = inject(AuthService);
   private readonly chats = inject(ChatService);
@@ -69,6 +77,12 @@ export class DirectMessageList {
     effect(() => void this.loadUsers(this.directUserIds(), ++this.loadVersion));
   }
 
+  /**
+   * Resolves the conversation partners behind the given ids.
+   *
+   * @param userIds - Ids of the people to load.
+   * @param version - Guards against results of a superseded load.
+   */
   private async loadUsers(userIds: string[], version: number): Promise<void> {
     if (!userIds.length) {
       this.otherUsers.set([]);
@@ -84,6 +98,12 @@ export class DirectMessageList {
   }
 
   /** Gastkonten und der eigene Account stehen nicht in der Liste. */
+  /**
+   * Maps loaded users into list rows, marking the signed-in user.
+   *
+   * @param users - The resolved conversation partners.
+   * @returns The rows to render.
+   */
   private toDirectMessageUsers(users: (UserSearchResult | null)[]): DirectMessageUser[] {
     const currentUserId = this.auth.currentUser()?.uid;
 
@@ -98,6 +118,7 @@ export class DirectMessageList {
       }));
   }
 
+  /** Returns the freshly selected partner when no conversation exists yet. */
   private getTemporaryUsers(
     user: DirectMessageUser | null,
     currentUserId: string,
@@ -107,10 +128,17 @@ export class DirectMessageList {
     return user && user.id !== currentUserId && !alreadyVisible ? [user] : [];
   }
 
+  /**
+   * Detects guest accounts by their name.
+   *
+   * @param displayName - The stored display name.
+   * @returns True for anonymous sessions.
+   */
   private isGuest(displayName: string): boolean {
     return displayName.trim().toLocaleLowerCase('de-DE') === 'gast';
   }
 
+  /** Collapses or expands the list. */
   protected toggle(): void {
     this.expanded.update((value) => !value);
   }

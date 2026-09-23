@@ -14,11 +14,13 @@ import { ChatMessage } from '../../../core/models/message.model';
 import { ReactionEmoji } from '../../../core/models/reaction.model';
 import { MessageItem } from '../message-item/message-item';
 
+/** Reports an edited message body back to the host. */
 export interface MessageEdit {
   id: string;
   text: string;
 }
 
+/** Reports a reaction that should be added or removed. */
 export interface MessageReactionToggle {
   id: string;
   emoji: ReactionEmoji;
@@ -37,6 +39,13 @@ type MessageListEntry =
   styleUrl: './message-list.scss',
   templateUrl: './message-list.html',
 })
+/**
+ * Scrollable message list grouped by day.
+ *
+ * @remarks
+ * Sticks to the bottom while the user is reading along, but leaves the
+ * position alone once they have scrolled up into the history.
+ */
 export class MessageList {
   readonly messages = input<ChatMessage[]>([]);
   readonly searchTarget = input<MessageSearchResult | null>(null);
@@ -79,6 +88,7 @@ export class MessageList {
   }
 
   /** Springt zum Suchtreffer, sonst bleibt die Liste am unteren Ende. */
+  /** Scrolls to the newest message or to a selected search hit. */
   private updateScrollPosition(): void {
     const messages = this.messages();
     const container = this.resolveScrollContainer();
@@ -90,6 +100,12 @@ export class MessageList {
     }
   }
 
+  /**
+   * Detects whether a new message arrived since the last render.
+   *
+   * @param messages - The current list.
+   * @returns True when the list grew at the bottom.
+   */
   private trackLatestMessage(messages: ChatMessage[]): boolean {
     if (messages.length === 0) {
       this.resetScrollState();
@@ -102,16 +118,24 @@ export class MessageList {
     return true;
   }
 
+  /** Clears the scroll bookkeeping when the chat changes. */
   private resetScrollState(): void {
     this.latestRenderedId = '';
     this.firstRender = true;
     this.pinnedToBottom = true;
   }
 
+  /**
+   * Whether a message was written by the signed-in user.
+   *
+   * @param message - The message to test.
+   * @returns True for the user's own messages.
+   */
   private isOwnMessage(message: ChatMessage | undefined): boolean {
     return !!message && !!this.currentUserId() && message.authorId === this.currentUserId();
   }
 
+  /** Jumps to the end of the list. */
   private scrollToBottom(container: HTMLElement): void {
     container.scrollTo({
       top: container.scrollHeight,
@@ -120,6 +144,7 @@ export class MessageList {
     this.pinnedToBottom = true;
   }
 
+  /** Records whether the user is still reading at the bottom. */
   private updatePinnedState(): void {
     const container = this.scrollContainer;
     if (!container) return;
@@ -127,6 +152,7 @@ export class MessageList {
     this.pinnedToBottom = distance <= BOTTOM_THRESHOLD;
   }
 
+  /** Returns the scrolling element, resolving it on first use. */
   private resolveScrollContainer(): HTMLElement | null {
     if (this.scrollContainer?.isConnected) return this.scrollContainer;
     this.detachScrollListener();
@@ -135,6 +161,11 @@ export class MessageList {
     return this.scrollContainer;
   }
 
+  /**
+   * Walks up the DOM to find the scrolling ancestor.
+   *
+   * @returns The scroll container, or `null` when none was found.
+   */
   private findScrollContainer(): HTMLElement | null {
     let element = this.host.nativeElement.parentElement;
     while (element) {
@@ -145,11 +176,17 @@ export class MessageList {
     return null;
   }
 
+  /** Removes the scroll listener when the component goes away. */
   private detachScrollListener(): void {
     this.scrollContainer?.removeEventListener('scroll', this.handleScroll);
     this.scrollContainer = null;
   }
 
+  /**
+   * Scrolls to the message selected in the search.
+   *
+   * @returns True when the target was found and scrolled to.
+   */
   private scrollToSearchTarget(): boolean {
     const target = this.searchTarget();
     const elements = this.messageElements();
@@ -163,6 +200,12 @@ export class MessageList {
     return true;
   }
 
+  /**
+   * Interleaves messages with the date separators between days.
+   *
+   * @param messages - The messages in chronological order.
+   * @returns Rows of messages and date markers.
+   */
   private createEntries(messages: ChatMessage[]): MessageListEntry[] {
     const entries: MessageListEntry[] = [];
     let previousDateKey = '';
@@ -174,10 +217,19 @@ export class MessageList {
     return entries;
   }
 
+  /** Returns a message's timestamp, falling back to now while it is pending. */
   private getMessageDate(message: ChatMessage): Date {
     return message.createdAt?.toDate() || new Date();
   }
 
+  /**
+   * Inserts a date separator when the day changes.
+   *
+   * @param entries - The rows assembled so far.
+   * @param date - The current message's date.
+   * @param previousKey - Day key of the previous message.
+   * @returns The day key now in effect.
+   */
   private addDateEntry(entries: MessageListEntry[], date: Date, previousKey: string): string {
     const dateKey = this.getDateKey(date);
     if (dateKey === previousKey) {
@@ -187,6 +239,13 @@ export class MessageList {
     return dateKey;
   }
 
+  /**
+   * Builds a date separator row.
+   *
+   * @param date - The day being introduced.
+   * @param dateKey - Its stable key.
+   * @returns The separator row.
+   */
   private createDateEntry(date: Date, dateKey: string): MessageListEntry {
     return {
       type: 'date',
@@ -195,6 +254,12 @@ export class MessageList {
     };
   }
 
+  /**
+   * Formats a date as a comparable day key.
+   *
+   * @param date - The date to reduce.
+   * @returns The key in `YYYY-MM-DD` form.
+   */
   private getDateKey(date: Date): string {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -202,6 +267,12 @@ export class MessageList {
     return `${year}-${month}-${day}`;
   }
 
+  /**
+   * Builds the label of a date separator.
+   *
+   * @param date - The day being introduced.
+   * @returns "Heute", "Gestern" or the written-out date.
+   */
   private getDateLabel(date: Date): string {
     const today = new Date();
     const yesterday = this.getYesterday(today);
@@ -214,16 +285,24 @@ export class MessageList {
     return this.formatLongDate(date);
   }
 
+  /** Returns the day before the given date. */
   private getYesterday(today: Date): Date {
     const yesterday = new Date(today);
     yesterday.setDate(today.getDate() - 1);
     return yesterday;
   }
 
+  /** Whether two dates fall on the same day. */
   private isSameDate(first: Date, second: Date): boolean {
     return this.getDateKey(first) === this.getDateKey(second);
   }
 
+  /**
+   * Writes out a date in German.
+   *
+   * @param date - The date to format.
+   * @returns For example "Montag, 21 September".
+   */
   private formatLongDate(date: Date): string {
     const weekday = new Intl.DateTimeFormat('de-DE', { weekday: 'long' }).format(date);
     const month = new Intl.DateTimeFormat('de-DE', { month: 'long' }).format(date);

@@ -11,6 +11,14 @@ import { Header } from '../shared/header/header';
   styleUrl: './register.scss',
   templateUrl: './register.html',
 })
+/**
+ * Registration form collecting name, email, password and consent.
+ *
+ * @remarks
+ * Does not create the account — the values are handed to
+ * {@link RegistrationDraftService} and the account is created once the user
+ * has picked an avatar on the next screen.
+ */
 export class Register {
   private readonly registrationDraft = inject(RegistrationDraftService);
   private readonly router = inject(Router);
@@ -50,6 +58,7 @@ export class Register {
     afterNextRender(() => this.resetFormAfterReload());
   }
 
+  /** Validates the form and continues to the avatar step. */
   protected onSubmit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -60,18 +69,22 @@ export class Register {
     void this.router.navigateByUrl('/choose-avatar');
   }
 
+  /** Whether the email field should be shown in its error state. */
   protected emailHasError(): boolean {
     return this.form.controls.email.invalid && this.form.controls.email.touched;
   }
 
+  /** Whether the password field should be shown in its error state. */
   protected passwordHasError(): boolean {
     return this.form.controls.password.invalid && this.form.controls.password.touched;
   }
 
+  /** The message shown below the email field. */
   protected emailErrorMessage(): string {
     return '*Diese E-Mail-Adresse ist leider ungültig.';
   }
 
+  /** The message shown below the password field. */
   protected passwordErrorMessage(): string {
     if (this.form.controls.password.hasError('minlength')) {
       return 'Das Passwort muss mindestens 6 Zeichen lang sein.';
@@ -80,6 +93,7 @@ export class Register {
     return 'Bitte geben Sie ein Passwort ein.';
   }
 
+  /** Hands the entered values to the draft service before navigating on. */
   private saveRegistrationDraft(): void {
     const { name, email, password, privacyAccepted } = this.form.getRawValue();
     this.registrationDraft.set({
@@ -90,6 +104,13 @@ export class Register {
     });
   }
 
+  /**
+   * Empties the form after a page reload.
+   *
+   * @remarks
+   * Browsers restore form values on reload, which would leave a stale password
+   * in the field without this.
+   */
   private resetFormAfterReload(): void {
     const [navigationEntry] = performance.getEntriesByType(
       'navigation',

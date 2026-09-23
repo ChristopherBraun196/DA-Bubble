@@ -12,6 +12,7 @@ const SEARCH_MIN_LENGTH = 3;
   styleUrl: './add-members.scss',
   templateUrl: './add-members.html',
 })
+/** Dialog for adding further members to an existing channel. */
 export class AddMembers {
   private readonly chats = inject(ChatService);
   private readonly users = inject(UserService);
@@ -34,12 +35,26 @@ export class AddMembers {
 
   protected readonly canAdd = computed(() => this.selected().length > 0);
 
+  /**
+   * Tracks the search term used to find people.
+   *
+   * @param event - The input event of the search field.
+   */
   protected updateSearchTerm(event: Event): void {
     const term = (event.target as HTMLInputElement).value;
     this.searchTerm.set(term);
     void this.search(term);
   }
 
+  /**
+   * Looks up people matching the search term.
+   *
+   * @param term - The typed term; shorter input clears the suggestions.
+   *
+   * @remarks
+   * A version counter discards results of a search the user has since
+   * typed past.
+   */
   private async search(term: string): Promise<void> {
     const version = ++this.searchVersion;
 
@@ -55,6 +70,12 @@ export class AddMembers {
     }
   }
 
+  /**
+   * Hides current members and already chosen people from the suggestions.
+   *
+   * @param matches - The search results.
+   * @returns Only people who can still be added.
+   */
   private withoutKnownPeople(matches: UserSearchResult[]): UserSearchResult[] {
     const knownIds = new Set([
       ...(this.activeChat()?.memberIds || []),
@@ -64,6 +85,11 @@ export class AddMembers {
     return matches.filter(({ uid }) => !knownIds.has(uid));
   }
 
+  /**
+   * Adds a person to the selection.
+   *
+   * @param person - The user picked from the suggestions.
+   */
   protected selectPerson(person: UserSearchResult): void {
     this.selected.update((people) => [...people, person]);
     this.searchTerm.set('');
@@ -71,10 +97,16 @@ export class AddMembers {
     this.addError.set('');
   }
 
+  /**
+   * Removes a person from the selection.
+   *
+   * @param uid - Id of the user to drop.
+   */
   protected removePerson(uid: string): void {
     this.selected.update((people) => people.filter((person) => person.uid !== uid));
   }
 
+  /** Adds the selected people to the channel and closes the dialog. */
   protected async add(): Promise<void> {
     const chatId = this.activeChat()?.id;
 

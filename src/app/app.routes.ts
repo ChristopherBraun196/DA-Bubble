@@ -2,6 +2,13 @@ import { Routes } from '@angular/router';
 
 import { authGuard } from './core/guards/auth.guard';
 
+/**
+ * Application routes.
+ *
+ * @remarks
+ * Every page is lazily loaded. Only `main` is protected by
+ * {@link authGuard}; the login flow and the legal pages stay public.
+ */
 export const routes: Routes = [
   {
     path: '',

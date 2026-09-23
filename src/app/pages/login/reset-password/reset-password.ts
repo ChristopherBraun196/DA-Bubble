@@ -31,6 +31,13 @@ const passwordsMatch: ValidatorFn = (control: AbstractControl): ValidationErrors
   styleUrl: './reset-password.scss',
   templateUrl: './reset-password.html',
 })
+/**
+ * Sets a new password using the code from the reset email.
+ *
+ * @remarks
+ * The `oobCode` query parameter is verified on load, so an expired link fails
+ * before the user types anything.
+ */
 export class ResetPassword implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
@@ -56,18 +63,22 @@ export class ResetPassword implements OnInit {
     { validators: passwordsMatch },
   );
 
+  /** Verifies the reset code carried by the link. */
   async ngOnInit(): Promise<void> {
     await this.verifyResetLink();
   }
 
+  /** Whether the form should be blocked, for example while the link is checked. */
   protected formDisabled(): boolean {
     return this.form.invalid || this.linkPending() || Boolean(this.linkError());
   }
 
+  /** Clears the error message when the user edits the form. */
   protected clearSubmitError(): void {
     this.submitError.set('');
   }
 
+  /** The message shown below the password fields. */
   protected errorMessage(): string {
     if (this.submitError()) return this.submitError();
     if (this.linkError()) return this.linkError();
@@ -76,6 +87,7 @@ export class ResetPassword implements OnInit {
     return '';
   }
 
+  /** Validates both fields and stores the new password. */
   protected async onSubmit(): Promise<void> {
     if (this.formDisabled() || this.resetPending()) {
       this.form.markAllAsTouched();
@@ -87,6 +99,7 @@ export class ResetPassword implements OnInit {
     await this.submitPassword();
   }
 
+  /** Checks the code from the email and blocks the form when it expired. */
   private async verifyResetLink(): Promise<void> {
     if (!this.actionCode) {
       this.linkError.set('Der Link zum Zurücksetzen ist unvollständig.');
@@ -103,6 +116,7 @@ export class ResetPassword implements OnInit {
     }
   }
 
+  /** Applies the new password and returns to the login page. */
   private async submitPassword(): Promise<void> {
     try {
       await this.auth.resetPassword(this.actionCode, this.form.controls.password.getRawValue());
@@ -113,15 +127,23 @@ export class ResetPassword implements OnInit {
     }
   }
 
+  /** Whether the entered password misses the minimum length. */
   private passwordIsTooShort(): boolean {
     const password = this.form.controls.password;
     return password.touched && password.hasError('minlength');
   }
 
+  /** Whether both password fields disagree. */
   private passwordsDiffer(): boolean {
     return this.form.controls.confirmation.touched && this.form.hasError('passwordMismatch');
   }
 
+  /**
+   * Turns a Firebase error code into a message shown on the form.
+   *
+   * @param error - The caught error.
+   * @returns A readable German message.
+   */
   private resolveResetError(error: unknown): string {
     if (!(error instanceof FirebaseError)) {
       return 'Das Passwort konnte nicht geändert werden. Bitte versuchen Sie es erneut.';

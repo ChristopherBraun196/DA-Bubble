@@ -9,6 +9,7 @@ import { CreateChannel } from '../create-channel/create-channel';
   styleUrl: './channel-list.scss',
   templateUrl: './channel-list.html',
 })
+/** Collapsible list of the channels the user belongs to. */
 export class ChannelList {
   private readonly chatService = inject(ChatService);
 
@@ -21,14 +22,17 @@ export class ChannelList {
   );
   protected readonly dialogOpen = signal(false);
 
+  /** Collapses or expands the list. */
   protected toggle(): void {
     this.expanded.update((value) => !value);
   }
 
+  /** Opens the channel creation dialog. */
   protected openDialog(): void {
     this.dialogOpen.set(true);
   }
 
+  /** Closes the channel creation dialog. */
   protected closeDialog(): void {
     this.dialogOpen.set(false);
   }

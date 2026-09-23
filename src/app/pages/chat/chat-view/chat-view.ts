@@ -25,6 +25,13 @@ import { MessageEdit, MessageList, MessageReactionToggle } from '../message-list
   styleUrl: './chat-view.scss',
   templateUrl: './chat-view.html',
 })
+/**
+ * Main view of a channel: header, message list and input.
+ *
+ * @remarks
+ * Follows the active chat and rewires the message subscription whenever it
+ * changes.
+ */
 export class ChatView {
   readonly searchTarget = input<MessageSearchResult | null>(null);
   readonly directMessageRequested = output<AppUser>();
@@ -62,6 +69,11 @@ export class ChatView {
     this.destroyRef.onDestroy(() => this.messages.disconnect());
   }
 
+  /**
+   * Sends a message into the open chat.
+   *
+   * @param text - The message body.
+   */
   protected async sendMessage(text: string): Promise<void> {
     const chatId = this.chats.activeChatId();
     if (!chatId || this.sending()) {
@@ -75,6 +87,11 @@ export class ChatView {
     }
   }
 
+  /**
+   * Stores an edited message body.
+   *
+   * @param edit - Id of the message and its new text.
+   */
   protected async editMessage({ id, text }: MessageEdit): Promise<void> {
     const chatId = this.chats.activeChatId();
 
@@ -85,6 +102,11 @@ export class ChatView {
     await this.messages.updateMessage(chatId, id, text);
   }
 
+  /**
+   * Opens the thread panel for a message.
+   *
+   * @param messageId - Id of the message the thread hangs off.
+   */
   protected openThread(messageId: string): void {
     const chatId = this.chats.activeChatId();
     if (chatId) {
@@ -92,6 +114,7 @@ export class ChatView {
     }
   }
 
+  /** Closes a thread that belongs to a chat the user has just left. */
   private closeForeignThread(chatId: string | null): void {
     const target = untracked(() => this.thread.target());
     if (target && target.chatId !== chatId) {
@@ -99,6 +122,11 @@ export class ChatView {
     }
   }
 
+  /**
+   * Adds or removes a reaction on a message.
+   *
+   * @param toggle - Id of the message and the emoji to toggle.
+   */
   protected async toggleReaction({ id, emoji }: MessageReactionToggle): Promise<void> {
     const chatId = this.chats.activeChatId();
     if (!chatId) {

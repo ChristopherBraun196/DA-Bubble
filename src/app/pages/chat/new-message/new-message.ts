@@ -15,6 +15,14 @@ import { MessageInput } from '../message-input/message-input';
   styleUrl: './new-message.scss',
   templateUrl: './new-message.html',
 })
+/**
+ * Form for starting a conversation without picking a chat first.
+ *
+ * @remarks
+ * The address field accepts `#` for channels and `@` for people; the chosen
+ * recipient decides whether the message goes into a channel or opens a
+ * direct conversation.
+ */
 export class NewMessage {
   private readonly auth = inject(AuthService);
   private readonly chats = inject(ChatService);
@@ -39,6 +47,11 @@ export class NewMessage {
       .map(({ id, name }) => ({ id: `channel:${id}`, label: name, icon: '#' })),
   );
 
+  /**
+   * Tracks the address field and opens the matching dropdown.
+   *
+   * @param event - The input event of the text field.
+   */
   protected updateRecipient(event: Event): void {
     const value = (event.target as HTMLInputElement).value;
     this.recipient.set(value);
@@ -51,6 +64,11 @@ export class NewMessage {
     }
   }
 
+  /**
+   * Applies the chosen recipient.
+   *
+   * @param entry - The selected dropdown row.
+   */
   protected selectRecipient(entry: MentionEntry): void {
     this.mentionOpen.set(false);
     if (entry.id.startsWith('channel:')) {
@@ -60,18 +78,25 @@ export class NewMessage {
     this.selectUser(entry);
   }
 
+  /** Remembers a channel as the recipient. */
   private selectChannel(entry: MentionEntry): void {
     this.recipient.set(`#${entry.label}`);
     this.selectedChannelId.set(entry.id.slice(8));
     this.selectedDirectUser.set(null);
   }
 
+  /** Remembers a person as the recipient. */
   private selectUser(entry: MentionEntry): void {
     this.recipient.set(`@${entry.label}`);
     this.selectedChannelId.set(null);
     this.selectedDirectUser.set(this.toDirectMessageUser(entry));
   }
 
+  /**
+   * Sends the message to whichever recipient was chosen.
+   *
+   * @param text - The message body.
+   */
   protected async sendMessage(text: string): Promise<void> {
     const channelId = this.selectedChannelId();
     const directUser = this.selectedDirectUser();
@@ -85,11 +110,23 @@ export class NewMessage {
     }
   }
 
+  /**
+   * Sends into a channel and opens it.
+   *
+   * @param channelId - Id of the target channel.
+   * @param text - The message body.
+   */
   private async sendChannelMessage(channelId: string, text: string): Promise<void> {
     await this.messages.sendMessage(channelId, text);
     this.channelSelected.emit(channelId);
   }
 
+  /**
+   * Sends a direct message, creating the conversation when needed.
+   *
+   * @param user - The recipient.
+   * @param text - The message body.
+   */
   private async sendDirectMessage(user: DirectMessageUser, text: string): Promise<void> {
     const currentUser = this.auth.currentUser();
     if (!currentUser) return;
@@ -107,6 +144,7 @@ export class NewMessage {
     return [...this.channelEntries(), ...this.userEntries()];
   });
 
+  /** Loads the selectable people once, on the first `@`. */
   private async loadUsers(): Promise<void> {
     if (this.loadingUsers) {
       return;
@@ -122,6 +160,12 @@ export class NewMessage {
     }
   }
 
+  /**
+   * Maps users into dropdown rows.
+   *
+   * @param users - The users to offer.
+   * @returns The rows to render.
+   */
   private toMentionEntries(users: UserSearchResult[]): MentionEntry[] {
     return users.map(({ uid, displayName, photoURL }) => ({
       id: `user:${uid}`,
@@ -130,6 +174,12 @@ export class NewMessage {
     }));
   }
 
+  /**
+   * Maps a dropdown row back into a conversation partner.
+   *
+   * @param entry - The selected row.
+   * @returns The recipient of the direct message.
+   */
   private toDirectMessageUser(entry: MentionEntry): DirectMessageUser {
     const userId = entry.id.slice(5);
     const isCurrentUser = userId === this.auth.currentUser()?.uid;

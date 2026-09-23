@@ -8,4 +8,5 @@ import { RouterLink } from '@angular/router';
   styleUrl: './imprint.scss',
   templateUrl: './imprint.html',
 })
+/** Static legal notice page. */
 export class Imprint {}

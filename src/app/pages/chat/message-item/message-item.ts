@@ -15,6 +15,13 @@ import { MessageReactions } from '../message-reactions/message-reactions';
     '(document:click)': 'closePopoversOutside($event)',
   },
 })
+/**
+ * A single message with its actions, reactions and inline editing.
+ *
+ * @remarks
+ * Renders both chat and thread messages; {@link MessageItem.inThread} hides
+ * the reply affordances where they do not apply.
+ */
 export class MessageItem {
   readonly message = input<ChatMessage | null>(null);
   readonly ownMessage = input(false);
@@ -41,16 +48,19 @@ export class MessageItem {
   private readonly editEmojiWrap = viewChild<ElementRef<HTMLElement>>('editEmojiWrap');
   private readonly editField = viewChild<ElementRef<HTMLTextAreaElement>>('editField');
 
+  /** Opens or closes the message's action menu. */
   protected toggleMenu(): void {
     this.reactionPickerOpen.set(false);
     this.menuOpen.update((open) => !open);
   }
 
+  /** Opens or closes the emoji picker used for reacting. */
   protected toggleReactionPicker(): void {
     this.menuOpen.set(false);
     this.reactionPickerOpen.update((open) => !open);
   }
 
+  /** Closes menu and pickers on a click outside the message. */
   protected closePopoversOutside(event: MouseEvent): void {
     const target = event.target as Node;
     if (this.menuOpen() && !this.menuWrap()?.nativeElement.contains(target)) {
@@ -64,10 +74,16 @@ export class MessageItem {
     }
   }
 
+  /** Opens or closes the emoji picker inside the edit field. */
   protected toggleEditEmojiPicker(): void {
     this.editEmojiOpen.update((open) => !open);
   }
 
+  /**
+   * Inserts an emoji into the edit field.
+   *
+   * @param emoji - The chosen character.
+   */
   protected insertEmoji(emoji: string): void {
     const field = this.editField()?.nativeElement;
     const start = field?.selectionStart ?? this.draft().length;
@@ -80,26 +96,39 @@ export class MessageItem {
     });
   }
 
+  /**
+   * Reports that a reaction should be added or removed.
+   *
+   * @param emoji - The emoji that was picked.
+   */
   protected toggleReaction(emoji: ReactionEmoji): void {
     this.reactionToggled.emit(emoji);
     this.reactionPickerOpen.set(false);
   }
 
+  /** Switches the message into edit mode. */
   protected startEdit(): void {
     this.draft.set(this.message()?.text || '');
     this.menuOpen.set(false);
     this.editing.set(true);
   }
 
+  /** Leaves edit mode without saving. */
   protected cancelEdit(): void {
     this.editEmojiOpen.set(false);
     this.editing.set(false);
   }
 
+  /**
+   * Tracks what is typed into the edit field.
+   *
+   * @param event - The input event of the text area.
+   */
   protected updateDraft(event: Event): void {
     this.draft.set((event.target as HTMLTextAreaElement).value);
   }
 
+  /** Reports the edited text, unless it is blank or unchanged. */
   protected saveEdit(): void {
     const text = this.draft().trim();
 

@@ -26,6 +26,13 @@ import { MessageEdit, MessageList, MessageReactionToggle } from '../message-list
   styleUrl: './direct-message-view.scss',
   templateUrl: './direct-message-view.html',
 })
+/**
+ * Main view of a direct conversation.
+ *
+ * @remarks
+ * Creates the underlying chat document lazily — a conversation only exists in
+ * Firestore once the first message is sent.
+ */
 export class DirectMessageView {
   protected readonly auth = inject(AuthService);
   private readonly chats = inject(ChatService);
@@ -54,6 +61,11 @@ export class DirectMessageView {
     this.destroyRef.onDestroy(() => this.disconnect());
   }
 
+  /**
+   * Resolves and opens the conversation with a partner.
+   *
+   * @param otherUserId - Id of the conversation partner.
+   */
   private async openConversation(otherUserId: string): Promise<void> {
     const version = ++this.connectionVersion;
     const currentUser = this.auth.currentUser();
@@ -65,6 +77,7 @@ export class DirectMessageView {
     await this.connectConversation(currentUser.uid, otherUserId, version);
   }
 
+  /** Resolves the chat id for the current partner and subscribes to it. */
   private prepareConversation(): void {
     this.messages.disconnect();
     this.chatId.set(null);
@@ -73,6 +86,13 @@ export class DirectMessageView {
     this.closeProfile();
   }
 
+  /**
+   * Subscribes to an existing conversation, if one has been created already.
+   *
+   * @param userId - The signed-in user.
+   * @param otherUserId - The conversation partner.
+   * @param version - Guards against a partner switched in the meantime.
+   */
   private async connectConversation(
     userId: string,
     otherUserId: string,
@@ -92,12 +112,18 @@ export class DirectMessageView {
     }
   }
 
+  /** Surfaces a failed connection unless the partner has meanwhile changed. */
   private showConnectionError(version: number): void {
     if (version !== this.connectionVersion) return;
     this.loadingChat.set(false);
     this.actionError.set('Die Direktnachricht konnte nicht geöffnet werden.');
   }
 
+  /**
+   * Sends a direct message, creating the conversation on first use.
+   *
+   * @param text - The message body.
+   */
   protected async sendMessage(text: string): Promise<void> {
     const chatId = this.chatId();
     if (!chatId || this.sending()) return;
@@ -114,6 +140,12 @@ export class DirectMessageView {
     }
   }
 
+  /**
+   * Creates the chat document and subscribes to it.
+   *
+   * @param chatId - Id the conversation will live under.
+   * @param recipientId - The conversation partner.
+   */
   private async prepareDirectChat(chatId: string, recipientId: string): Promise<void> {
     const currentUser = this.auth.currentUser();
     if (!currentUser) throw new Error('User missing');
@@ -121,6 +153,11 @@ export class DirectMessageView {
     this.messages.connect(chatId);
   }
 
+  /**
+   * Stores an edited message body.
+   *
+   * @param edit - Id of the message and its new text.
+   */
   protected async editMessage({ id, text }: MessageEdit): Promise<void> {
     const chatId = this.chatId();
     if (!chatId) return;
@@ -131,6 +168,11 @@ export class DirectMessageView {
     }
   }
 
+  /**
+   * Adds or removes a reaction on a message.
+   *
+   * @param toggle - Id of the message and the emoji to toggle.
+   */
   protected async toggleReaction({ id, emoji }: MessageReactionToggle): Promise<void> {
     const chatId = this.chatId();
     if (!chatId) return;
@@ -141,6 +183,7 @@ export class DirectMessageView {
     }
   }
 
+  /** Loads and shows the partner's profile. */
   protected async openProfile(): Promise<void> {
     if (this.isCurrentUser()) {
       this.showProfile(null);
@@ -154,16 +197,23 @@ export class DirectMessageView {
     }
   }
 
+  /**
+   * Opens the partner's profile.
+   *
+   * @param profile - The loaded user, or `null` when unavailable.
+   */
   private showProfile(profile: AppUser | null): void {
     this.profileUser.set(profile);
     this.profileOpen.set(true);
   }
 
+  /** Closes the profile dialog. */
   protected closeProfile(): void {
     this.profileOpen.set(false);
     this.profileUser.set(null);
   }
 
+  /** Releases the message subscription when the view is left. */
   private disconnect(): void {
     this.connectionVersion++;
     this.messages.disconnect();

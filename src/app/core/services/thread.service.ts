@@ -16,12 +16,21 @@ import { FirebaseService } from '../firebase/firebase.service';
 import { mapChatMessage } from '../models/message.mapper';
 import { ChatMessage } from '../models/message.model';
 
+/** Identifies the message a thread panel is currently showing. */
 export interface ThreadTarget {
   chatId: string;
   messageId: string;
 }
 
 @Injectable({ providedIn: 'root' })
+/**
+ * Streams a single thread: its parent message and all replies.
+ *
+ * @remarks
+ * Keeps two subscriptions, because the parent lives among the chat's messages
+ * while its replies are selected by `threadParentId`. A version counter drops
+ * late snapshots after the user has already switched threads.
+ */
 export class ThreadService {
   private readonly firebase = inject(FirebaseService);
   private readonly targetState = signal<ThreadTarget | null>(null);
@@ -36,6 +45,12 @@ export class ThreadService {
   readonly loading = signal(false);
   readonly error = signal('');
 
+  /**
+   * Opens a thread and starts following parent and replies.
+   *
+   * @param chatId - Id of the chat the message belongs to.
+   * @param messageId - Id of the message the thread hangs off.
+   */
   open(chatId: string, messageId: string): void {
     const target = this.targetState();
     if (target?.chatId === chatId && target?.messageId === messageId) {
@@ -48,6 +63,7 @@ export class ThreadService {
     this.listenToReplies(chatId, messageId);
   }
 
+  /** Closes the thread and stops both subscriptions. */
   close(): void {
     this.connectionVersion++;
     this.subscriptions.forEach((unsubscribe) => unsubscribe());
@@ -59,6 +75,7 @@ export class ThreadService {
     this.error.set('');
   }
 
+  /** Subscribes to the message the thread belongs to. */
   private listenToParent(chatId: string, messageId: string): void {
     const parentRef = doc(this.firebase.firestore, 'chats', chatId, 'messages', messageId);
     const version = this.connectionVersion;
@@ -71,6 +88,7 @@ export class ThreadService {
     );
   }
 
+  /** Stores the parent message unless the thread has meanwhile changed. */
   private handleParentSnapshot(snapshot: DocumentSnapshot<DocumentData>, version: number): void {
     if (version !== this.connectionVersion) {
       return;
@@ -79,6 +97,7 @@ export class ThreadService {
     this.parentState.set(data ? mapChatMessage(snapshot.id, data) : null);
   }
 
+  /** Subscribes to all replies carrying this message as their parent. */
   private listenToReplies(chatId: string, messageId: string): void {
     const repliesQuery = query(
       collection(this.firebase.firestore, 'chats', chatId, 'messages'),
@@ -95,6 +114,7 @@ export class ThreadService {
     );
   }
 
+  /** Stores the replies unless the thread has meanwhile changed. */
   private handleRepliesSnapshot(snapshot: QuerySnapshot<DocumentData>, version: number): void {
     if (version !== this.connectionVersion) {
       return;
@@ -103,6 +123,7 @@ export class ThreadService {
     this.loading.set(false);
   }
 
+  /** Surfaces a listener failure as a readable error message. */
   private handleListenError(error: unknown, version: number): void {
     if (version !== this.connectionVersion) {
       return;

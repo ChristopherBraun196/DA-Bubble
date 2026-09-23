@@ -10,6 +10,7 @@ import { UserService } from '../../../core/services/user.service';
   styleUrl: './channel-info.scss',
   templateUrl: './channel-info.html',
 })
+/** Channel details with inline editing for name and description. */
 export class ChannelInfo {
   private readonly auth = inject(AuthService);
   private readonly chats = inject(ChatService);
@@ -46,6 +47,11 @@ export class ChannelInfo {
     });
   }
 
+  /**
+   * Resolves the name behind the channel's creator id.
+   *
+   * @param creatorId - Uid stored on the channel.
+   */
   private async loadCreator(creatorId: string): Promise<void> {
     if (!creatorId) {
       this.createdBy.set('Unbekannt');
@@ -56,12 +62,19 @@ export class ChannelInfo {
     this.createdBy.set(creator?.displayName || 'Unbekannter Nutzer');
   }
 
+  /** Switches the name into edit mode with an empty draft. */
   protected startNameEdit(): void {
     this.nameDraft.set('');
     this.saveError.set('');
     this.editingName.set(true);
   }
 
+  /**
+   * Stores a new channel name.
+   *
+   * @remarks
+   * Rejects names already taken by another channel before writing.
+   */
   protected async saveName(): Promise<void> {
     const name = this.nameDraft().trim();
 
@@ -80,12 +93,14 @@ export class ChannelInfo {
     }
   }
 
+  /** Switches the description into edit mode with an empty draft. */
   protected startDescriptionEdit(): void {
     this.descriptionDraft.set('');
     this.saveError.set('');
     this.editingDescription.set(true);
   }
 
+  /** Stores a new channel description. */
   protected async saveDescription(): Promise<void> {
     const description = this.descriptionDraft().trim();
 
@@ -99,6 +114,12 @@ export class ChannelInfo {
     }
   }
 
+  /**
+   * Writes the changed fields and reports whether it worked.
+   *
+   * @param changes - The fields to overwrite.
+   * @returns True on success, false when the write failed.
+   */
   private async updateChannel(changes: { name?: string; description?: string }): Promise<boolean> {
     const chatId = this.activeChat()?.id;
 
@@ -120,14 +141,25 @@ export class ChannelInfo {
     }
   }
 
+  /**
+   * Tracks what is typed into the name field.
+   *
+   * @param event - The input event of the text field.
+   */
   protected updateNameDraft(event: Event): void {
     this.nameDraft.set((event.target as HTMLInputElement).value);
   }
 
+  /**
+   * Tracks what is typed into the description field.
+   *
+   * @param event - The input event of the text area.
+   */
   protected updateDescriptionDraft(event: Event): void {
     this.descriptionDraft.set((event.target as HTMLTextAreaElement).value);
   }
 
+  /** Removes the signed-in user from this channel and closes the dialog. */
   protected async leaveChannel(): Promise<void> {
     const identifiers = this.getLeaveIdentifiers();
     if (!identifiers || this.leaving()) {
@@ -136,12 +168,22 @@ export class ChannelInfo {
     await this.removeMembership(identifiers);
   }
 
+  /**
+   * Collects the ids needed to leave the channel.
+   *
+   * @returns Chat and user id, or `null` when either is missing.
+   */
   private getLeaveIdentifiers(): { chatId: string; userId: string } | null {
     const chatId = this.activeChat()?.id;
     const userId = this.auth.currentUser()?.uid;
     return chatId && userId ? { chatId, userId } : null;
   }
 
+  /**
+   * Removes the user from the channel and closes the dialog.
+   *
+   * @param ids - Chat and user id of the membership to drop.
+   */
   private async removeMembership(ids: { chatId: string; userId: string }): Promise<void> {
     this.leaving.set(true);
     this.saveError.set('');

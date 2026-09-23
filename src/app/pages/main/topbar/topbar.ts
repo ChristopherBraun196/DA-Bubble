@@ -18,6 +18,7 @@ export type TopbarPanel = 'none' | 'menu' | 'profile';
   styleUrl: './topbar.scss',
   templateUrl: './topbar.html',
 })
+/** Top bar with the workspace search and the current user's menu. */
 export class Topbar {
   readonly messageSelected = output<MessageSearchResult>();
   readonly channelSelected = output<string>();
@@ -32,18 +33,22 @@ export class Topbar {
 
   protected readonly panel = signal<TopbarPanel>('none');
 
+  /** Opens or closes the user menu. */
   protected toggleMenu(): void {
     this.panel.update((current) => (current === 'menu' ? 'none' : 'menu'));
   }
 
+  /** Replaces the menu with the profile dialog. */
   protected openProfile(): void {
     this.panel.set('profile');
   }
 
+  /** Closes whichever panel is open. */
   protected closePanel(): void {
     this.panel.set('none');
   }
 
+  /** Signs the user out and returns to the intro page. */
   protected async logout(): Promise<void> {
     this.closePanel();
     const user = this.auth.currentUser();

@@ -6,6 +6,7 @@ import { Component, input, output } from '@angular/core';
   styleUrl: './channel-list-item.scss',
   templateUrl: './channel-list-item.html',
 })
+/** A single channel row in the sidebar. */
 export class ChannelListItem {
   readonly name = input.required<string>();
   readonly active = input(false);

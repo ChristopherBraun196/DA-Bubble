@@ -10,6 +10,13 @@ import { AvatarFallback } from '../../../shared/avatar-fallback/avatar-fallback'
   styleUrl: './profile-dialog.scss',
   templateUrl: './profile-dialog.html',
 })
+/**
+ * Shows a user profile and lets the signed-in user rename themselves.
+ *
+ * @remarks
+ * Serves both the own profile and other members' — editing is only offered
+ * on the former.
+ */
 export class ProfileDialog {
   private readonly auth = inject(AuthService);
 
@@ -17,6 +24,7 @@ export class ProfileDialog {
   readonly closed = output<void>();
   readonly messageRequested = output<AppUser>();
 
+  /** Whether the dialog shows the signed-in user, which unlocks editing. */
   protected readonly isOwnProfile = computed(
     () => !this.user() || this.user()?.uid === this.auth.currentUser()?.uid,
   );
@@ -37,20 +45,33 @@ export class ProfileDialog {
   /** Startet leer, der aktuelle Name steht als Platzhalter im Feld. */
   protected readonly nameDraft = signal('');
 
+  /** Switches the name into edit mode with an empty draft. */
   protected startEdit(): void {
     this.nameDraft.set('');
     this.saveError.set('');
     this.editing.set(true);
   }
 
+  /** Leaves edit mode without saving. */
   protected cancelEdit(): void {
     this.editing.set(false);
   }
 
+  /**
+   * Tracks what is typed into the name field.
+   *
+   * @param event - The input event of the text field.
+   */
   protected updateNameDraft(event: Event): void {
     this.nameDraft.set((event.target as HTMLInputElement).value);
   }
 
+  /**
+   * Persists the new display name.
+   *
+   * @remarks
+   * A blank draft simply closes edit mode, leaving the current name in place.
+   */
   protected async save(): Promise<void> {
     const name = this.nameDraft().trim();
 

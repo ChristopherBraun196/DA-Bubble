@@ -22,6 +22,13 @@ const ANIMATION_DURATION = 2040;
   templateUrl: './intro-animation.html',
   styleUrl: './intro-animation.scss',
 })
+/**
+ * Plays the staged opening animation of the logo.
+ *
+ * @remarks
+ * Each phase is driven by a timer rather than CSS events, so the sequence
+ * stays predictable when animations are reduced or disabled.
+ */
 export class IntroAnimation implements OnDestroy {
   protected readonly phase: WritableSignal<IntroAnimationPhase> = signal('icon');
   protected readonly isPositioned = (): boolean =>
@@ -36,11 +43,13 @@ export class IntroAnimation implements OnDestroy {
     afterNextRender((): void => this.startAnimation());
   }
 
+  /** Cancels all pending phase transitions. */
   public ngOnDestroy(): void {
     this.timerIds.forEach((timerId: number): void => window.clearTimeout(timerId));
   }
 
   /** Starts the Figma-defined logo and page transition sequence. */
+  /** Schedules the phase transitions of the animation. */
   private startAnimation(): void {
     this.timerIds.push(
       window.setTimeout((): void => this.phase.set('positioned'), LOGO_POSITION_DELAY),

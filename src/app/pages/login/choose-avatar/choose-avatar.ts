@@ -29,6 +29,14 @@ const MAIN_TRANSITION_DURATION = 200;
   styleUrl: './choose-avatar.scss',
   templateUrl: './choose-avatar.html',
 })
+/**
+ * Final registration step: pick an avatar and create the account.
+ *
+ * @remarks
+ * Reads the credentials from {@link RegistrationDraftService}. Only here is
+ * the Firebase account actually created, after which a short success overlay
+ * plays before entering the workspace.
+ */
 export class ChooseAvatar {
   private readonly auth = inject(AuthService);
   private readonly destroyRef = inject(DestroyRef);
@@ -57,11 +65,17 @@ export class ChooseAvatar {
     }
   }
 
+  /**
+   * Marks an avatar as chosen.
+   *
+   * @param avatarPath - Path of the selected image.
+   */
   protected selectAvatar(avatarPath: string): void {
     this.selectedAvatar.set(avatarPath);
     this.registrationError.set('');
   }
 
+  /** Creates the account with the chosen avatar and shows the confirmation. */
   protected async completeRegistration(): Promise<void> {
     const registration = this.registration();
 
@@ -72,6 +86,7 @@ export class ChooseAvatar {
     await this.createAccount(registration);
   }
 
+  /** Starts the transition into the workspace once the account exists. */
   protected beginMainTransition(): void {
     if (!this.accountCreated()) {
       return;
@@ -85,6 +100,11 @@ export class ChooseAvatar {
     );
   }
 
+  /**
+   * Registers the user in Firebase and clears the draft.
+   *
+   * @param registration - The values collected on the previous step.
+   */
   private async createAccount(registration: RegistrationDraft): Promise<void> {
     this.registrationPending.set(true);
     this.registrationError.set('');
@@ -98,6 +118,7 @@ export class ChooseAvatar {
     }
   }
 
+  /** Shows the confirmation overlay and schedules the navigation. */
   private showSuccessOverlay(): void {
     this.accountCreated.set(true);
     this.navigationTimerId = window.setTimeout(
@@ -106,6 +127,7 @@ export class ChooseAvatar {
     );
   }
 
+  /** Enters the workspace, replacing the registration flow in the history. */
   private async navigateToMain(): Promise<void> {
     const navigationSucceeded = await this.router.navigateByUrl('/main', { replaceUrl: true });
 
@@ -117,6 +139,7 @@ export class ChooseAvatar {
     this.registrationPending.set(false);
   }
 
+  /** Cancels the pending navigation, for example when the view is destroyed. */
   private clearNavigationTimer(): void {
     if (this.navigationTimerId !== undefined) {
       window.clearTimeout(this.navigationTimerId);
@@ -124,6 +147,12 @@ export class ChooseAvatar {
     }
   }
 
+  /**
+   * Creates the Firebase account with the chosen avatar.
+   *
+   * @param registration - The draft collected on the previous step.
+   * @returns The pending registration call.
+   */
   private registerWithSelectedAvatar(registration: RegistrationDraft): Promise<unknown> {
     return this.auth.registerWithEmail(
       registration.email,
@@ -133,6 +162,12 @@ export class ChooseAvatar {
     );
   }
 
+  /**
+   * Turns a Firebase error code into a message shown on the form.
+   *
+   * @param error - The caught error.
+   * @returns A readable German message.
+   */
   private resolveRegistrationError(error: unknown): string {
     if (!(error instanceof FirebaseError)) {
       return DEFAULT_REGISTRATION_ERROR;

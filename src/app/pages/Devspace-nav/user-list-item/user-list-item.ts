@@ -7,6 +7,7 @@ import { AvatarFallback } from '../../../shared/avatar-fallback/avatar-fallback'
   styleUrl: './user-list-item.scss',
   templateUrl: './user-list-item.html',
 })
+/** A single person row in the sidebar, including the online marker. */
 export class UserListItem {
   readonly name = input.required<string>();
   readonly avatar = input.required<string>();

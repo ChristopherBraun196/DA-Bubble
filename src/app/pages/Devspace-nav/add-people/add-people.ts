@@ -15,6 +15,13 @@ const SEARCH_MIN_LENGTH = 3;
   styleUrl: './add-people.scss',
   templateUrl: './add-people.html',
 })
+/**
+ * Invite step of the channel creation flow.
+ *
+ * @remarks
+ * Either copies the members of the channel the dialog was opened from, or
+ * lets the user pick people individually.
+ */
 export class AddPeople {
   private readonly chats = inject(ChatService);
   private readonly users = inject(UserService);
@@ -39,17 +46,36 @@ export class AddPeople {
     () => this.mode() === 'all' || this.selected().length > 0,
   );
 
+  /**
+   * Switches between inviting everyone and picking individuals.
+   *
+   * @param mode - The chosen invite mode.
+   */
   protected setMode(mode: AddPeopleMode): void {
     this.mode.set(mode);
     this.addError.set('');
   }
 
+  /**
+   * Tracks the search term used to find people.
+   *
+   * @param event - The input event of the search field.
+   */
   protected updateSearchTerm(event: Event): void {
     const term = (event.target as HTMLInputElement).value;
     this.searchTerm.set(term);
     void this.search(term);
   }
 
+  /**
+   * Looks up people matching the search term.
+   *
+   * @param term - The typed term; shorter input clears the suggestions.
+   *
+   * @remarks
+   * A version counter discards results of a search the user has since
+   * typed past.
+   */
   private async search(term: string): Promise<void> {
     const version = ++this.searchVersion;
 
@@ -65,11 +91,22 @@ export class AddPeople {
     }
   }
 
+  /**
+   * Hides already chosen people from the suggestions.
+   *
+   * @param matches - The search results.
+   * @returns The results minus everyone already selected.
+   */
   private withoutSelected(matches: UserSearchResult[]): UserSearchResult[] {
     const selectedIds = new Set(this.selected().map(({ uid }) => uid));
     return matches.filter(({ uid }) => !selectedIds.has(uid));
   }
 
+  /**
+   * Adds a person to the selection.
+   *
+   * @param person - The user picked from the suggestions.
+   */
   protected selectPerson(person: UserSearchResult): void {
     this.selected.update((people) => [...people, person]);
     this.searchTerm.set('');
@@ -77,10 +114,16 @@ export class AddPeople {
     this.addError.set('');
   }
 
+  /**
+   * Removes a person from the selection.
+   *
+   * @param uid - Id of the user to drop.
+   */
   protected removePerson(uid: string): void {
     this.selected.update((people) => people.filter((person) => person.uid !== uid));
   }
 
+  /** Adds the selected people to the channel and closes the dialog. */
   protected async create(): Promise<void> {
     if (!this.canCreate() || this.adding()) {
       return;
@@ -99,6 +142,11 @@ export class AddPeople {
     }
   }
 
+  /**
+   * Resolves which user ids to write, depending on the invite mode.
+   *
+   * @returns The member ids to add to the channel.
+   */
   private memberIdsToAdd(): string[] {
     return this.mode() === 'all' ? this.sourceMemberIds() : this.selected().map(({ uid }) => uid);
   }

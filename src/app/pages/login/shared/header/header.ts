@@ -7,4 +7,5 @@ import { RouterLink } from '@angular/router';
   styleUrl: './header.scss',
   templateUrl: './header.html',
 })
+/** Logo header shared by the login flow and the legal pages. */
 export class Header {}

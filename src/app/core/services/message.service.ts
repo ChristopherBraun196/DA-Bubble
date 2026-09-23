@@ -32,6 +32,14 @@ import { AuthService } from './auth.service';
 const MESSAGE_LIMIT = 50;
 
 @Injectable({ providedIn: 'root' })
+/**
+ * Streams and writes the messages of a single chat.
+ *
+ * @remarks
+ * Only one chat is subscribed at a time; switching chats replaces the
+ * subscription. Thread replies live in the same collection and are separated
+ * by their `threadParentId`.
+ */
 export class MessageService {
   private readonly auth = inject(AuthService);
   private readonly firebase = inject(FirebaseService);
@@ -45,6 +53,12 @@ export class MessageService {
   readonly loading = signal(false);
   readonly error = signal('');
 
+  /**
+   * Subscribes to the messages of a chat.
+   *
+   * @param chatId - Id of the chat to follow.
+   * @param since - Optional lower bound, used to hide history before a user joined.
+   */
   connect(chatId: string, since: Timestamp | null = null): void {
     if (
       chatId === this.connectedChatId &&
@@ -58,6 +72,7 @@ export class MessageService {
     this.subscribeToMessages(chatId);
   }
 
+  /** Tears down a previous subscription and resets the message state. */
   private prepareConnection(chatId: string): void {
     this.disconnect();
     this.connectedChatId = chatId;
@@ -65,6 +80,12 @@ export class MessageService {
     this.error.set('');
   }
 
+  /**
+   * Builds the query for a chat's top-level messages.
+   *
+   * @param chatId - Id of the chat.
+   * @returns The Firestore query, ordered chronologically.
+   */
   private createMessagesQuery(chatId: string) {
     return query(
       collection(this.firebase.firestore, 'chats', chatId, 'messages'),
@@ -74,6 +95,7 @@ export class MessageService {
     );
   }
 
+  /** Opens the live subscription for the given chat. */
   private subscribeToMessages(chatId: string): void {
     const messagesQuery = this.createMessagesQuery(chatId);
     const version = this.connectionVersion;
@@ -88,17 +110,20 @@ export class MessageService {
     );
   }
 
+  /** Maps an incoming snapshot into the messages signal. */
   private handleMessagesSnapshot(snapshot: QuerySnapshot<DocumentData>): void {
     const messages = snapshot.docs.map((messageSnapshot) => this.mapMessage(messageSnapshot));
     this.messagesState.set(messages);
     this.loading.set(false);
   }
 
+  /** Surfaces a listener failure as a readable error message. */
   private handleListenError(error: unknown): void {
     this.error.set(this.resolveErrorMessage(error));
     this.loading.set(false);
   }
 
+  /** Stops the listener and clears the cached messages. */
   disconnect(): void {
     this.connectionVersion++;
     this.historyStart = null;
@@ -110,6 +135,12 @@ export class MessageService {
     this.error.set('');
   }
 
+  /**
+   * Sends a message into a chat.
+   *
+   * @param chatId - Id of the target chat.
+   * @param text - The message body; blank input is ignored.
+   */
   async sendMessage(chatId: string, text: string): Promise<void> {
     const user = this.auth.currentUser();
     const messageText = text.trim();
@@ -120,6 +151,13 @@ export class MessageService {
   }
 
   /** Legt eine Thread-Antwort an und zaehlt sie an der Ursprungsnachricht mit. */
+  /**
+   * Sends a reply inside a thread and updates the parent's reply counter.
+   *
+   * @param chatId - Id of the chat the thread belongs to.
+   * @param parentId - Id of the message being replied to.
+   * @param text - The reply body; blank input is ignored.
+   */
   async sendReply(chatId: string, parentId: string, text: string): Promise<void> {
     const user = this.auth.currentUser();
     const messageText = text.trim();
@@ -129,6 +167,13 @@ export class MessageService {
     await this.persistReply(chatId, parentId, messageText, user);
   }
 
+  /**
+   * Rewrites the text of an existing message and marks it as edited.
+   *
+   * @param chatId - Id of the chat.
+   * @param messageId - Id of the message to change.
+   * @param text - The new body; blank input is ignored.
+   */
   async updateMessage(chatId: string, messageId: string, text: string): Promise<void> {
     const messageText = text.trim();
 
@@ -140,6 +185,17 @@ export class MessageService {
     await updateDoc(messageRef, { text: messageText, editedAt: serverTimestamp() });
   }
 
+  /**
+   * Adds the current user's reaction, or removes it when already present.
+   *
+   * @param chatId - Id of the chat.
+   * @param messageId - Id of the message being reacted to.
+   * @param emoji - The emoji to toggle.
+   *
+   * @remarks
+   * Runs inside a transaction so simultaneous reactions cannot overwrite
+   * each other.
+   */
   async toggleReaction(chatId: string, messageId: string, emoji: ReactionEmoji): Promise<void> {
     const user = this.auth.currentUser();
     if (!user) {
@@ -152,6 +208,13 @@ export class MessageService {
     );
   }
 
+  /**
+   * Writes a message and marks the chat as no longer empty.
+   *
+   * @param chatId - Id of the target chat.
+   * @param text - The message body.
+   * @param user - The author.
+   */
   private async persistMessage(chatId: string, text: string, user: User): Promise<void> {
     const chatRef = doc(this.firebase.firestore, 'chats', chatId);
     const messageRef = doc(collection(chatRef, 'messages'));
@@ -161,6 +224,14 @@ export class MessageService {
     await batch.commit();
   }
 
+  /**
+   * Writes a thread reply and raises the parent's reply counter in one batch.
+   *
+   * @param chatId - Id of the chat the thread belongs to.
+   * @param parentId - Id of the message being replied to.
+   * @param text - The reply body.
+   * @param user - The author.
+   */
   private async persistReply(
     chatId: string,
     parentId: string,
@@ -177,6 +248,14 @@ export class MessageService {
     await batch.commit();
   }
 
+  /**
+   * Assembles the payload for a new message.
+   *
+   * @param user - The author.
+   * @param text - The message body.
+   * @param threadParentId - Parent message id for thread replies.
+   * @returns The document to store.
+   */
   private createMessageDocument(user: User, text: string, threadParentId: string | null = null) {
     return {
       authorId: user.uid,
@@ -192,10 +271,21 @@ export class MessageService {
     };
   }
 
+  /**
+   * Converts a Firestore document into a {@link ChatMessage}.
+   *
+   * @param snapshot - The message document.
+   * @returns The mapped message.
+   */
   private mapMessage(snapshot: QueryDocumentSnapshot<DocumentData>): ChatMessage {
     return mapChatMessage(snapshot.id, snapshot.data());
   }
 
+  /**
+   * Computes the reaction list after toggling one user's entry.
+   *
+   * @returns The updated reactions, with empty ones dropped.
+   */
   private toggleUser(
     reactions: MessageReaction[],
     emoji: ReactionEmoji,
@@ -211,6 +301,14 @@ export class MessageService {
     );
   }
 
+  /**
+   * Applies a reaction toggle inside a running transaction.
+   *
+   * @param transaction - The transaction to write through.
+   * @param messageRef - Reference to the message being reacted to.
+   * @param emoji - The emoji to toggle.
+   * @param user - The reacting user.
+   */
   private async updateReaction(
     transaction: Transaction,
     messageRef: DocumentReference<DocumentData>,
@@ -225,16 +323,36 @@ export class MessageService {
     transaction.update(messageRef, { reactions: this.toggleUser(reactions, emoji, user) });
   }
 
+  /**
+   * Adds or removes a user within a single reaction.
+   *
+   * @param users - The users who reacted so far.
+   * @param user - The user toggling their reaction.
+   * @returns The updated user list.
+   */
   private toggleReactionUser(users: ReactionUser[], user: ReactionUser): ReactionUser[] {
     return users.some(({ id }) => id === user.id)
       ? users.filter(({ id }) => id !== user.id)
       : [...users, user];
   }
 
+  /**
+   * Creates a reaction carrying its first user.
+   *
+   * @param emoji - The chosen emoji.
+   * @param user - The first user to react.
+   * @returns The new reaction.
+   */
   private createReaction(emoji: ReactionEmoji, user: ReactionUser): MessageReaction {
     return { emoji, users: [user] };
   }
 
+  /**
+   * Maps an unknown failure onto a message shown in the UI.
+   *
+   * @param error - The caught error.
+   * @returns A readable German message.
+   */
   private resolveErrorMessage(error: unknown): string {
     return error instanceof Error
       ? error.message
