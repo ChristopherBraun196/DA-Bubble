@@ -22,20 +22,13 @@ export interface MentionEntry {
   label: string;
   /** Text inserted on selection; defaults to {@link MentionEntry.label}. */
   value?: string;
-  id: string;
-  label: string;
-  value?: string;
   /** Optional secondary line, for example an email address. */
   description?: string;
   /** Text the filter matches against; defaults to {@link MentionEntry.label}. */
   searchText?: string;
-  description?: string;
-  searchText?: string;
   /** Avatar URL for people. */
   avatar?: string;
   /** Leading glyph for channels, typically `#`. */
-  icon?: string;
-  avatar?: string;
   icon?: string;
 }
 
