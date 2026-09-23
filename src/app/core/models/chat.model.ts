@@ -9,6 +9,7 @@ export interface Chat {
   description: string;
   createdBy: string;
   memberIds: string[];
+  hasMessages: boolean;
   createdAt: Timestamp | null;
   updatedAt: Timestamp | null;
 }

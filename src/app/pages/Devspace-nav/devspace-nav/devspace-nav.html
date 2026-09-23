@@ -20,5 +20,9 @@
     (channelSelected)="selectChannel($event)"
   />
 
-  <app-direct-message-list [activeUserId]="activeUserId()" (userSelected)="selectUser($event)" />
+  <app-direct-message-list
+    [activeUserId]="activeUserId()"
+    [temporaryUser]="temporaryUser()"
+    (userSelected)="selectUser($event)"
+  />
 </nav>

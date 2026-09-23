@@ -80,6 +80,7 @@ export class ChatService {
       description: description.trim(),
       createdBy: userId,
       memberIds: [userId],
+      hasMessages: false,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     });
@@ -90,7 +91,7 @@ export class ChatService {
 
   async ensureDirectChat(userId: string, otherUserId: string): Promise<string> {
     const memberIds = [...new Set([userId, otherUserId])].sort();
-    const chatId = `direct_${memberIds.join('_')}`;
+    const chatId = this.getDirectChatId(userId, otherUserId);
     const chatRef = doc(this.firebase.firestore, 'chats', chatId);
     const snapshot = await getDoc(chatRef);
 
@@ -101,6 +102,14 @@ export class ChatService {
     return chatId;
   }
 
+  getDirectChatId(userId: string, otherUserId: string): string {
+    return `direct_${[...new Set([userId, otherUserId])].sort().join('_')}`;
+  }
+
+  async directChatExists(chatId: string): Promise<boolean> {
+    return (await getDoc(doc(this.firebase.firestore, 'chats', chatId))).exists();
+  }
+
   private createDirectChatDocument(memberIds: string[], userId: string) {
     return {
       type: 'direct',
@@ -108,6 +117,7 @@ export class ChatService {
       description: '',
       createdBy: userId,
       memberIds,
+      hasMessages: false,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     };
@@ -182,9 +192,18 @@ export class ChatService {
       description: data.description || '',
       createdBy: data.createdBy || '',
       memberIds: Array.isArray(data.memberIds) ? data.memberIds : [],
+      hasMessages: this.hasMessages(data),
       createdAt: data.createdAt instanceof Timestamp ? data.createdAt : null,
       updatedAt: data.updatedAt instanceof Timestamp ? data.updatedAt : null,
     };
+  }
+
+  private hasMessages(data: Partial<ChatDocument>): boolean {
+    if (data.hasMessages === true) return true;
+    if (!(data.createdAt instanceof Timestamp) || !(data.updatedAt instanceof Timestamp)) {
+      return false;
+    }
+    return data.updatedAt.toMillis() > data.createdAt.toMillis();
   }
 
   private ensureActiveChat(chats: Chat[]): void {

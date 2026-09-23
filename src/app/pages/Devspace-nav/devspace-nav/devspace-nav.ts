@@ -22,6 +22,7 @@ export class DevspaceNav {
     kind: 'channel',
     id: 'entwicklerteam',
   });
+  protected readonly temporaryUser = signal<DirectMessageUser | null>(null);
 
   protected activeChannelId(): string | null {
     const selection = this.selection();
@@ -34,6 +35,7 @@ export class DevspaceNav {
   }
 
   public selectChannel(id: string): void {
+    this.temporaryUser.set(null);
     this.composingChanged.emit(false);
     this.directMessageSelected.emit(null);
     this.selection.set({ kind: 'channel', id });
@@ -41,12 +43,14 @@ export class DevspaceNav {
   }
 
   public selectUser(user: DirectMessageUser): void {
+    this.temporaryUser.set(user);
     this.composingChanged.emit(false);
     this.directMessageSelected.emit(user);
     this.selection.set({ kind: 'user', id: user.id });
   }
 
   protected startCompose(): void {
+    this.temporaryUser.set(null);
     this.selection.set(null);
     this.directMessageSelected.emit(null);
     this.composingChanged.emit(true);

@@ -79,10 +79,11 @@ export class DirectMessageView {
     version: number,
   ): Promise<void> {
     try {
-      const chatId = await this.chats.ensureDirectChat(userId, otherUserId);
+      const chatId = this.chats.getDirectChatId(userId, otherUserId);
+      const chatExists = await this.chats.directChatExists(chatId);
       if (version !== this.connectionVersion) return;
       this.chatId.set(chatId);
-      this.messages.connect(chatId);
+      if (chatExists) this.messages.connect(chatId);
       requestAnimationFrame(() => this.messageInput()?.focus());
     } catch {
       this.showConnectionError(version);
@@ -100,15 +101,24 @@ export class DirectMessageView {
   protected async sendMessage(text: string): Promise<void> {
     const chatId = this.chatId();
     if (!chatId || this.sending()) return;
+    const recipientId = this.user().id;
     this.sending.set(true);
     this.actionError.set('');
     try {
+      await this.prepareDirectChat(chatId, recipientId);
       await this.messages.sendMessage(chatId, text);
     } catch {
       this.actionError.set('Die Nachricht konnte nicht gesendet werden.');
     } finally {
       this.sending.set(false);
     }
+  }
+
+  private async prepareDirectChat(chatId: string, recipientId: string): Promise<void> {
+    const currentUser = this.auth.currentUser();
+    if (!currentUser) throw new Error('User missing');
+    await this.chats.ensureDirectChat(currentUser.uid, recipientId);
+    this.messages.connect(chatId);
   }
 
   protected async editMessage({ id, text }: MessageEdit): Promise<void> {

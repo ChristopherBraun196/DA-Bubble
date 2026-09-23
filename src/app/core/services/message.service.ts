@@ -157,7 +157,7 @@ export class MessageService {
     const messageRef = doc(collection(chatRef, 'messages'));
     const batch = writeBatch(this.firebase.firestore);
     batch.set(messageRef, this.createMessageDocument(user, text));
-    batch.update(chatRef, { updatedAt: serverTimestamp() });
+    batch.update(chatRef, { hasMessages: true, updatedAt: serverTimestamp() });
     await batch.commit();
   }
 
