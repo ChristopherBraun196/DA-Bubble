@@ -31,12 +31,13 @@ export class UserService {
   /**
    * Returns every known user, cached after the first call.
    *
-   * @returns All users reduced to the fields needed for lists.
+   * @returns All non-anonymous users reduced to the fields needed for lists.
    */
   async getAllUsers(): Promise<UserSearchResult[]> {
     const snapshot = await getDocs(collection(this.firebase.firestore, 'users'));
 
     return snapshot.docs
+      .filter((userSnapshot) => userSnapshot.data()['isAnonymous'] !== true)
       .map((userSnapshot) => this.mapSearchResult(userSnapshot))
       .sort((first, second) => first.displayName.localeCompare(second.displayName, 'de'));
   }
@@ -112,7 +113,7 @@ export class UserService {
    */
   async getProfile(uid: string): Promise<AppUser | null> {
     const snapshot = await getDoc(doc(this.firebase.firestore, 'users', uid));
-    return snapshot.exists() ? { ...snapshot.data(), uid: snapshot.id } as AppUser : null;
+    return snapshot.exists() ? ({ ...snapshot.data(), uid: snapshot.id } as AppUser) : null;
   }
 
   /**
