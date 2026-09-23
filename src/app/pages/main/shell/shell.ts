@@ -67,12 +67,16 @@ export class Shell {
   }
 
   protected showMemberDirectMessage(user: AppUser): void {
-    this.devspaceNav()?.selectUser({
+    this.openDirectMessage({
       id: user.uid,
       name: user.displayName,
       avatar: user.photoURL,
       online: true,
     });
+  }
+
+  protected openDirectMessage(user: DirectMessageUser): void {
+    this.devspaceNav()?.selectUser(user);
   }
 
   protected showSearchMessage(message: MessageSearchResult): void {

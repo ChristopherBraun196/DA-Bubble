@@ -24,7 +24,10 @@
 
     <main class="shell__chat">
       @if (composing()) {
-        <app-new-message (channelSelected)="showChannel($event)" />
+        <app-new-message
+          (channelSelected)="showChannel($event)"
+          (directMessageSelected)="openDirectMessage($event)"
+        />
       } @else if (activeDirectUser(); as user) {
         <app-direct-message-view [user]="user" />
       } @else {

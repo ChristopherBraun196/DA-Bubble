@@ -1,10 +1,12 @@
 import { Component, computed, inject, output, signal, viewChild } from '@angular/core';
 
 import { UserSearchResult } from '../../../core/models/user.model';
+import { AuthService } from '../../../core/services/auth.service';
 import { ChatService } from '../../../core/services/chat.service';
 import { MessageService } from '../../../core/services/message.service';
 import { UserService } from '../../../core/services/user.service';
 import { MentionDropdown, MentionEntry } from '../../../shared/mention-dropdown/mention-dropdown';
+import { DirectMessageUser } from '../../Devspace-nav/direct-message-list/direct-message-list';
 import { MessageInput } from '../message-input/message-input';
 
 @Component({
@@ -14,71 +16,96 @@ import { MessageInput } from '../message-input/message-input';
   templateUrl: './new-message.html',
 })
 export class NewMessage {
+  private readonly auth = inject(AuthService);
   private readonly chats = inject(ChatService);
   private readonly messages = inject(MessageService);
   private readonly users = inject(UserService);
   private loadingUsers = false;
 
-  // TODO: Empfaenger und Chat anlegen.
   protected readonly recipient = signal('');
   protected readonly mentionOpen = signal(false);
   protected readonly userEntries = signal<MentionEntry[]>([]);
   protected readonly selectedChannelId = signal<string | null>(null);
+  protected readonly selectedDirectUser = signal<DirectMessageUser | null>(null);
   protected readonly sending = signal(false);
   protected readonly mentionDropdown = viewChild(MentionDropdown);
   readonly channelSelected = output<string>();
+  readonly directMessageSelected = output<DirectMessageUser>();
 
   protected readonly channelEntries = computed<MentionEntry[]>(() =>
     this.chats
       .chats()
       .filter(({ type }) => type === 'channel')
-      .map(({ id, name }) => ({ id, label: name })),
+      .map(({ id, name }) => ({ id: `channel:${id}`, label: name, icon: '#' })),
   );
 
   protected updateRecipient(event: Event): void {
     const value = (event.target as HTMLInputElement).value;
     this.recipient.set(value);
     this.selectedChannelId.set(null);
-    this.mentionOpen.set(value.startsWith('#') || value.startsWith('@'));
+    this.selectedDirectUser.set(null);
+    this.mentionOpen.set(Boolean(value.trim()));
 
-    if (value.startsWith('@') && this.userEntries().length === 0) {
+    if (!value.trim().startsWith('#') && this.userEntries().length === 0) {
       void this.loadUsers();
     }
   }
 
   protected selectRecipient(entry: MentionEntry): void {
-    const isChannel = this.recipient().startsWith('#');
-    const prefix = isChannel ? '#' : '@';
-    this.recipient.set(`${prefix}${entry.label}`);
-    this.selectedChannelId.set(isChannel ? entry.id : null);
     this.mentionOpen.set(false);
+    if (entry.id.startsWith('channel:')) {
+      this.selectChannel(entry);
+      return;
+    }
+    this.selectUser(entry);
+  }
+
+  private selectChannel(entry: MentionEntry): void {
+    this.recipient.set(`#${entry.label}`);
+    this.selectedChannelId.set(entry.id.slice(8));
+    this.selectedDirectUser.set(null);
+  }
+
+  private selectUser(entry: MentionEntry): void {
+    this.recipient.set(`@${entry.label}`);
+    this.selectedChannelId.set(null);
+    this.selectedDirectUser.set(this.toDirectMessageUser(entry));
   }
 
   protected async sendMessage(text: string): Promise<void> {
     const channelId = this.selectedChannelId();
-    if (!channelId || this.sending()) {
-      return;
-    }
+    const directUser = this.selectedDirectUser();
+    if ((!channelId && !directUser) || this.sending()) return;
     this.sending.set(true);
     try {
-      await this.messages.sendMessage(channelId, text);
-      this.channelSelected.emit(channelId);
+      if (channelId) await this.sendChannelMessage(channelId, text);
+      if (directUser) await this.sendDirectMessage(directUser, text);
     } finally {
       this.sending.set(false);
     }
   }
 
-  /** Was nach dem # oder @ getippt wurde - ohne Praefix gibt es nichts zu suchen. */
-  protected readonly mentionSearch = computed(() => {
-    const value = this.recipient();
+  private async sendChannelMessage(channelId: string, text: string): Promise<void> {
+    await this.messages.sendMessage(channelId, text);
+    this.channelSelected.emit(channelId);
+  }
 
-    return value.startsWith('#') || value.startsWith('@') ? value.slice(1) : '';
+  private async sendDirectMessage(user: DirectMessageUser, text: string): Promise<void> {
+    const currentUser = this.auth.currentUser();
+    if (!currentUser) return;
+    const chatId = await this.chats.ensureDirectChat(currentUser.uid, user.id);
+    await this.messages.sendMessage(chatId, text);
+    this.directMessageSelected.emit(user);
+  }
+
+  protected readonly mentionSearch = computed(() => this.recipient().trim().replace(/^[#@]/, ''));
+
+  protected readonly mentionEntries = computed(() => {
+    const recipient = this.recipient().trim();
+    if (recipient.startsWith('#')) return this.channelEntries();
+    if (recipient.startsWith('@')) return this.userEntries();
+    return [...this.channelEntries(), ...this.userEntries()];
   });
-
-  /** # zeigt Channels, @ zeigt Personen. */
-  protected readonly mentionEntries = computed(() =>
-    this.recipient().startsWith('#') ? this.channelEntries() : this.userEntries(),
-  );
 
   private async loadUsers(): Promise<void> {
     if (this.loadingUsers) {
@@ -97,9 +124,21 @@ export class NewMessage {
 
   private toMentionEntries(users: UserSearchResult[]): MentionEntry[] {
     return users.map(({ uid, displayName, photoURL }) => ({
-      id: uid,
+      id: `user:${uid}`,
       label: displayName,
       avatar: photoURL,
     }));
+  }
+
+  private toDirectMessageUser(entry: MentionEntry): DirectMessageUser {
+    const userId = entry.id.slice(5);
+    const isCurrentUser = userId === this.auth.currentUser()?.uid;
+    return {
+      id: userId,
+      name: `${entry.label}${isCurrentUser ? ' (Du)' : ''}`,
+      avatar: entry.avatar || '/img/Profile_Guest.png',
+      online: isCurrentUser,
+      isCurrentUser,
+    };
   }
 }

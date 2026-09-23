@@ -10,7 +10,7 @@
         [value]="recipient()"
         (input)="updateRecipient($event)"
         (keydown)="mentionDropdown()?.handleKeydown($event)"
-        placeholder="An: #channel, oder @jemand oder E-Mail Adresse"
+        placeholder="An: Channel, Person oder E-Mail-Adresse"
         aria-label="Empfänger der neuen Nachricht"
       />
 
@@ -30,7 +30,7 @@
     <app-message-input
       placeholder="Starte eine neue Nachricht"
       [disabled]="sending()"
-      [sendDisabled]="!selectedChannelId()"
+      [sendDisabled]="!selectedChannelId() && !selectedDirectUser()"
       (messageSent)="sendMessage($event)"
     />
   </div>
