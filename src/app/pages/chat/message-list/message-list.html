@@ -7,7 +7,9 @@
   } @else if (error()) {
     <p class="message-list__status message-list__status--error">{{ error() }}</p>
   } @else if (messages().length === 0) {
-    <p class="message-list__status">{{ emptyText() }}</p>
+    @if (emptyText()) {
+      <p class="message-list__status">{{ emptyText() }}</p>
+    }
   } @else {
     @for (entry of entries(); track entry.id) {
       @if (entry.type === 'date') {

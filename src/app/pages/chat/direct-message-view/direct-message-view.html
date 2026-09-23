@@ -13,28 +13,55 @@
   </header>
 
   <div class="direct-message__content">
-    <div class="direct-message__intro">
-      <div class="direct-message__profile">
-        <img appAvatarFallback [src]="user().avatar" alt="" />
-        <h2>{{ displayName() }}</h2>
+    @if (
+      !loadingChat() && !messages.loading() && !messages.error() && messages.messages().length === 0
+    ) {
+      <div class="direct-message__intro">
+        <div class="direct-message__profile">
+          <img appAvatarFallback [src]="user().avatar" alt="" />
+          <h2>{{ displayName() }}</h2>
+        </div>
+        @if (isCurrentUser()) {
+          <p>
+            Dieser Raum ist nur für dich da. Mache dir Notizen, liste deine To-dos auf oder bewahre
+            Links und Dateien griffbereit auf.
+          </p>
+        } @else {
+          <p>
+            Diese Unterhaltung findet nur zwischen
+            <span>&#64;{{ displayName() }}</span> und dir statt.
+          </p>
+        }
       </div>
-      @if (isCurrentUser()) {
-        <p>
-          Dieser Raum ist nur für dich da. Mache dir Notizen, liste deine To-dos auf oder bewahre
-          Links und Dateien griffbereit auf. Du kannst hier auch gerne Dinge mit dir selbst
-          besprechen.
-        </p>
-      } @else {
-        <p>
-          Diese Unterhaltung findet nur zwischen
-          <span>&#64;{{ displayName() }}</span> und dir statt.
-        </p>
-      }
-    </div>
+    }
+
+    @if (loadingChat()) {
+      <p class="direct-message__feedback">Direktnachricht wird geladen …</p>
+    } @else {
+      <app-message-list
+        [messages]="messages.messages()"
+        [currentUserId]="auth.currentUser()?.uid || null"
+        [loading]="messages.loading()"
+        [error]="messages.error()"
+        emptyText=""
+        (messageEdited)="editMessage($event)"
+        (reactionToggled)="toggleReaction($event)"
+      />
+    }
   </div>
 
+  @if (actionError()) {
+    <p class="direct-message__feedback direct-message__feedback--error" role="alert">
+      {{ actionError() }}
+    </p>
+  }
+
   <div class="direct-message__input">
-    <app-message-input [placeholder]="placeholder()" />
+    <app-message-input
+      [placeholder]="placeholder()"
+      [disabled]="!chatId() || loadingChat() || sending()"
+      (messageSent)="sendMessage($event)"
+    />
   </div>
 </section>
 

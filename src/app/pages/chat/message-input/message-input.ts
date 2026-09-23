@@ -55,6 +55,10 @@ export class MessageInput {
   protected readonly messageField = viewChild<ElementRef<HTMLTextAreaElement>>('messageField');
   protected readonly mentionDropdown = viewChild(MentionDropdown);
 
+  public focus(): void {
+    this.messageField()?.nativeElement.focus();
+  }
+
   @HostListener('document:click', ['$event'])
   protected closePickersOutside(event: MouseEvent): void {
     if (!this.host.nativeElement.contains(event.target as Node)) {

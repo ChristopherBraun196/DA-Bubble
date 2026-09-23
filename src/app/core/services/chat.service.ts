@@ -6,11 +6,13 @@ import {
   collection,
   doc,
   DocumentData,
+  getDoc,
   onSnapshot,
   query,
   QueryDocumentSnapshot,
   QuerySnapshot,
   serverTimestamp,
+  setDoc,
   Timestamp,
   Unsubscribe,
   updateDoc,
@@ -84,6 +86,31 @@ export class ChatService {
 
     this.activeChatIdState.set(channelRef.id);
     return channelRef.id;
+  }
+
+  async ensureDirectChat(userId: string, otherUserId: string): Promise<string> {
+    const memberIds = [...new Set([userId, otherUserId])].sort();
+    const chatId = `direct_${memberIds.join('_')}`;
+    const chatRef = doc(this.firebase.firestore, 'chats', chatId);
+    const snapshot = await getDoc(chatRef);
+
+    if (!snapshot.exists()) {
+      await setDoc(chatRef, this.createDirectChatDocument(memberIds, userId));
+    }
+    this.activeChatIdState.set(chatId);
+    return chatId;
+  }
+
+  private createDirectChatDocument(memberIds: string[], userId: string) {
+    return {
+      type: 'direct',
+      name: 'Direktnachricht',
+      description: '',
+      createdBy: userId,
+      memberIds,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    };
   }
 
   async updateChannel(

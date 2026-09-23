@@ -75,13 +75,17 @@
 
 .direct-message__content {
   display: flex;
+  flex-direction: column;
   flex: 1;
-  align-items: flex-end;
   min-height: 0;
-  padding: 40px 45px 60px;
+  overflow-y: auto;
+  padding: 24px 40px;
 }
 
 .direct-message__intro {
+  margin-top: auto;
+  padding-top: 40px;
+
   p {
     margin: 24px 0 0;
     color: #686868;
@@ -115,6 +119,17 @@
 
 .direct-message__input {
   padding: 0 45px 40px;
+}
+
+.direct-message__feedback {
+  margin: 0;
+  padding: 12px 24px;
+  color: #686868;
+  text-align: center;
+}
+
+.direct-message__feedback--error {
+  color: #ed1e79;
 }
 
 .direct-message__profile-overlay {
