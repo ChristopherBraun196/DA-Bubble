@@ -1,5 +1,9 @@
 <div class="thread">
-  <app-thread-header [channelName]="channelName()" (closed)="closed.emit()" />
+  <app-thread-header
+    [channelName]="channelName()"
+    [directMessage]="isDirectMessage()"
+    (closed)="closed.emit()"
+  />
 
   <div class="thread__messages">
     @if (thread.parent(); as parent) {

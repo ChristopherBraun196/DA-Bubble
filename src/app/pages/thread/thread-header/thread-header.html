@@ -2,7 +2,9 @@
   <div class="thread-header__titles">
     <h2 class="thread-header__title">Thread</h2>
     <span class="thread-header__channel">
-      <span class="material-symbols-outlined">tag</span>
+      <span class="material-symbols-outlined">
+        {{ directMessage() ? 'alternate_email' : 'tag' }}
+      </span>
       {{ channelName() }}
     </span>
   </div>

@@ -37,9 +37,7 @@ export class Shell {
   protected readonly activeDirectUser = signal<DirectMessageUser | null>(null);
   protected readonly devspaceNav = viewChild(DevspaceNav);
   /** The thread panel is hidden while composing a new message. */
-  protected readonly threadVisible = computed(
-    () => !!this.thread.target() && !this.composing() && !this.activeDirectUser(),
-  );
+  protected readonly threadVisible = computed(() => !!this.thread.target() && !this.composing());
 
   constructor() {
     const user = this.auth.currentUser();

@@ -40,7 +40,10 @@
 
     @if (threadVisible()) {
       <aside class="shell__thread">
-        <app-thread-panel (closed)="closeThread()" />
+        <app-thread-panel
+          [directMessageName]="activeDirectUser()?.name ?? null"
+          (closed)="closeThread()"
+        />
       </aside>
     }
 

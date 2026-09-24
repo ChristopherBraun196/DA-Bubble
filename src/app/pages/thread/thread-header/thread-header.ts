@@ -6,8 +6,9 @@ import { Component, input, output } from '@angular/core';
   styleUrl: './thread-header.scss',
   templateUrl: './thread-header.html',
 })
-/** Header of the thread panel, showing the channel and a close button. */
+/** Header of the thread panel, showing its chat context and a close button. */
 export class ThreadHeader {
   readonly channelName = input.required<string>();
+  readonly directMessage = input(false);
   readonly closed = output<void>();
 }

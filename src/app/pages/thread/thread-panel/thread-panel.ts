@@ -1,4 +1,4 @@
-import { Component, computed, inject, output, signal } from '@angular/core';
+import { Component, computed, inject, input, output, signal } from '@angular/core';
 import { AuthService } from '../../../core/services/auth.service';
 import { ChatService } from '../../../core/services/chat.service';
 import { MessageService } from '../../../core/services/message.service';
@@ -26,6 +26,7 @@ import { ThreadHeader } from '../thread-header/thread-header';
  * {@link MessageItem.inThread} set so reply affordances are hidden.
  */
 export class ThreadPanel {
+  readonly directMessageName = input<string | null>(null);
   readonly closed = output<void>();
 
   protected readonly auth = inject(AuthService);
@@ -37,9 +38,11 @@ export class ThreadPanel {
   protected readonly currentUserId = computed(() => this.auth.currentUser()?.uid || null);
   protected readonly channelName = computed(
     () =>
+      this.directMessageName() ||
       this.chats.chats().find(({ id }) => id === this.thread.target()?.chatId)?.name ||
       'Unbenannter Chat',
   );
+  protected readonly isDirectMessage = computed(() => !!this.directMessageName());
   protected readonly replyLabel = computed(() => {
     const count = this.thread.replies().length;
     if (count === 0) {

@@ -13,6 +13,7 @@ import { AppUser } from '../../../core/models/user.model';
 import { AuthService } from '../../../core/services/auth.service';
 import { ChatService } from '../../../core/services/chat.service';
 import { MessageService } from '../../../core/services/message.service';
+import { ThreadService } from '../../../core/services/thread.service';
 import { UserService } from '../../../core/services/user.service';
 import { AvatarFallback } from '../../../shared/avatar-fallback/avatar-fallback';
 import { DirectMessageUser } from '../../Devspace-nav/direct-message-list/direct-message-list';
@@ -37,6 +38,7 @@ export class DirectMessageView {
   protected readonly auth = inject(AuthService);
   private readonly chats = inject(ChatService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly thread = inject(ThreadService);
   private readonly users = inject(UserService);
   protected readonly messages = inject(MessageService);
   private connectionVersion = 0;
@@ -166,6 +168,12 @@ export class DirectMessageView {
     } catch {
       this.actionError.set('Die Nachricht konnte nicht bearbeitet werden.');
     }
+  }
+
+  /** Opens the thread panel for a direct message. */
+  protected openThread(messageId: string): void {
+    const chatId = this.chatId();
+    if (chatId) this.thread.open(chatId, messageId);
   }
 
   /**
