@@ -1,9 +1,10 @@
 import { MessageSearchResult } from '../../../core/models/message-search.model';
-import { Component, computed, DestroyRef, inject, signal, viewChild } from '@angular/core';
+import { Component, computed, DestroyRef, effect, inject, signal, viewChild } from '@angular/core';
 import { AuthService } from '../../../core/services/auth.service';
 import { AppUser } from '../../../core/models/user.model';
 import { ChatService } from '../../../core/services/chat.service';
 import { ThreadService } from '../../../core/services/thread.service';
+import { UserService } from '../../../core/services/user.service';
 import { ChatView } from '../../chat/chat-view/chat-view';
 import { DevspaceNav } from '../../Devspace-nav/devspace-nav/devspace-nav';
 import { ThreadPanel } from '../../thread/thread-panel/thread-panel';
@@ -29,6 +30,8 @@ export class Shell {
   private readonly auth = inject(AuthService);
   private readonly chats = inject(ChatService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly users = inject(UserService);
+  private directRestoreVersion = 0;
 
   protected readonly thread = inject(ThreadService);
   protected readonly devspaceOpen = signal(true);
@@ -46,7 +49,71 @@ export class Shell {
       void this.chats.connect(user.uid);
     }
 
+    effect(() => {
+      const activeChat = this.chats.chats().find(({ id }) => id === this.chats.activeChatId());
+      const version = ++this.directRestoreVersion;
+      if (activeChat?.type === 'direct' && !this.activeDirectUser()) {
+        void this.restoreDirectMessage(activeChat.id, activeChat.memberIds, version);
+      }
+    });
+
     this.destroyRef.onDestroy(() => this.disconnect());
+  }
+
+  /** Restores a direct-message view selected during the initial chat load. */
+  private async restoreDirectMessage(
+    chatId: string,
+    memberIds: string[],
+    version: number,
+  ): Promise<void> {
+    const currentUserId = this.auth.currentUser()?.uid;
+    if (!currentUserId) return;
+    const partnerId = memberIds.find((id) => id !== currentUserId) || currentUserId;
+    const user = await this.resolveDirectUser(partnerId, currentUserId);
+    if (version !== this.directRestoreVersion || this.chats.activeChatId() !== chatId) return;
+    const navigation = this.devspaceNav();
+    if (navigation) navigation.selectUser(user);
+    else this.showDirectMessage(user);
+  }
+
+  /** Resolves the sidebar row for a direct-message participant. */
+  private async resolveDirectUser(
+    userId: string,
+    currentUserId: string,
+  ): Promise<DirectMessageUser> {
+    if (userId === currentUserId) return this.currentDirectUser(userId);
+    try {
+      const user = await this.users.findById(userId);
+      return {
+        id: userId,
+        name: user?.displayName || 'Unbekannter Nutzer',
+        avatar: user?.photoURL || '/img/Profile_Guest.png',
+        online: false,
+      };
+    } catch {
+      return this.unknownDirectUser(userId);
+    }
+  }
+
+  /** Maps the signed-in user to a direct-message participant. */
+  private currentDirectUser(userId: string): DirectMessageUser {
+    return {
+      id: userId,
+      name: `${this.auth.displayName()} (Du)`,
+      avatar: this.auth.photoURL(),
+      online: true,
+      isCurrentUser: true,
+    };
+  }
+
+  /** Provides a usable direct-message view when a profile cannot be loaded. */
+  private unknownDirectUser(userId: string): DirectMessageUser {
+    return {
+      id: userId,
+      name: 'Unbekannter Nutzer',
+      avatar: '/img/Profile_Guest.png',
+      online: false,
+    };
   }
 
   /** Collapses or expands the sidebar. */
