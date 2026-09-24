@@ -98,7 +98,7 @@
   bottom: calc(100% + 8px);
   z-index: 5;
   display: block;
-  width: min(304px, calc(100vw - 48px));
+  width: min(var(--message-emoji-picker-width, 304px), calc(100vw - 48px));
 }
 
 @media (max-width: 700px) {

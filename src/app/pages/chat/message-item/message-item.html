@@ -65,6 +65,7 @@
         <app-message-reactions
           [reactions]="message.reactions"
           [currentUserId]="currentUserId()"
+          [limit]="inThread() ? 7 : 20"
           (toggled)="toggleReaction($event)"
         />
 
@@ -86,22 +87,16 @@
         class="message__actions"
         [class.message__actions--open]="menuOpen() || reactionPickerOpen()"
       >
-        <button
-          class="message__action"
-          type="button"
-          aria-label="Mit Haken reagieren"
-          (click)="toggleReaction('✅')"
-        >
-          <span class="message__emoji">✅</span>
-        </button>
-        <button
-          class="message__action"
-          type="button"
-          aria-label="Mit Hände hoch reagieren"
-          (click)="toggleReaction('🙌')"
-        >
-          <span class="message__emoji">🙌</span>
-        </button>
+        @for (emoji of reactionHistory.recent(); track emoji) {
+          <button
+            class="message__action"
+            type="button"
+            [attr.aria-label]="'Mit ' + emoji + ' reagieren'"
+            (click)="toggleReaction(emoji)"
+          >
+            <span class="message__emoji">{{ emoji }}</span>
+          </button>
+        }
 
         <div class="message__reaction-picker-wrap" #reactionPickerWrap>
           <button

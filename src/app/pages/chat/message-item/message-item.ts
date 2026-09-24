@@ -1,7 +1,17 @@
 import { DatePipe } from '@angular/common';
-import { Component, computed, ElementRef, input, output, signal, viewChild } from '@angular/core';
+import {
+  Component,
+  computed,
+  ElementRef,
+  inject,
+  input,
+  output,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { ChatMessage } from '../../../core/models/message.model';
 import { ReactionEmoji } from '../../../core/models/reaction.model';
+import { ReactionHistoryService } from '../../../core/services/reaction-history.service';
 import { AvatarFallback } from '../../../shared/avatar-fallback/avatar-fallback';
 import { EmojiPicker } from '../../../shared/emoji-picker/emoji-picker';
 import { MessageReactions } from '../message-reactions/message-reactions';
@@ -23,6 +33,8 @@ import { MessageReactions } from '../message-reactions/message-reactions';
  * the reply affordances where they do not apply.
  */
 export class MessageItem {
+  protected readonly reactionHistory = inject(ReactionHistoryService);
+
   readonly message = input<ChatMessage | null>(null);
   readonly ownMessage = input(false);
   readonly currentUserId = input<string | null>(null);
@@ -102,6 +114,7 @@ export class MessageItem {
    * @param emoji - The emoji that was picked.
    */
   protected toggleReaction(emoji: ReactionEmoji): void {
+    this.reactionHistory.record(emoji);
     this.reactionToggled.emit(emoji);
     this.reactionPickerOpen.set(false);
   }

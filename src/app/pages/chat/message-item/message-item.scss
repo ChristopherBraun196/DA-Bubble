@@ -169,7 +169,7 @@ app-message-reactions {
   left: 0;
   z-index: 5;
   display: block;
-  width: min(304px, calc(100vw - 48px));
+  width: min(var(--message-emoji-picker-width, 304px), calc(100vw - 48px));
 }
 
 .message__edit-emoji {
@@ -265,7 +265,7 @@ app-message-reactions {
   bottom: calc(100% + 8px);
   z-index: 4;
   display: block;
-  width: min(304px, calc(100vw - 48px));
+  width: min(var(--message-emoji-picker-width, 304px), calc(100vw - 48px));
 }
 
 .message__menu {
