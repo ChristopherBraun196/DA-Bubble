@@ -3,9 +3,10 @@ import { Component, computed, inject, input, output, signal } from '@angular/cor
 import { AppUser } from '../../../core/models/user.model';
 import { AuthService } from '../../../core/services/auth.service';
 import { AvatarFallback } from '../../../shared/avatar-fallback/avatar-fallback';
+import { AvatarPicker } from '../../../shared/avatar-picker/avatar-picker';
 
 @Component({
-  imports: [AvatarFallback],
+  imports: [AvatarFallback, AvatarPicker],
   selector: 'app-profile-dialog',
   styleUrl: './profile-dialog.scss',
   templateUrl: './profile-dialog.html',
@@ -41,6 +42,7 @@ export class ProfileDialog {
   protected readonly editing = signal(false);
   protected readonly saving = signal(false);
   protected readonly saveError = signal('');
+  protected readonly avatarDraft = signal('');
 
   /** Startet leer, der aktuelle Name steht als Platzhalter im Feld. */
   protected readonly nameDraft = signal('');
@@ -50,6 +52,12 @@ export class ProfileDialog {
     this.nameDraft.set('');
     this.saveError.set('');
     this.editing.set(true);
+    this.avatarDraft.set(this.avatar());
+  }
+
+  /** Remembers the avatar the user clicked, without saving it yet. */
+  protected selectAvatar(avatar: string): void {
+    this.avatarDraft.set(avatar);
   }
 
   /** Leaves edit mode without saving. */
@@ -67,16 +75,13 @@ export class ProfileDialog {
   }
 
   /**
-   * Persists the new display name.
+   * Persists the edited name and avatar
    *
    * @remarks
    * A blank draft simply closes edit mode, leaving the current name in place.
    */
   protected async save(): Promise<void> {
-    const name = this.nameDraft().trim();
-
-    if (!name) {
-      this.editing.set(false);
+    if (this.saving()) {
       return;
     }
 
@@ -84,12 +89,27 @@ export class ProfileDialog {
     this.saveError.set('');
 
     try {
-      await this.auth.updateDisplayName(name);
+      await this.persistChanges();
       this.editing.set(false);
     } catch {
-      this.saveError.set('Der Name konnte nicht gespeichert werden. Versuch es noch einmal.');
+      this.saveError.set(
+        'Die Änderungen konnten nicht gespeichert werden. Versuch es noch einmal.',
+      );
     } finally {
       this.saving.set(false);
+    }
+  }
+
+  /** Writes name and avatar, each only when the user actually changed it. */
+  private async persistChanges(): Promise<void> {
+    const name = this.nameDraft().trim();
+
+    if (name) {
+      await this.auth.updateDisplayName(name);
+    }
+
+    if (this.avatarDraft() && this.avatarDraft() !== this.avatar()) {
+      await this.auth.updatePhotoURL(this.avatarDraft());
     }
   }
 }

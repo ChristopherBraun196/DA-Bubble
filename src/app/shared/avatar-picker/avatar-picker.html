@@ -1,0 +1,15 @@
+<ul class="avatar-picker">
+  @for (avatar of avatars; track avatar) {
+    <li>
+      <button
+        class="avatar-picker__item"
+        [class.avatar-picker__item--active]="avatar === selected()"
+        type="button"
+        [attr.aria-label]="'Avatar auswählen'"
+        (click)="picked.emit(avatar)"
+      >
+        <img class="avatar-picker__image" [src]="avatar" alt="" />
+      </button>
+    </li>
+  }
+</ul>

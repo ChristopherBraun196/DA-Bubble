@@ -186,6 +186,23 @@ export class AuthService {
     this.profileRevision.update((revision) => revision + 1);
   }
 
+  /**
+   * Replaces the current user's avatar in both Firebase Auth and Firestore.
+   *
+   * @param photoURL - Path of the newly chosen avatar.
+   */
+  async updatePhotoURL(photoURL: string): Promise<void> {
+    const user = this.currentUser();
+
+    if (!user || !photoURL) {
+      return;
+    }
+
+    await updateProfile(user, { photoURL });
+    await this.users.ensureUser(user);
+    this.profileRevision.update((revision) => revision + 1);
+  }
+
   /** Signs the current user out and clears guest data where applicable. */
   async logout(): Promise<void> {
     await signOut(this.firebase.auth);

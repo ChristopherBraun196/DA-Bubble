@@ -1,0 +1,35 @@
+@use '../../../styles/variables' as variables;
+
+.avatar-picker {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.avatar-picker__item {
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  line-height: 0;
+
+  &--active {
+    border-color: variables.$purple-primary;
+  }
+
+  &:hover {
+    border-color: variables.$purple-secondary;
+  }
+}
+
+.avatar-picker__image {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+}

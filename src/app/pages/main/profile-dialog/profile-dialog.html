@@ -15,7 +15,13 @@
     </button>
   </header>
 
-  <img appAvatarFallback class="profile__avatar" [src]="avatar()" [alt]="name()" />
+  <img
+    appAvatarFallback
+    class="profile__avatar"
+    [src]="editing() ? avatarDraft() : avatar()"
+    [alt]="name()"
+  />
+  <app-avatar-picker [selected]="avatarDraft()" (picked)="selectAvatar($event)" />
 
   @if (editing()) {
     <form class="profile__form" (submit)="$event.preventDefault(); save()">
