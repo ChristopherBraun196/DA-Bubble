@@ -21,9 +21,10 @@
     [src]="editing() ? avatarDraft() : avatar()"
     [alt]="name()"
   />
-  <app-avatar-picker [selected]="avatarDraft()" (picked)="selectAvatar($event)" />
 
   @if (editing()) {
+    <app-avatar-picker [selected]="avatarDraft()" (picked)="selectAvatar($event)" />
+
     <form class="profile__form" (submit)="$event.preventDefault(); save()">
       <label class="profile__label" for="profile-name">
         <span class="material-symbols-outlined">account_circle</span>
