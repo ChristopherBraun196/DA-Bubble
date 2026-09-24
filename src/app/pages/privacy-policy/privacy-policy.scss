@@ -4,6 +4,10 @@
   display: block;
   min-height: 100vh;
   background-color: variable.$background;
+
+  @media screen and (min-width: 320px) and (max-width: 768px) {
+    background-color: variable.$white;
+  }
 }
 
 .privacy-policy-wrapper {
@@ -13,6 +17,10 @@
 
   padding: 0 300px 300px;
   margin: 0 auto;
+
+  @media screen and (min-width: 320px) and (max-width: 768px) {
+    padding: 0 10px 10px;
+  }
 }
 
 .back-button {
@@ -25,6 +33,12 @@
   text-decoration: none;
   margin-left: 300px;
   color: variable.$black;
+
+  @media screen and (min-width: 320px) and (max-width: 768px) {
+    margin-left: 0;
+    padding-top: 24px;
+    padding-left: 10px;
+  }
 
   .material-symbols-outlined {
     transition: font-variation-settings 0.2s;
@@ -50,6 +64,10 @@ h1 {
   font-size: 46px;
   font-weight: 700;
   color: variable.$purple-primary;
+
+  @media screen and (min-width: 320px) and (max-width: 768px) {
+    font-size: 30px;
+  }
 }
 
 h2 {
@@ -57,11 +75,19 @@ h2 {
   font-weight: 700;
   color: variable.$purple-primary;
   padding-top: 8px;
+
+  @media screen and (min-width: 320px) and (max-width: 768px) {
+    font-size: 22px;
+  }
 }
 
 p {
   font-size: 20px;
   font-weight: 400;
+
+  @media screen and (min-width: 320px) and (max-width: 768px) {
+    font-size: 16px;
+  }
 }
 
 .line-small {
