@@ -262,3 +262,69 @@
     background-color: #797ef3;
   }
 }
+
+/*
+ * Die Karte haengt mal in der Topbar, mal in einem Overlay — deshalb rechnet
+ * sie hier gegen den Viewport statt gegen ihren Container. Unter 340px Breite
+ * bleibt sie bei 300px stehen.
+ */
+@media (max-width: 539px) {
+  .profile {
+    gap: 16px;
+    width: clamp(300px, 100vw - 40px, 500px);
+    padding: 24px 20px;
+  }
+
+  .profile__title {
+    font-size: 20px;
+  }
+
+  .profile__close {
+    width: 32px;
+    height: 32px;
+  }
+
+  .profile__avatar {
+    width: 160px;
+    height: 160px;
+    margin: 8px auto 12px;
+  }
+
+  .profile__name {
+    font-size: 24px;
+  }
+
+  .profile__status,
+  .profile__mail,
+  .profile__label {
+    font-size: 18px;
+  }
+
+  .profile__mail {
+    gap: 12px;
+    margin-top: 12px;
+  }
+
+  .profile__mail-value {
+    padding-left: 0;
+    font-size: 16px;
+  }
+
+  .profile__field {
+    padding: 12px 16px;
+  }
+
+  .profile__actions {
+    gap: 12px;
+  }
+
+  .profile__button {
+    padding: 12px 20px;
+    font-size: 16px;
+  }
+
+  .profile__message {
+    padding: 12px 20px;
+    font-size: 16px;
+  }
+}
