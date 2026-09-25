@@ -69,6 +69,17 @@
     right: auto;
     left: 0;
   }
+
+  /*
+   * Einspaltig spannt die Channel-Card ueber die volle Breite. Erst dadurch hat
+   * der absolut positionierte Kasten eine feste Breite, an der sich das
+   * `max-width: 100%` der Karte darin ueberhaupt ausrichten kann.
+   */
+  @media (max-width: 869px) {
+    &--left {
+      right: 0;
+    }
+  }
 }
 
 .chat-header__profile-overlay {

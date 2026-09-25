@@ -233,3 +233,15 @@
     display: none;
   }
 }
+
+@media (max-width: 599px) {
+  .shell {
+    padding: 0;
+  }
+
+  .shell__devspace app-devspace-nav,
+  .shell__chat > *,
+  .shell__thread app-thread-panel {
+    border-radius: 0;
+  }
+}

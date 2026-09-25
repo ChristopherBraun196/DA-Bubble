@@ -195,3 +195,16 @@
     font-size: 20px;
   }
 }
+
+@media (max-width: 599px) {
+  .topbar {
+    padding: 16px 16px;
+  }
+}
+
+@media (max-width: 335px) {
+  .topbar {
+    gap: 0;
+    padding: 16px 8px;
+  }
+}

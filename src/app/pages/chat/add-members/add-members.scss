@@ -241,3 +241,71 @@
     cursor: not-allowed;
   }
 }
+
+/*
+ * Auf schmalen Schirmen richtet sich die Karte nach dem Viewport statt nach
+ * 398px. Die Vorschlagsliste gibt ihre feste Breite auf und spannt stattdessen
+ * ueber das Suchfeld, sonst ragt sie bei 320px rechts heraus.
+ */
+@media (max-width: 449px) {
+  .add-members {
+    gap: 16px;
+    width: min(398px, 100vw - 48px);
+    padding: 20px 12px;
+  }
+
+  .add-members__title {
+    font-size: 20px;
+  }
+
+  .add-members__close {
+    width: 32px;
+    height: 32px;
+  }
+
+  .add-members__field {
+    gap: 8px;
+    padding: 10px 14px;
+  }
+
+  .add-members__chip {
+    min-width: 0;
+    font-size: 16px;
+  }
+
+  .add-members__chip-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .add-members__input {
+    flex-basis: 80px;
+    min-width: 80px;
+    font-size: 16px;
+  }
+
+  .add-members__suggestions {
+    left: 0;
+    right: 0;
+    width: auto;
+    padding: 16px;
+  }
+
+  .add-members__suggestion {
+    gap: 12px;
+    min-height: 48px;
+    font-size: 16px;
+  }
+
+  .add-members__suggestion-avatar {
+    flex-basis: 40px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .add-members__submit {
+    width: auto;
+    padding: 12px 20px;
+  }
+}
