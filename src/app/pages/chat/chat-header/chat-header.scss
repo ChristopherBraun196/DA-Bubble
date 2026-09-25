@@ -148,3 +148,10 @@
     color: #ffffff;
   }
 }
+
+/* Die Mitglieder stehen hier unten in der Channel-Card statt oben im Header. */
+@media (max-width: 599px) {
+  .chat-header__avatars {
+    display: none;
+  }
+}

@@ -101,6 +101,33 @@
     <p class="channel-info__creator">{{ createdBy() || 'Wird geladen …' }}</p>
   </section>
 
+  <!-- Uebernimmt auf schmalen Schirmen die Rolle der Mitglieder-Card. -->
+  <section class="channel-info__section channel-info__members">
+    <span class="channel-info__label">Mitglieder</span>
+
+    <ul class="channel-info__member-list">
+      @for (member of members(); track member.id) {
+        <li>
+          <app-user-list-item
+            [name]="member.name"
+            [avatar]="member.avatar"
+            [online]="member.online"
+            (selected)="memberSelected.emit(member.user)"
+          />
+        </li>
+      }
+    </ul>
+
+    <button
+      class="channel-info__add-members"
+      type="button"
+      (click)="addMembersRequested.emit()"
+    >
+      <span class="material-symbols-outlined">person_add</span>
+      <span>Mitglieder hinzufügen</span>
+    </button>
+  </section>
+
   @if (saveError()) {
     <p class="channel-info__error">{{ saveError() }}</p>
   }

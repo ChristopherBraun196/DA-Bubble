@@ -1,11 +1,15 @@
 import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
 
+import { ChannelMember, toChannelMembers } from '../../../core/models/channel-member.model';
+import { AppUser } from '../../../core/models/user.model';
 import { AuthService } from '../../../core/services/auth.service';
+import { ChannelMemberService } from '../../../core/services/channel-member.service';
 import { ChatService } from '../../../core/services/chat.service';
 import { UserService } from '../../../core/services/user.service';
+import { UserListItem } from '../../Devspace-nav/user-list-item/user-list-item';
 
 @Component({
-  imports: [],
+  imports: [UserListItem],
   selector: 'app-channel-info',
   styleUrl: './channel-info.scss',
   templateUrl: './channel-info.html',
@@ -14,10 +18,25 @@ import { UserService } from '../../../core/services/user.service';
 export class ChannelInfo {
   private readonly auth = inject(AuthService);
   private readonly chats = inject(ChatService);
+  private readonly channelMembers = inject(ChannelMemberService);
   private readonly users = inject(UserService);
 
   readonly channelName = input.required<string>();
   readonly closed = output<void>();
+  /** Only reached from the member section this card shows on narrow screens. */
+  readonly addMembersRequested = output<void>();
+  readonly memberSelected = output<AppUser>();
+
+  /**
+   * The channel's members.
+   *
+   * @remarks
+   * The chat header keeps the subscription open, so this card only reads the
+   * rows it already holds.
+   */
+  protected readonly members = computed<ChannelMember[]>(() =>
+    toChannelMembers(this.channelMembers.members(), this.auth.currentUser()?.uid || null),
+  );
 
   private readonly activeChat = computed(() =>
     this.chats.chats().find(({ id }) => id === this.chats.activeChatId()),

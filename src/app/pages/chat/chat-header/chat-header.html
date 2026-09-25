@@ -12,7 +12,12 @@
 
   @if (dialog() === 'channel') {
     <div class="chat-header__dialog chat-header__dialog--left">
-      <app-channel-info [channelName]="channelName()" (closed)="closeDialog()" />
+      <app-channel-info
+        [channelName]="channelName()"
+        (closed)="closeDialog()"
+        (addMembersRequested)="openAdd()"
+        (memberSelected)="openProfile($event)"
+      />
     </div>
   }
 

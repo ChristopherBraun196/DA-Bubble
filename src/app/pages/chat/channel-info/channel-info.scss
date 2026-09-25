@@ -179,3 +179,50 @@
     width: 560px;
   }
 }
+
+/*
+ * Ab hier verschwinden die Avatare aus dem Chat-Header, deshalb uebernimmt die
+ * Karte die Mitgliederliste. Darueber bleibt sie der Mitglieder-Card ueberlassen.
+ */
+.channel-info__members {
+  display: none;
+}
+
+.channel-info__member-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.channel-info__add-members {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 12px;
+  border: none;
+  border-radius: 30px;
+  background: transparent;
+  color: #000000;
+  font-family: inherit;
+  font-size: 16px;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
+
+  &:hover {
+    background-color: #eceefe;
+    color: #444df2;
+  }
+}
+
+@media (max-width: 599px) {
+  .channel-info__members {
+    display: flex;
+  }
+}
