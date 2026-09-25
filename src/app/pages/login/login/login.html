@@ -12,7 +12,7 @@
         />
       </div>
 
-      <div class="login-shell__auth">
+      <div class="login-shell__auth login-shell__auth--top">
         <span>Neu bei DABubble?</span>
         <a [routerLink]="['/register']">Konto erstellen</a>
       </div>
@@ -96,7 +96,10 @@
       </div>
     </form>
   </section>
-
+  <div class="login-shell__auth login-shell__auth--bottom">
+    <span>Neu bei DABubble?</span>
+    <a [routerLink]="['/register']">Konto erstellen</a>
+  </div>
   <footer class="login-shell__footer">
     <a [routerLink]="['/impressum']">Impressum</a>
     <a [routerLink]="['/datenschutz']">Datenschutz</a>
