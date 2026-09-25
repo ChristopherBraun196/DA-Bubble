@@ -85,6 +85,59 @@
   margin-left: 24px;
 }
 
+@media (max-width: 1149px) {
+  .shell__devspace {
+    flex-basis: 330px;
+
+    app-devspace-nav {
+      width: 330px;
+      min-width: 330px;
+    }
+  }
+
+  .shell__thread {
+    flex-basis: 330px;
+  }
+}
+
+@media (max-width: 1049px) {
+  .shell__devspace {
+    flex-basis: 297px;
+
+    app-devspace-nav {
+      width: 297px;
+      min-width: 297px;
+    }
+  }
+
+  .shell__thread {
+    flex-basis: 297px;
+  }
+}
+
+
+@media (max-width: 979px) {
+  .shell {
+    gap: 12px;
+    padding: 12px 12px 16px;
+  }
+
+  .shell__devspace {
+    flex-basis: 267px;
+    margin-right: 16px;
+
+    app-devspace-nav {
+      width: 267px;
+      min-width: 267px;
+    }
+  }
+
+  .shell__thread {
+    flex-basis: 267px;
+    margin-left: 16px;
+  }
+}
+
 /* Die Karte am linken Rand zum Ein- und Ausklappen. */
 .shell__devspace-toggle {
   position: absolute;
@@ -141,5 +194,42 @@
   &:hover {
     color: var(--color-primary);
     box-shadow: -2px 0 12px rgba(0, 0, 0, 0.16);
+  }
+}
+
+
+@media (max-width: 869px) {
+  .shell__workspace {
+    display: block;
+  }
+
+  .shell__devspace,
+  .shell__chat,
+  .shell__thread {
+    display: none;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+  }
+
+  .shell__workspace[data-pane='devspace'] .shell__devspace,
+  .shell__workspace[data-pane='chat'] .shell__chat,
+  .shell__workspace[data-pane='thread'] .shell__thread {
+    display: flex;
+  }
+
+  .shell__workspace--devspace-closed .shell__devspace {
+    flex-basis: auto;
+    margin-right: 0;
+  }
+
+  .shell__devspace app-devspace-nav {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .shell__devspace-toggle,
+  .shell__thread-toggle {
+    display: none;
   }
 }

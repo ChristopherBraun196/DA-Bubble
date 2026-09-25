@@ -43,6 +43,39 @@
   transition: color 150ms ease;
 }
 
+.topbar__back {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+  padding: 8px 12px 8px 4px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text);
+  font-family: inherit;
+  cursor: pointer;
+  transition: color 150ms ease;
+
+  &:hover {
+    color: var(--color-primary);
+  }
+}
+
+.topbar__back-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex: 0 0 auto;
+}
+
+.topbar__back-text {
+  font-size: 20px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 .topbar__user {
   display: flex;
   align-items: center;
@@ -88,7 +121,7 @@
   flex: 0 0 auto;
 }
 
-/* Dunkelt den Rest der Seite ab, waehrend das Menue offen ist. */
+
 .topbar__backdrop {
   position: fixed;
   inset: 0;
@@ -141,15 +174,16 @@
   }
 }
 
+@media (max-width: 869px) {
+  .topbar app-workspace-search {
+    display: none;
+  }
+}
+
 @media (max-width: 700px) {
   .topbar {
     flex-wrap: wrap;
     gap: 12px;
-  }
-  app-workspace-search {
-    order: 3;
-    flex-basis: 100%;
-    max-width: none;
   }
   .topbar__user-name {
     display: none;

@@ -23,6 +23,19 @@
   padding: 8px 4px 0 12px;
 }
 
+/*
+ * Die Suche zieht aus der Topbar hier herunter, sobald nur eine Spalte laeuft.
+ * Ihr `flex: 1` waere in dieser Spalte vertikal — deshalb zurueckgesetzt.
+ */
+.devspace app-workspace-search {
+  flex: 0 0 auto;
+  max-width: none;
+  margin: -8px 4px 0;
+  /* Weisses Feld auf weisser Karte braucht eine Kante. */
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+}
+
 .devspace__brand {
   display: flex;
   align-items: center;

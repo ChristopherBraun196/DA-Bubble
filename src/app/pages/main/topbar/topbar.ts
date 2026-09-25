@@ -1,5 +1,5 @@
 import { MessageSearchResult } from '../../../core/models/message-search.model';
-import { Component, computed, inject, output, signal } from '@angular/core';
+import { Component, computed, inject, input, output, signal } from '@angular/core';
 import { AppUser } from '../../../core/models/user.model';
 import { WorkspaceSearch } from '../workspace-search/workspace-search';
 import { Router } from '@angular/router';
@@ -20,6 +20,12 @@ export type TopbarPanel = 'none' | 'menu' | 'profile';
 })
 /** Top bar with the workspace search and the current user's menu. */
 export class Topbar {
+  /** Swaps the logo and search for a way back to the sidebar on narrow screens. */
+  readonly backVisible = input(false);
+  /** False once the sidebar carries the workspace search instead. */
+  readonly searchVisible = input(true);
+
+  readonly back = output<void>();
   readonly messageSelected = output<MessageSearchResult>();
   readonly channelSelected = output<string>();
   readonly directMessageRequested = output<AppUser>();

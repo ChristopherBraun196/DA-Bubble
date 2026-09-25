@@ -1,5 +1,8 @@
 <div class="shell">
   <app-topbar
+    [backVisible]="backVisible()"
+    [searchVisible]="!compact()"
+    (back)="showDevspacePane()"
     (messageSelected)="showSearchMessage($event)"
     (channelSelected)="showChannel($event)"
     (directMessageRequested)="showMemberDirectMessage($event)"
@@ -7,18 +10,24 @@
 
   <div
     class="shell__workspace"
+    [attr.data-pane]="pane()"
     [class.shell__workspace--devspace-closed]="!devspaceOpen()"
     [class.shell__workspace--thread-closed]="!threadVisible()"
   >
     <aside
       id="devspace-navigation"
       class="shell__devspace"
-      [attr.aria-hidden]="!devspaceOpen()"
-      [attr.inert]="!devspaceOpen() ? '' : null"
+      [attr.aria-hidden]="devspaceHidden()"
+      [attr.inert]="devspaceHidden() ? '' : null"
     >
       <app-devspace-nav
+        [searchVisible]="compact()"
         (composingChanged)="showCompose($event)"
         (directMessageSelected)="showDirectMessage($event)"
+        (navigated)="showChatPane()"
+        (messageSelected)="showSearchMessage($event)"
+        (channelSelected)="showChannel($event)"
+        (directMessageRequested)="showMemberDirectMessage($event)"
       />
     </aside>
 

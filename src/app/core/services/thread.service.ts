@@ -36,12 +36,19 @@ export class ThreadService {
   private readonly targetState = signal<ThreadTarget | null>(null);
   private readonly parentState = signal<ChatMessage | null>(null);
   private readonly repliesState = signal<ChatMessage[]>([]);
+  private readonly openRequestState = signal(0);
   private subscriptions: Unsubscribe[] = [];
   private connectionVersion = 0;
 
   readonly target = this.targetState.asReadonly();
   readonly parent = this.parentState.asReadonly();
   readonly replies = this.repliesState.asReadonly();
+  /**
+   * Counts calls to {@link ThreadService.open}, including repeats for the
+   * thread already shown. Lets callers react to an open request even when the
+   * target itself does not change.
+   */
+  readonly openRequests = this.openRequestState.asReadonly();
   readonly loading = signal(false);
   readonly error = signal('');
 
@@ -52,6 +59,7 @@ export class ThreadService {
    * @param messageId - Id of the message the thread hangs off.
    */
   open(chatId: string, messageId: string): void {
+    this.openRequestState.update((count) => count + 1);
     const target = this.targetState();
     if (target?.chatId === chatId && target?.messageId === messageId) {
       return;

@@ -1,14 +1,24 @@
 <header class="topbar">
-  <a class="topbar__logo" href="/main" aria-label="DABubble Startseite">
-    <img src="/img/Logo.png" alt="" />
-    <span class="topbar__logo-text">DABubble</span>
-  </a>
+  @if (backVisible()) {
+    <button class="topbar__back" type="button" (click)="back.emit()">
+      <span class="material-symbols-outlined">arrow_back</span>
+      <img class="topbar__back-logo" src="/img/Devspace_logo.png" alt="" />
+      <span class="topbar__back-text">Devspace</span>
+    </button>
+  } @else {
+    <a class="topbar__logo" href="/main" aria-label="DABubble Startseite">
+      <img src="/img/Logo.png" alt="" />
+      <span class="topbar__logo-text">DABubble</span>
+    </a>
 
-  <app-workspace-search
-    (messageSelected)="messageSelected.emit($event)"
-    (channelSelected)="channelSelected.emit($event)"
-    (directMessageRequested)="directMessageRequested.emit($event)"
-  />
+    @if (searchVisible()) {
+      <app-workspace-search
+        (messageSelected)="messageSelected.emit($event)"
+        (channelSelected)="channelSelected.emit($event)"
+        (directMessageRequested)="directMessageRequested.emit($event)"
+      />
+    }
+  }
 
   <div class="topbar__user-wrap">
     <button

@@ -13,6 +13,12 @@ import { NewMessage } from '../../chat/new-message/new-message';
 import { DirectMessageView } from '../../chat/direct-message-view/direct-message-view';
 import { DirectMessageUser } from '../../Devspace-nav/direct-message-list/direct-message-list';
 
+/** Below this width the workspace shows a single column at a time. */
+const COMPACT_VIEWPORT = '(max-width: 869px)';
+
+/** The column that owns the screen while the workspace is compact. */
+export type WorkspacePane = 'devspace' | 'chat' | 'thread';
+
 @Component({
   imports: [Topbar, DevspaceNav, ChatView, ThreadPanel, NewMessage, DirectMessageView],
   selector: 'app-shell',
@@ -39,8 +45,16 @@ export class Shell {
   protected readonly composing = signal(false);
   protected readonly activeDirectUser = signal<DirectMessageUser | null>(null);
   protected readonly devspaceNav = viewChild(DevspaceNav);
+  protected readonly compact = signal(false);
+  protected readonly pane = signal<WorkspacePane>('devspace');
   /** The thread panel is hidden while composing a new message. */
   protected readonly threadVisible = computed(() => !!this.thread.target() && !this.composing());
+  /** Only a compact layout that left the sidebar behind needs a way back. */
+  protected readonly backVisible = computed(() => this.compact() && this.pane() !== 'devspace');
+  /** Compact screens hide the sidebar by pane, not by the collapse toggle. */
+  protected readonly devspaceHidden = computed(() =>
+    this.compact() ? this.pane() !== 'devspace' : !this.devspaceOpen(),
+  );
 
   constructor() {
     const user = this.auth.currentUser();
@@ -48,6 +62,13 @@ export class Shell {
     if (user) {
       void this.chats.connect(user.uid);
     }
+
+    this.watchViewport();
+
+    effect(() => {
+      this.thread.openRequests();
+      if (this.threadVisible()) this.pane.set('thread');
+    });
 
     effect(() => {
       const activeChat = this.chats.chats().find(({ id }) => id === this.chats.activeChatId());
@@ -58,6 +79,16 @@ export class Shell {
     });
 
     this.destroyRef.onDestroy(() => this.disconnect());
+  }
+
+  /** Keeps {@link compact} in sync with the single-column breakpoint. */
+  private watchViewport(): void {
+    const query = window.matchMedia(COMPACT_VIEWPORT);
+    const sync = () => this.compact.set(query.matches);
+
+    sync();
+    query.addEventListener('change', sync);
+    this.destroyRef.onDestroy(() => query.removeEventListener('change', sync));
   }
 
   /** Restores a direct-message view selected during the initial chat load. */
@@ -121,9 +152,20 @@ export class Shell {
     this.devspaceOpen.update((value) => !value);
   }
 
-  /** Closes the thread panel. */
+  /** Closes the thread panel and hands the screen back to the chat. */
   protected closeThread(): void {
     this.thread.close();
+    this.pane.set('chat');
+  }
+
+  /** Brings the main column forward after a sidebar row was picked. */
+  protected showChatPane(): void {
+    this.pane.set('chat');
+  }
+
+  /** Returns from the chat or thread column to the sidebar. */
+  protected showDevspacePane(): void {
+    this.pane.set('devspace');
   }
 
   /**
