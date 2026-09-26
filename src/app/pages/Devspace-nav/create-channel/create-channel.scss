@@ -16,6 +16,8 @@
   gap: 20px;
   width: 100%;
   max-width: 900px;
+  /* Ohne das haelt das Flex-Mindestmass die Karte auf min-content-Breite fest. */
+  min-width: 0;
   padding: 40px;
   border-radius: 30px;
   background-color: #ffffff;
@@ -139,5 +141,47 @@
     background-color: #adb0d9;
     color: #ffffff;
     cursor: not-allowed;
+  }
+}
+
+/*
+ * Als Flex-Item hat die Karte ein automatisches Mindestmass in Hoehe ihres
+ * min-content. Wird der Inhalt breiter als der Schirm, weigert sie sich zu
+ * schrumpfen und das zentrierte Layout schiebt sie ueber beide Raender hinaus.
+ * `min-width: 0` hebt das auf, der Rest sorgt dafuer, dass der Inhalt passt.
+ */
+@media (max-width: 599px) {
+  .create-channel__backdrop {
+    padding: 16px;
+  }
+
+  .create-channel {
+    gap: 16px;
+    padding: 24px 20px;
+  }
+
+  .create-channel__title {
+    font-size: 22px;
+  }
+
+  .create-channel__close {
+    width: 32px;
+    height: 32px;
+  }
+
+  .create-channel__text,
+  .create-channel__label,
+  .create-channel__input {
+    font-size: 16px;
+  }
+
+  .create-channel__field {
+    padding: 12px 16px;
+  }
+
+  .create-channel__submit {
+    margin-top: 16px;
+    padding: 12px 24px;
+    font-size: 16px;
   }
 }
