@@ -79,7 +79,6 @@
   }
 }
 
-/* Eine ausgewaehlte Person im Eingabefeld. */
 .add-members__chip {
   display: flex;
   align-items: center;
@@ -242,11 +241,6 @@
   }
 }
 
-/*
- * Auf schmalen Schirmen richtet sich die Karte nach dem Viewport statt nach
- * 398px. Die Vorschlagsliste gibt ihre feste Breite auf und spannt stattdessen
- * ueber das Suchfeld, sonst ragt sie bei 320px rechts heraus.
- */
 @media (max-width: 449px) {
   .add-members {
     gap: 16px;

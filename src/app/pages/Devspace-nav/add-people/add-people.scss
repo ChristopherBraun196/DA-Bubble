@@ -40,7 +40,9 @@
   background: transparent;
   color: #000000;
   cursor: pointer;
-  transition: background-color 150ms ease, color 150ms ease;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
 
   &:hover {
     background-color: #eceefe;
@@ -114,7 +116,6 @@
   }
 }
 
-/* Eine ausgewaehlte Person im Eingabefeld. */
 .add-people__chip {
   display: flex;
   align-items: center;
@@ -156,7 +157,6 @@
   }
 }
 
-/* Die Vorschlaege haengen unter dem Eingabefeld. */
 .add-people__suggestions {
   position: absolute;
   top: calc(100% + 8px);

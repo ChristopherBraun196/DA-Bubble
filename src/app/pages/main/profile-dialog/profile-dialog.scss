@@ -263,11 +263,6 @@
   }
 }
 
-/*
- * Die Karte haengt mal in der Topbar, mal in einem Overlay — deshalb rechnet
- * sie hier gegen den Viewport statt gegen ihren Container. Unter 340px Breite
- * bleibt sie bei 300px stehen.
- */
 @media (max-width: 539px) {
   .profile {
     gap: 16px;

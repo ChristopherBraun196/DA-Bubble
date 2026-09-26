@@ -48,7 +48,9 @@
   background: transparent;
   color: #000000;
   cursor: pointer;
-  transition: background-color 150ms ease, color 150ms ease;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
 
   &:hover {
     background-color: #eceefe;
@@ -173,17 +175,12 @@
   }
 }
 
-/* Schmalerer Chat, schmalere Karte. */
 @media (max-width: 1099px) {
   .channel-info {
     width: 560px;
   }
 }
 
-/*
- * Ab hier verschwinden die Avatare aus dem Chat-Header, deshalb uebernimmt die
- * Karte die Mitgliederliste. Darueber bleibt sie der Mitglieder-Card ueberlassen.
- */
 .channel-info__members {
   display: none;
 }

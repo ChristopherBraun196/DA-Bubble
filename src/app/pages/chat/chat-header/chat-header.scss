@@ -64,17 +64,11 @@
   right: 0;
   z-index: 11;
 
-  /* Die Channel-Card haengt am linken Rand unter dem Channel-Button. */
   &--left {
     right: auto;
     left: 0;
   }
 
-  /*
-   * Einspaltig spannt die Channel-Card ueber die volle Breite. Erst dadurch hat
-   * der absolut positionierte Kasten eine feste Breite, an der sich das
-   * `max-width: 100%` der Karte darin ueberhaupt ausrichten kann.
-   */
   @media (max-width: 869px) {
     &--left {
       right: 0;
@@ -116,7 +110,6 @@
   border-radius: 50%;
   object-fit: cover;
 
-  /* Die Avatare ueberlappen sich leicht. */
   & + & {
     margin-left: -12px;
   }
@@ -149,7 +142,6 @@
   }
 }
 
-/* Die Mitglieder stehen hier unten in der Channel-Card statt oben im Header. */
 @media (max-width: 599px) {
   .chat-header__avatars {
     display: none;
