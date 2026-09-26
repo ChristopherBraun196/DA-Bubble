@@ -1,9 +1,13 @@
 <main class="avatar-shell">
-  <app-header />
+  <app-header [centered]="true" />
 
   @if (registration(); as registrationData) {
     <section class="avatar-content">
-      <article class="avatar-card" [attr.aria-busy]="registrationPending()">
+      <article
+        class="avatar-card"
+        [class.avatar-card--with-error]="registrationError()"
+        [attr.aria-busy]="registrationPending()"
+      >
         <a class="avatar-card__back" [routerLink]="['/register']" aria-label="Zurück">
           <span aria-hidden="true"></span>
         </a>
@@ -19,7 +23,7 @@
 
           <div class="avatar-profile__selection">
             <h2>{{ registrationData.displayName }}</h2>
-            <p>Aus der Liste wählen</p>
+            <p>Choose your avatar....</p>
 
             <div class="avatar-list" aria-label="Avatar auswählen">
               @for (avatarPath of avatarPaths; track avatarPath; let avatarNumber = $index) {

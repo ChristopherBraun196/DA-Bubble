@@ -1,4 +1,5 @@
 @use '../../../../styles/variables' as variables;
+@use 'register-mobile';
 
 :host {
   display: block;
@@ -40,19 +41,16 @@
 
   &__back {
     position: absolute;
+    z-index: 3;
     top: 45px;
     left: 32px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    display: grid;
+    place-items: center;
     width: 40px;
     height: 40px;
     border-radius: 50%;
     color: variables.$black;
     text-decoration: none;
-    transition:
-      color 100ms ease-in,
-      background-color 100ms ease-in;
 
     span {
       display: block;
@@ -60,13 +58,13 @@
       height: 24px;
       background-color: currentColor;
       mask: url('/icons/arrow-back.svg') center / 24px 24px no-repeat;
+      transform: translateY(-2px);
+      pointer-events: none;
     }
 
-    &:hover,
     &:focus-visible {
-      background-color: variables.$background;
-      color: variables.$purple-primary;
-      outline: none;
+      outline: 2px solid variables.$purple-primary;
+      outline-offset: 2px;
     }
   }
 
@@ -76,6 +74,7 @@
     left: 67px;
     width: 486px;
     text-align: center;
+    pointer-events: none;
 
     h1 {
       width: 329px;
@@ -333,66 +332,4 @@
   }
 }
 
-@media (max-width: 700px) {
-  .register-shell {
-    min-height: 900px;
-    overflow-y: auto;
-  }
-
-  .register-content {
-    align-items: flex-start;
-    padding: 132px 16px 100px;
-  }
-
-  .register-card {
-    width: 100%;
-    max-width: 606px;
-    transform: none;
-
-    &__heading {
-      left: 50%;
-      width: calc(100% - 96px);
-      transform: translateX(-50%);
-
-      h1 {
-        width: 100%;
-        margin-left: 0;
-        font-size: 32px;
-        line-height: 40px;
-      }
-
-      p {
-        width: 100%;
-        margin-top: 24px;
-        font-size: 18px;
-        line-height: 22px;
-      }
-    }
-
-    &__fields {
-      inset-inline: 24px;
-    }
-
-    &__submit {
-      right: 24px;
-    }
-  }
-
-  .register-field {
-    width: 100%;
-  }
-
-  .privacy-consent {
-    right: 24px;
-    left: 24px;
-
-    &__text {
-      flex-wrap: wrap;
-      white-space: normal;
-    }
-  }
-
-  .register-footer {
-    bottom: 24px;
-  }
-}
+@include register-mobile.styles;

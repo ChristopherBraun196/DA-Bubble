@@ -51,6 +51,7 @@
     font-weight: 700;
     line-height: 55px;
     text-align: center;
+    pointer-events: none;
   }
 
   &__back {
@@ -264,61 +265,110 @@
     transform 100ms ease-out;
 }
 
-@media (max-width: 700px) {
+@media screen and (min-width: 320px) and (max-width: 768px) {
   .avatar-shell {
-    min-height: 900px;
+    min-height: max(100svh, 932px);
     overflow-y: auto;
+
+    > app-header {
+      top: 87px;
+    }
   }
 
   .avatar-content {
     align-items: flex-start;
-    padding: 132px 16px 100px;
+    padding: 207px 16px 205px;
   }
 
   .avatar-card {
     width: 100%;
-    max-width: 606px;
+    max-width: 398px;
+    height: 520px;
     transform: none;
 
     h1 {
-      left: 72px;
-      width: calc(100% - 96px);
+      top: 26px;
+      left: 50%;
+      width: 218px;
       font-size: 32px;
       line-height: 40px;
+      transform: translateX(-50%);
+    }
+
+    &__back {
+      top: 20px;
+      left: 22px;
     }
 
     &__submit {
-      right: 24px;
+      top: 445px;
+      right: 21px;
+    }
+
+    &__error {
+      top: 430px;
+      right: 21px;
+      left: 21px;
+      width: auto;
+      overflow-wrap: anywhere;
+    }
+
+    &--with-error {
+      height: 560px;
+
+      .avatar-card__submit {
+        top: 491px;
+      }
     }
   }
 
   .avatar-profile {
-    right: 24px;
-    left: 24px;
+    top: 126px;
+    right: 21px;
+    left: 21px;
+    gap: 24px;
     width: auto;
 
-    &__selection p {
-      text-align: center;
+    &__preview {
+      width: 120px;
+      height: 120px;
+    }
+
+    &__selection {
+      h2 {
+        font-size: 32px;
+      }
+
+      p {
+        margin: 8px 0 16px;
+        text-align: left;
+      }
     }
   }
 
   .avatar-list {
-    justify-content: center;
+    align-items: flex-start;
+    gap: 4px;
     width: 100%;
+    height: 56px;
   }
 
   .avatar-option {
-    width: min(72px, calc((100vw - 80px) / 6));
-    height: min(72px, calc((100vw - 80px) / 6));
+    flex: 0 0 calc((100% - 20px) / 6);
+    width: calc((100% - 20px) / 6);
+    height: auto;
+    aspect-ratio: 1;
+    padding: 4px;
 
     img {
       width: 100%;
       height: 100%;
+      object-fit: cover;
     }
   }
 
   .avatar-footer {
-    bottom: 24px;
+    bottom: 31px;
   }
 
   .account-created-toast {
@@ -327,5 +377,19 @@
     left: 16px;
     justify-content: center;
     text-align: center;
+  }
+}
+
+@media screen and (min-width: 320px) and (max-width: 360px) {
+  .avatar-card {
+    h1 {
+      width: 200px;
+      font-size: 28px;
+      line-height: 36px;
+    }
+
+    &__back {
+      left: 8px;
+    }
   }
 }

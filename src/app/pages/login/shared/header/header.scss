@@ -25,27 +25,6 @@
   height: 24px;
 }
 
-// @media (max-width: 700px) {
-//   .auth-header {
-//     justify-content: center;
-//     padding: 24px;
-//   }
-
-//   .auth-header__brand {
-//     gap: 12px;
-//   }
-
-//   .auth-header__icon {
-//     width: 56px;
-//     height: 56px;
-//   }
-
-//   .auth-header__wordmark {
-//     width: 136px;
-//     height: auto;
-//   }
-// }
-
 @media screen and (min-width: 320px) and (max-width: 768px) {
   .auth-header {
     justify-content: flex-start;
@@ -65,5 +44,24 @@
   .auth-header__wordmark {
     width: 100px;
     height: auto;
+  }
+
+  .auth-header--centered {
+    justify-content: center;
+    padding: 0;
+    background-color: transparent;
+
+    .auth-header__brand {
+      gap: 13px;
+    }
+
+    .auth-header__icon {
+      width: 56px;
+      height: 56px;
+    }
+
+    .auth-header__wordmark {
+      width: 135px;
+    }
   }
 }

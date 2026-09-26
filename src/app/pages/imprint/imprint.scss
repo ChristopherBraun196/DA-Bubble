@@ -72,7 +72,7 @@ section {
       padding-left: 8px;
 
       @media screen and (min-width: 320px) and (max-width: 768px) {
-        padding-left: 4px;
+        padding-left: 0;
         display: block;
       }
     }
@@ -89,6 +89,10 @@ section {
     padding-left: 24px;
     font-size: 32px;
     color: variables.$purple-primary;
+
+    @media screen and (min-width: 320px) and (max-width: 768px) {
+      padding-left: 14px;
+    }
   }
 
   h2 + p {
@@ -96,6 +100,7 @@ section {
     padding-bottom: 48px;
 
     @media screen and (min-width: 320px) and (max-width: 768px) {
+      padding-left: 14px;
       line-height: 1.5;
       overflow-wrap: anywhere;
       font-size: 16px;

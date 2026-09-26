@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -8,4 +8,6 @@ import { RouterLink } from '@angular/router';
   templateUrl: './header.html',
 })
 /** Logo header shared by the login flow and the legal pages. */
-export class Header {}
+export class Header {
+  readonly centered = input(false);
+}

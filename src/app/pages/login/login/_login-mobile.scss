@@ -1,0 +1,145 @@
+@use '../../../../styles/variables' as variables;
+
+@mixin styles {
+  @media screen and (min-width: 320px) and (max-width: 768px) {
+    .login-shell {
+      min-height: max(100svh, 932px);
+      overflow-y: auto;
+
+      &__topbar {
+        justify-content: center;
+        padding: 72px 16px 0;
+      }
+
+      &__brand {
+        gap: 13px;
+      }
+
+      &__icon {
+        width: 56px;
+        height: 56px;
+      }
+
+      &__wordmark {
+        width: 135px;
+        height: auto;
+      }
+
+      &__auth--top {
+        display: none;
+      }
+
+      &__auth.login-shell__auth--bottom {
+        position: absolute;
+        top: 744px;
+        left: 50%;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        margin: 0;
+        transform: translateX(-50%);
+
+        a {
+          min-width: 165px;
+          padding: 7px 18px;
+          border-color: variables.$purple-secondary;
+          color: variables.$purple-primary;
+          font-weight: 700;
+          text-align: center;
+          white-space: nowrap;
+        }
+      }
+
+      &__footer {
+        bottom: 30px;
+      }
+
+      .login-formfield {
+        position: static;
+        margin-top: 32px;
+        padding-inline: 16px;
+
+        form {
+          width: 100%;
+          max-width: 398px;
+          height: 552px;
+          padding-inline: 20px;
+        }
+
+        h1 {
+          width: 100%;
+          margin-top: 35px;
+          font-size: 32px;
+          line-height: 38px;
+        }
+
+        p {
+          width: 100%;
+          height: auto;
+          margin-top: 16px;
+          font-size: 18px;
+          line-height: 22px;
+        }
+
+        .input-pill {
+          width: 100%;
+          height: 50px;
+          margin-top: 15px;
+
+          &__icon {
+            left: 34px;
+          }
+        }
+
+        .error-slot + .input-pill {
+          margin-top: 10px;
+        }
+
+        .error-slot {
+          position: static;
+          width: 100%;
+          height: 20px;
+        }
+
+        form > a {
+          height: 30px;
+          margin-top: 0;
+        }
+
+        .divider {
+          width: 100%;
+          margin-top: 20px;
+        }
+
+        .btn-google {
+          width: 100%;
+          height: 50px;
+          margin-top: 20px;
+        }
+
+        .actions {
+          gap: 20px;
+          width: 310px;
+          margin-top: 20px;
+        }
+      }
+    }
+  }
+
+  @media screen and (min-width: 320px) and (max-width: 360px) {
+    .login-shell .login-formfield {
+      .actions {
+        gap: 8px;
+        width: 100%;
+      }
+
+      .btn-primary,
+      .btn-secondary {
+        width: auto;
+        padding-inline: 10px;
+        font-size: 16px;
+        flex: 1;
+      }
+    }
+  }
+}
