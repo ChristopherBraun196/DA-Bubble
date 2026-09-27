@@ -1,4 +1,7 @@
+import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { AuthService } from '../../../core/services/auth.service';
 import { ProfileDialog } from './profile-dialog';
 
 describe('ProfileDialog', () => {
@@ -8,6 +11,19 @@ describe('ProfileDialog', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ProfileDialog],
+      providers: [
+        {
+          provide: AuthService,
+          useValue: {
+            currentUser: signal({ uid: 'user-1', isAnonymous: false }),
+            displayName: signal('Test User'),
+            photoURL: signal('/img/Profile.png'),
+            email: signal('test@example.com'),
+            updateDisplayName: async () => undefined,
+            updatePhotoURL: async () => undefined,
+          },
+        },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ProfileDialog);
