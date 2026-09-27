@@ -25,10 +25,16 @@ export class ProfileDialog {
   readonly closed = output<void>();
   readonly messageRequested = output<AppUser>();
 
-  /** Whether the dialog shows the signed-in user, which unlocks editing. */
+  /** Whether the dialog shows the signed-in user. */
   protected readonly isOwnProfile = computed(
     () => !this.user() || this.user()?.uid === this.auth.currentUser()?.uid,
   );
+
+  /** Guests may view their own profile but not change it. */
+  protected readonly canEdit = computed(
+    () => this.isOwnProfile() && this.auth.currentUser()?.isAnonymous === false,
+  );
+
   protected readonly name = computed(() =>
     this.isOwnProfile() ? this.auth.displayName() : this.user()?.displayName || '',
   );

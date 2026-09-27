@@ -59,7 +59,7 @@
   } @else {
     <div class="profile__row">
       <p class="profile__name">{{ name() }}</p>
-      @if (isOwnProfile()) {
+      @if (canEdit()) {
         <button class="profile__edit" type="button" (click)="startEdit()">Bearbeiten</button>
       }
     </div>
