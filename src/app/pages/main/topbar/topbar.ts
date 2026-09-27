@@ -9,7 +9,7 @@ import { GuestMembershipService } from '../../../core/services/guest-membership.
 import { AvatarFallback } from '../../../shared/avatar-fallback/avatar-fallback';
 import { ProfileDialog } from '../profile-dialog/profile-dialog';
 
-/** Es ist immer hoechstens eine Card offen. */
+/** At most one card is open at a time. */
 export type TopbarPanel = 'none' | 'menu' | 'profile';
 
 @Component({

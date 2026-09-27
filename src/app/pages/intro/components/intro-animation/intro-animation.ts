@@ -49,7 +49,6 @@ export class IntroAnimation implements OnDestroy {
   }
 
   /** Starts the Figma-defined logo and page transition sequence. */
-  /** Schedules the phase transitions of the animation. */
   private startAnimation(): void {
     this.timerIds.push(
       window.setTimeout((): void => this.phase.set('positioned'), LOGO_POSITION_DELAY),

@@ -62,14 +62,22 @@ export class Shell {
     if (user) {
       void this.chats.connect(user.uid);
     }
-
     this.watchViewport();
+    this.followThreadRequests();
+    this.restoreActiveDirectChat();
+    this.destroyRef.onDestroy(() => this.disconnect());
+  }
 
+  /** Switches to the thread pane on small screens whenever a thread is opened. */
+  private followThreadRequests(): void {
     effect(() => {
       this.thread.openRequests();
       if (this.threadVisible()) this.pane.set('thread');
     });
+  }
 
+  /** Reopens the direct message view after a reload when a direct chat is active. */
+  private restoreActiveDirectChat(): void {
     effect(() => {
       const activeChat = this.chats.chats().find(({ id }) => id === this.chats.activeChatId());
       const version = ++this.directRestoreVersion;
@@ -77,8 +85,6 @@ export class Shell {
         void this.restoreDirectMessage(activeChat.id, activeChat.memberIds, version);
       }
     });
-
-    this.destroyRef.onDestroy(() => this.disconnect());
   }
 
   /** Keeps {@link compact} in sync with the single-column breakpoint. */

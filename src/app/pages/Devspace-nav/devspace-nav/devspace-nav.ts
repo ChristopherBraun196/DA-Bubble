@@ -6,7 +6,7 @@ import { WorkspaceSearch } from '../../main/workspace-search/workspace-search';
 import { ChannelList } from '../channel-list/channel-list';
 import { DirectMessageList, DirectMessageUser } from '../direct-message-list/direct-message-list';
 
-/** Was gerade im Chat offen ist: entweder ein Channel oder eine Direktnachricht. */
+/** What is currently open in the chat: either a channel or a direct message. */
 export type DevspaceSelection = { kind: 'channel'; id: string } | { kind: 'user'; id: string };
 
 @Component({

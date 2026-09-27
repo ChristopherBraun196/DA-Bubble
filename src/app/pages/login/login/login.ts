@@ -5,6 +5,17 @@ import { FirebaseError } from 'firebase/app';
 
 import { AuthService } from '../../../core/services/auth.service';
 
+/** Messages for the Firebase error codes the login can run into. */
+const LOGIN_ERROR_MESSAGES: Record<string, string> = {
+  'auth/network-request-failed':
+    'Keine Verbindung zu Firebase. Bitte prüfe deine Internetverbindung.',
+  'auth/popup-closed-by-user': 'Die Google-Anmeldung wurde abgebrochen.',
+  'auth/popup-blocked': 'Das Google-Anmeldefenster wurde vom Browser blockiert.',
+  'auth/operation-not-allowed': 'Diese Anmeldemethode ist in Firebase nicht freigeschaltet.',
+  'auth/admin-restricted-operation': 'Diese Anmeldemethode ist in Firebase nicht freigeschaltet.',
+  'permission-denied': 'Firebase hat den Datenbankzugriff abgelehnt.',
+};
+
 @Component({
   imports: [RouterLink, ReactiveFormsModule],
   selector: 'app-login',
@@ -75,19 +86,26 @@ export class Login {
     }
 
     this.loginPending.set(true);
-    this.loginError.set(false);
-    this.loginErrorMessage.set('');
-
+    this.clearLoginError();
     try {
       await action();
       await this.router.navigateByUrl('/main', { replaceUrl: true });
     } catch (error) {
-      console.error('Firebase login failed:', error);
-      this.loginError.set(true);
-      this.loginErrorMessage.set(this.resolveLoginErrorMessage(error));
+      this.showLoginError(error);
     } finally {
       this.loginPending.set(false);
     }
+  }
+
+  /**
+   * Logs a failed sign-in and shows the matching message below the form.
+   *
+   * @param error - The caught error.
+   */
+  private showLoginError(error: unknown): void {
+    console.error('Firebase login failed:', error);
+    this.loginError.set(true);
+    this.loginErrorMessage.set(this.resolveLoginErrorMessage(error));
   }
 
   /**
@@ -101,20 +119,9 @@ export class Login {
       return 'Die Anmeldung ist fehlgeschlagen. Bitte versuche es erneut.';
     }
 
-    switch (error.code) {
-      case 'auth/network-request-failed':
-        return 'Keine Verbindung zu Firebase. Bitte prüfe deine Internetverbindung.';
-      case 'auth/popup-closed-by-user':
-        return 'Die Google-Anmeldung wurde abgebrochen.';
-      case 'auth/popup-blocked':
-        return 'Das Google-Anmeldefenster wurde vom Browser blockiert.';
-      case 'auth/operation-not-allowed':
-      case 'auth/admin-restricted-operation':
-        return 'Diese Anmeldemethode ist in Firebase nicht freigeschaltet.';
-      case 'permission-denied':
-        return 'Firebase hat den Datenbankzugriff abgelehnt.';
-      default:
-        return 'Anmeldung fehlgeschlagen. Bitte überprüfe deine Eingaben.';
-    }
+    return (
+      LOGIN_ERROR_MESSAGES[error.code] ??
+      'Anmeldung fehlgeschlagen. Bitte überprüfe deine Eingaben.'
+    );
   }
 }

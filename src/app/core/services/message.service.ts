@@ -150,7 +150,6 @@ export class MessageService {
     await this.persistMessage(chatId, messageText, user);
   }
 
-  /** Legt eine Thread-Antwort an und zaehlt sie an der Ursprungsnachricht mit. */
   /**
    * Sends a reply inside a thread and updates the parent's reply counter.
    *

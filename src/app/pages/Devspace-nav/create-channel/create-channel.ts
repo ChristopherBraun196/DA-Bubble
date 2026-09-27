@@ -32,14 +32,14 @@ export class CreateChannel {
   protected readonly creating = signal(false);
   protected readonly createError = signal('');
 
-  /** Die ID des gerade angelegten Channels, in den Schritt 2 die Mitglieder eintraegt. */
+  /** Id of the channel just created; step 2 adds the members to it. */
   protected readonly createdChannelId = signal('');
 
-  /** Der Channel, der beim Oeffnen aktiv war - Quelle fuer "Alle Mitglieder von ...". */
+  /** The channel that was active when the dialog opened, source for "All members of …". */
   protected readonly sourceChannelName: string;
   protected readonly sourceMemberIds: string[];
 
-  /** Channel-Name ist Pflicht - der Button bleibt bis dahin gesperrt. */
+  /** The channel name is required; the button stays disabled until it is set. */
   protected readonly canCreate = computed(() => this.channelName().trim().length > 0);
 
   constructor() {
@@ -84,7 +84,15 @@ export class CreateChannel {
       this.createError.set('Es gibt bereits einen Channel mit diesem Namen.');
       return;
     }
+    await this.submitChannel(userId);
+  }
 
+  /**
+   * Creates the channel and shows an error when it fails.
+   *
+   * @param userId - The creator's id.
+   */
+  private async submitChannel(userId: string): Promise<void> {
     this.creating.set(true);
     this.createError.set('');
 

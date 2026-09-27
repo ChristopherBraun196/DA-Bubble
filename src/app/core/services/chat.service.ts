@@ -79,7 +79,6 @@ export class ChatService {
     }
   }
 
-  // Checkt das kein Channel doppelt angelegt werden kann.
   /**
    * Checks whether a channel with the given name already exists.
    *
@@ -101,7 +100,6 @@ export class ChatService {
     );
   }
 
-  /** Legt den Channel an und macht ihn zum aktiven Chat. Gibt die neue Dokument-ID zurueck. */
   /**
    * Creates a channel and makes it the active chat.
    *

@@ -26,7 +26,7 @@ export interface MessageReactionToggle {
   emoji: ReactionEmoji;
 }
 
-/** Ab diesem Abstand zum Ende gilt die Liste als "unten" und folgt neuen Nachrichten. */
+/** Distance from the end within which the list counts as "at the bottom" and follows new messages. */
 const BOTTOM_THRESHOLD = 120;
 
 type MessageListEntry =
@@ -87,7 +87,6 @@ export class MessageList {
     this.destroyRef.onDestroy(() => this.detachScrollListener());
   }
 
-  /** Springt zum Suchtreffer, sonst bleibt die Liste am unteren Ende. */
   /** Scrolls to the newest message or to a selected search hit. */
   private updateScrollPosition(): void {
     const messages = this.messages();

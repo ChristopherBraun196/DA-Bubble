@@ -97,9 +97,8 @@ export class DirectMessageList {
     }
   }
 
-  /** Gastkonten und der eigene Account stehen nicht in der Liste. */
   /**
-   * Maps loaded users into list rows, marking the signed-in user.
+   * Maps loaded users into list rows, leaving out the signed-in user and guests.
    *
    * @param users - The resolved conversation partners.
    * @returns The rows to render.

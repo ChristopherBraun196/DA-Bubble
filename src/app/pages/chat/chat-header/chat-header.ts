@@ -19,7 +19,6 @@ import { AddMembers } from '../add-members/add-members';
 import { ChannelInfo } from '../channel-info/channel-info';
 import { MembersDialog } from '../members-dialog/members-dialog';
 
-/** Es ist immer hoechstens eine Card offen. */
 /** Which popover the header currently shows. */
 export type ChatHeaderDialog = 'none' | 'channel' | 'members' | 'add';
 
@@ -70,7 +69,6 @@ export class ChatHeader {
     this.dialog.update((current) => (current === 'members' ? 'none' : 'members'));
   }
 
-  /** Wird aus der Mitglieder-Card und ueber den Plus-Button aufgerufen. */
   /** Switches to the dialog for adding members. */
   protected openAdd(): void {
     this.selectedMember.set(null);

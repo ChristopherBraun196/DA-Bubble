@@ -51,13 +51,15 @@ export class PasswordReset {
       return;
     }
 
-    if (this.resetPending()) {
-      return;
+    if (!this.resetPending()) {
+      await this.sendResetMail();
     }
+  }
 
+  /** Requests the reset email and reports success or failure on the form. */
+  private async sendResetMail(): Promise<void> {
     this.resetPending.set(true);
-    this.resetSent.set(false);
-    this.submitError.set('');
+    this.clearSubmitState();
 
     try {
       await this.auth.sendPasswordReset(this.form.controls.email.getRawValue().trim());

@@ -131,7 +131,6 @@ export class AddPeople {
 
     this.adding.set(true);
     this.addError.set('');
-
     try {
       await this.chats.addMembers(this.chatId(), this.memberIdsToAdd());
       this.closed.emit();

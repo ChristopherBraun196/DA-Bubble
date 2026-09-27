@@ -8,6 +8,9 @@ import { ChatService } from '../../../core/services/chat.service';
 import { UserService } from '../../../core/services/user.service';
 import { UserListItem } from '../../Devspace-nav/user-list-item/user-list-item';
 
+/** The channel fields that can be edited from the info dialog. */
+type ChannelChanges = { name?: string; description?: string };
+
 @Component({
   imports: [UserListItem],
   selector: 'app-channel-info',
@@ -42,11 +45,11 @@ export class ChannelInfo {
     this.chats.chats().find(({ id }) => id === this.chats.activeChatId()),
   );
 
-  /** Kommt direkt aus Firestore - nach dem Speichern aktualisiert der Snapshot die Anzeige. */
+  /** Read straight from Firestore; the snapshot refreshes the view after saving. */
   protected readonly name = computed(() => this.activeChat()?.name || this.channelName());
   protected readonly description = computed(() => this.activeChat()?.description || '');
 
-  /** Wird aus der createdBy-UID des Channels nachgeladen. */
+  /** Resolved from the channel's createdBy uid. */
   protected readonly createdBy = signal('');
 
   protected readonly editingName = signal(false);
@@ -56,7 +59,7 @@ export class ChannelInfo {
   protected readonly leaving = signal(false);
   protected readonly saveError = signal('');
 
-  /** Die Entwuerfe starten leer, der aktuelle Wert steht als Platzhalter im Feld. */
+  /** Drafts start empty; the current value is shown as the placeholder. */
   protected readonly nameDraft = signal('');
   protected readonly descriptionDraft = signal('');
 
@@ -102,14 +105,28 @@ export class ChannelInfo {
       return;
     }
 
-    if (this.chats.channelNameExists(name, this.activeChat()?.id)) {
-      this.saveError.set('Es gibt bereits einen Channel mit diesem Namen.');
+    if (this.rejectDuplicateName(name)) {
       return;
     }
 
     if (await this.updateChannel({ name })) {
       this.editingName.set(false);
     }
+  }
+
+  /**
+   * Shows an error when another channel already uses the name.
+   *
+   * @param name - The name the user wants to save.
+   * @returns True when the name is taken and saving should stop.
+   */
+  private rejectDuplicateName(name: string): boolean {
+    const taken = this.chats.channelNameExists(name, this.activeChat()?.id);
+
+    if (taken) {
+      this.saveError.set('Es gibt bereits einen Channel mit diesem Namen.');
+    }
+    return taken;
   }
 
   /** Switches the description into edit mode with an empty draft. */
@@ -139,13 +156,23 @@ export class ChannelInfo {
    * @param changes - The fields to overwrite.
    * @returns True on success, false when the write failed.
    */
-  private async updateChannel(changes: { name?: string; description?: string }): Promise<boolean> {
+  private async updateChannel(changes: ChannelChanges): Promise<boolean> {
     const chatId = this.activeChat()?.id;
 
     if (!chatId || this.saving()) {
       return false;
     }
+    return this.persistChannel(chatId, changes);
+  }
 
+  /**
+   * Writes the changes and reports whether it worked.
+   *
+   * @param chatId - Id of the channel.
+   * @param changes - The fields to overwrite.
+   * @returns True on success, false when the write failed.
+   */
+  private async persistChannel(chatId: string, changes: ChannelChanges): Promise<boolean> {
     this.saving.set(true);
     this.saveError.set('');
 

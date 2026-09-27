@@ -5,6 +5,10 @@ import { AuthService } from '../../../core/services/auth.service';
 import { AvatarFallback } from '../../../shared/avatar-fallback/avatar-fallback';
 import { AvatarPicker } from '../../../shared/avatar-picker/avatar-picker';
 
+/** Shown when saving the name or avatar fails. */
+const SAVE_ERROR_MESSAGE =
+  'Die Änderungen konnten nicht gespeichert werden. Versuch es noch einmal.';
+
 @Component({
   imports: [AvatarFallback, AvatarPicker],
   selector: 'app-profile-dialog',
@@ -50,7 +54,7 @@ export class ProfileDialog {
   protected readonly saveError = signal('');
   protected readonly avatarDraft = signal('');
 
-  /** Startet leer, der aktuelle Name steht als Platzhalter im Feld. */
+  /** Starts empty; the current name is shown as the placeholder. */
   protected readonly nameDraft = signal('');
 
   /** Switches the name into edit mode with an empty draft. */
@@ -93,14 +97,11 @@ export class ProfileDialog {
 
     this.saving.set(true);
     this.saveError.set('');
-
     try {
       await this.persistChanges();
       this.editing.set(false);
     } catch {
-      this.saveError.set(
-        'Die Änderungen konnten nicht gespeichert werden. Versuch es noch einmal.',
-      );
+      this.saveError.set(SAVE_ERROR_MESSAGE);
     } finally {
       this.saving.set(false);
     }

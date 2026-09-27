@@ -113,15 +113,21 @@ export class AddMembers {
     if (!this.canAdd() || this.adding() || !chatId) {
       return;
     }
+    await this.submitMembers(chatId);
+  }
 
+  /**
+   * Writes the selected people into the channel and closes the dialog.
+   *
+   * @param chatId - Id of the channel to add them to.
+   */
+  private async submitMembers(chatId: string): Promise<void> {
+    const memberIds = this.selected().map(({ uid }) => uid);
     this.adding.set(true);
     this.addError.set('');
 
     try {
-      await this.chats.addMembers(
-        chatId,
-        this.selected().map(({ uid }) => uid),
-      );
+      await this.chats.addMembers(chatId, memberIds);
       this.closed.emit();
     } catch {
       this.addError.set('Die Mitglieder konnten nicht hinzugefügt werden. Versuch es noch einmal.');

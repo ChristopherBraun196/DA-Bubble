@@ -10,7 +10,6 @@ import {
 import { FirebaseService } from '../firebase/firebase.service';
 import { MessageSearchResult } from '../models/message-search.model';
 
-/** Laedt die Channel-Verlaeufe nur waehrend einer Textsuche, nicht bei jedem Tastendruck. */
 @Injectable()
 /**
  * Keeps a searchable copy of the most recent messages across all chats.

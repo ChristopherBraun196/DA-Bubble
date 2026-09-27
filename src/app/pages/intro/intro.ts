@@ -40,17 +40,14 @@ export class Intro implements OnDestroy {
   }
 
   /** Opens the login shell after the intro transition has completed. */
-  /** Navigates to the login screen, guarding against a double trigger. */
   protected async openLogin(): Promise<void> {
     if (this.navigationStarted) {
       return;
     }
 
     this.navigationStarted = true;
-
     try {
       const navigationSucceeded = await this.router.navigateByUrl('/login');
-
       if (!navigationSucceeded && this.router.url !== '/login') {
         this.forceLoginNavigation();
       }

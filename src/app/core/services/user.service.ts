@@ -145,29 +145,35 @@ export class UserService {
     const userRef = doc(this.firebase.firestore, 'users', authUser.uid);
     const snapshot = await getDoc(userRef);
     const existingUser = snapshot.exists() ? (snapshot.data() as Partial<AppUser>) : null;
-    const displayName = this.resolveDisplayName(authUser, existingUser);
-    const onboardingCompleted = this.resolveOnboardingStatus(authUser, existingUser);
+    const data = this.createUserDocument(authUser, existingUser);
 
-    await setDoc(
-      userRef,
-      {
-        uid: authUser.uid,
-        displayName,
-        nameNormalized: displayName.toLocaleLowerCase('de-DE'),
-        email: authUser.email,
-        photoURL: authUser.photoURL || existingUser?.photoURL || '/img/Profile_Guest.png',
-        isAnonymous: authUser.isAnonymous,
-        onboardingCompleted,
-        lastSeenAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-        ...(snapshot.exists()
-          ? {}
-          : {
-              createdAt: serverTimestamp(),
-            }),
-      },
-      { merge: true },
-    );
+    if (!snapshot.exists()) {
+      data['createdAt'] = serverTimestamp();
+    }
+    await setDoc(userRef, data, { merge: true });
+  }
+
+  /**
+   * Assembles the user document mirrored from Firebase Auth.
+   *
+   * @param authUser - The user returned by Firebase Auth.
+   * @param existingUser - The stored document, when one exists.
+   * @returns The fields to write.
+   */
+  private createUserDocument(authUser: User, existingUser: Partial<AppUser> | null): DocumentData {
+    const displayName = this.resolveDisplayName(authUser, existingUser);
+
+    return {
+      uid: authUser.uid,
+      displayName,
+      nameNormalized: displayName.toLocaleLowerCase('de-DE'),
+      email: authUser.email,
+      photoURL: authUser.photoURL || existingUser?.photoURL || '/img/Profile_Guest.png',
+      isAnonymous: authUser.isAnonymous,
+      onboardingCompleted: this.resolveOnboardingStatus(authUser, existingUser),
+      lastSeenAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    };
   }
 
   /**
@@ -178,21 +184,15 @@ export class UserService {
    * @returns The display name to persist.
    */
   private resolveDisplayName(authUser: User, existingUser: Partial<AppUser> | null): string {
-    const authDisplayName = authUser.displayName?.trim();
+    const guestName = authUser.isAnonymous ? 'Gast' : '';
 
-    if (authDisplayName) {
-      return authDisplayName;
-    }
-
-    if (existingUser?.displayName) {
-      return existingUser.displayName;
-    }
-
-    if (authUser.isAnonymous) {
-      return 'Gast';
-    }
-
-    return authUser.email?.split('@')[0] || 'Nutzer';
+    return (
+      authUser.displayName?.trim() ||
+      existingUser?.displayName ||
+      guestName ||
+      authUser.email?.split('@')[0] ||
+      'Nutzer'
+    );
   }
 
   /**
