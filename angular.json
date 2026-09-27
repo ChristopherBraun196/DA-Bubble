@@ -28,6 +28,11 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "public/icons",
+                "output": "/assets/icons"
               }
             ],
             "styles": ["src/styles.scss"],

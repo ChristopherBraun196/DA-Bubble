@@ -5,6 +5,7 @@
     "ng": "ng",
     "start": "ng serve -o",
     "build": "ng build",
+    "postbuild": "node scripts/prepare-static-routes.mjs",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:Da-Bubble": "node dist/Da-Bubble/server/server.mjs"

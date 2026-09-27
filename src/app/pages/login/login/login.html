@@ -27,7 +27,7 @@
         class="input-pill"
         [class.input-pill--error]="form.get('email')?.invalid && form.get('email')?.touched"
       >
-        <img class="input-pill__icon input-pill__icon--email" src="/icons/mail.svg" alt="" />
+        <img class="input-pill__icon input-pill__icon--email" src="/assets/icons/mail.svg" alt="" />
         <input
           formControlName="email"
           type="email"
@@ -50,7 +50,7 @@
           (form.get('password')?.invalid && form.get('password')?.touched) || loginError()
         "
       >
-        <img class="input-pill__icon input-pill__icon--password" src="/icons/lock.svg" alt="" />
+        <img class="input-pill__icon input-pill__icon--password" src="/assets/icons/lock.svg" alt="" />
         <input
           formControlName="password"
           type="password"
@@ -79,7 +79,7 @@
         [disabled]="loginPending()"
         (click)="loginWithGoogle()"
       >
-        <img src="icons/google.svg" alt="" />
+        <img src="/assets/icons/google.svg" alt="" />
         Anmelden mit Google
       </button>
 
