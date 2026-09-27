@@ -1,59 +1,93 @@
-# DaBubble
+# DABubble
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.0.8.
+**Echtzeit-Chat mit Angular 22 und Firebase**
 
-## Development server
+![Angular](https://img.shields.io/badge/Angular-22-DD0031?logo=angular&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)
+![Firebase](https://img.shields.io/badge/Firebase-Auth%20%26%20Firestore-FFCA28?logo=firebase&logoColor=black)
+![SCSS](https://img.shields.io/badge/SCSS-CC6699?logo=sass&logoColor=white)
 
-To start a local development server, run:
+**Live-Demo** · folgt in Kürze
+
+Eine Chat-Anwendung im Stil von Slack mit Channels, Direktnachrichten, Threads und
+Emoji-Reaktionen. Entstanden als Gruppenprojekt an der Developer Akademie.
+
+## Features
+
+- **Konto & Anmeldung**: Registrierung mit Avatar-Auswahl, Login per E-Mail, Google oder als Gast, Passwort zurücksetzen
+- **Channels**: anlegen, umbenennen, beschreiben, Mitglieder hinzufügen oder verlassen
+- **Direktnachrichten**: private Unterhaltungen mit jedem Mitglied
+- **Threads**: Antworten auf einzelne Nachrichten, in Channels und Direktnachrichten
+- **Reaktionen & Emojis**: Emoji-Picker beim Schreiben, Reaktionen mit Zähler und Übersicht, wer reagiert hat
+- **Erwähnungen**: `@` für Mitglieder, `#` für Channels, mit Autovervollständigung
+- **Suche**: durchsucht Nachrichten, Channels und Mitglieder
+- **Profil**: Name und Avatar nachträglich ändern
+- **Responsive**: optimiert bis 320 px Bildschirmbreite
+
+## Umgesetzt mit Angular
+
+- **Standalone Components**: kein NgModule, jede Komponente bringt ihre Abhängigkeiten selbst mit
+- **Signals**: `signal`, `computed` und `effect` für den gesamten UI-State, `input()` und `output()` für die Kommunikation zwischen Komponenten
+- **Neue Control-Flow-Syntax**: `@if`, `@for` und `@switch` statt Strukturdirektiven
+- **Reactive Forms**: Validierung mit eigenen Fehlermeldungen unter den Feldern
+- **Lazy Loading**: jede Seite wird erst beim Aufruf geladen
+- **Route Guard**: der Workspace ist nur für angemeldete Nutzer erreichbar
+- **Server-Side Rendering**: statische Seiten werden vorgerendert, alles mit Firebase-Anbindung läuft im Browser
+
+## Tech-Stack
+
+| Bereich      | Technologie                              |
+| ------------ | ---------------------------------------- |
+| Frontend     | Angular 22                               |
+| Sprache      | TypeScript (Strict Mode), HTML, SCSS     |
+| Backend      | Firebase Authentication, Cloud Firestore |
+| Tests        | Vitest                                   |
+| Formatierung | Prettier                                 |
+
+## Code-Stil
+
+- Eine Funktion erfüllt genau eine Aufgabe
+- Höchstens 400 Zeilen pro TypeScript-Datei
+- camelCase für Variablen und Funktionen, PascalCase für Klassen, kebab-case für CSS-Klassen
+- CSS-Klassen nach BEM (`block__element--modifier`), SCSS mit Nesting und gemeinsamen Farbvariablen
+- Alle Klassen, Services und Methoden sind mit TSDoc dokumentiert
+
+## Lokal starten
+
+**Voraussetzungen:** Node.js und ein eigenes Firebase-Projekt mit aktivierter Authentication (E-Mail, Google, Anonym) und Firestore.
 
 ```bash
-ng serve
+git clone https://github.com/ChristopherBraun196/DA-Bubble.git
+cd DA-Bubble
+npm install
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+Die Firebase-Konfiguration ist nicht im Repository enthalten. Kopiere die Vorlage und trage deine eigenen Zugangsdaten ein:
 
 ```bash
-ng generate component component-name
+cp src/environments/environment.example.ts src/environments/environment.ts
+cp src/environments/environment.example.ts src/environments/environment.development.ts
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Danach starten:
 
 ```bash
-ng generate --help
+npm start
 ```
 
-## Building
+Die App öffnet sich unter `http://localhost:4200`.
 
-To build the project run:
+## Projektstruktur
 
-```bash
-ng build
+```
+src/app/
+├── core/       Services, Models und Guards für den Firebase-Zugriff
+├── pages/      Seiten und Komponenten, nach Feature gruppiert
+└── shared/     Wiederverwendbare Komponenten (Emoji-Picker, Mention-Dropdown, Avatar-Picker)
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+## Team
 
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- [Moritz Böhm](https://github.com/mlb27)
+- [Adrian Bieber](https://github.com/abieber23)
+- [Christopher Braun](https://github.com/ChristopherBraun196)
