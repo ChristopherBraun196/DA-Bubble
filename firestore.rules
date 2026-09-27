@@ -8,32 +8,202 @@ service cloud.firestore {
     }
 
     function isMember(chatId) {
-      return request.auth.uid in
-        get(/databases/$(database)/documents/chats/$(chatId)).data.memberIds;
+      return signedIn()
+        && request.auth.uid in
+          get(/databases/$(database)/documents/chats/$(chatId)).data.memberIds;
+    }
+
+    function changesOnly(fields) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(fields);
+    }
+
+    function validUserCreate(uid) {
+      return request.resource.data.keys().hasOnly([
+          'uid',
+          'displayName',
+          'nameNormalized',
+          'email',
+          'photoURL',
+          'isAnonymous',
+          'onboardingCompleted',
+          'createdAt',
+          'lastSeenAt',
+          'updatedAt'
+        ])
+        && request.resource.data.keys().hasAll([
+          'uid',
+          'displayName',
+          'nameNormalized',
+          'email',
+          'photoURL',
+          'isAnonymous',
+          'onboardingCompleted',
+          'createdAt',
+          'lastSeenAt',
+          'updatedAt'
+        ])
+        && request.resource.data.uid == uid
+        && request.resource.data.displayName is string
+        && request.resource.data.nameNormalized is string
+        && request.resource.data.photoURL is string
+        && request.resource.data.isAnonymous is bool
+        && request.resource.data.onboardingCompleted is bool;
+    }
+
+    function validChatCreate() {
+      return request.resource.data.keys().hasOnly([
+          'type',
+          'name',
+          'description',
+          'createdBy',
+          'memberIds',
+          'hasMessages',
+          'createdAt',
+          'updatedAt'
+        ])
+        && request.resource.data.keys().hasAll([
+          'type',
+          'name',
+          'description',
+          'createdBy',
+          'memberIds',
+          'hasMessages',
+          'createdAt',
+          'updatedAt'
+        ])
+        && request.resource.data.type in ['channel', 'direct']
+        && request.resource.data.name is string
+        && request.resource.data.description is string
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.memberIds is list
+        && request.resource.data.memberIds.toSet().size()
+          == request.resource.data.memberIds.size()
+        && request.auth.uid in request.resource.data.memberIds
+        && request.resource.data.hasMessages == false
+        && ((request.resource.data.type == 'channel'
+              && request.resource.data.memberIds.size() >= 1)
+            || (request.resource.data.type == 'direct'
+              && request.resource.data.memberIds.size() == 2));
+    }
+
+    function validMemberChange() {
+      let oldMembers = resource.data.memberIds.toSet();
+      let newMembers = request.resource.data.memberIds.toSet();
+      let addedMembers = newMembers.difference(oldMembers);
+      let removedMembers = oldMembers.difference(newMembers);
+
+      return request.resource.data.memberIds is list
+        && request.resource.data.memberIds.toSet().size()
+          == request.resource.data.memberIds.size()
+        && ((resource.data.type == 'channel'
+              && addedMembers.size() > 0
+              && removedMembers.size() == 0)
+            || (addedMembers.size() == 0
+              && removedMembers.hasOnly([request.auth.uid])));
+    }
+
+    function validChatUpdate() {
+      let changedFields = request.resource.data.diff(resource.data).affectedKeys();
+
+      return changedFields.hasOnly([
+          'name',
+          'description',
+          'memberIds',
+          'hasMessages',
+          'updatedAt'
+        ])
+        && (!changedFields.hasAny(['name', 'description'])
+          || resource.data.type == 'channel')
+        && (!changedFields.hasAny(['memberIds']) || validMemberChange())
+        && request.resource.data.name is string
+        && request.resource.data.description is string
+        && request.resource.data.hasMessages is bool;
+    }
+
+    function validMessageCreate() {
+      return request.resource.data.keys().hasOnly([
+          'authorId',
+          'authorName',
+          'authorPhotoURL',
+          'text',
+          'threadParentId',
+          'createdAt',
+          'editedAt',
+          'reactions',
+          'replyCount',
+          'lastReplyAt'
+        ])
+        && request.resource.data.keys().hasAll([
+          'authorId',
+          'authorName',
+          'authorPhotoURL',
+          'text',
+          'threadParentId',
+          'createdAt',
+          'editedAt',
+          'reactions',
+          'replyCount',
+          'lastReplyAt'
+        ])
+        && request.resource.data.authorId == request.auth.uid
+        && request.resource.data.authorName is string
+        && request.resource.data.authorPhotoURL is string
+        && request.resource.data.text is string
+        && request.resource.data.text.size() > 0
+        && (request.resource.data.threadParentId == null
+          || request.resource.data.threadParentId is string)
+        && request.resource.data.editedAt == null
+        && request.resource.data.reactions is list
+        && request.resource.data.replyCount == 0
+        && request.resource.data.lastReplyAt == null;
+    }
+
+    function validMessageUpdate() {
+      let changedFields = request.resource.data.diff(resource.data).affectedKeys();
+      let editsOwnText = resource.data.authorId == request.auth.uid
+        && changedFields.hasOnly(['text', 'editedAt'])
+        && request.resource.data.text is string
+        && request.resource.data.text.size() > 0;
+      let changesReactions = changedFields.hasOnly(['reactions'])
+        && request.resource.data.reactions is list;
+      let addsReply = changedFields.hasOnly(['replyCount', 'lastReplyAt'])
+        && request.resource.data.replyCount == resource.data.replyCount + 1;
+
+      return editsOwnText || changesReactions || addsReply;
     }
 
     match /users/{uid} {
       allow read: if signedIn();
-      allow create, update: if signedIn() && request.auth.uid == uid;
+      allow create: if signedIn()
+        && request.auth.uid == uid
+        && validUserCreate(uid);
+      allow update: if signedIn()
+        && request.auth.uid == uid
+        && request.resource.data.uid == resource.data.uid
+        && changesOnly([
+          'displayName',
+          'nameNormalized',
+          'photoURL',
+          'onboardingCompleted',
+          'lastSeenAt',
+          'updatedAt'
+        ]);
       allow delete: if false;
     }
 
     match /chats/{chatId} {
       allow read: if signedIn()
-        && (resource == null || request.auth.uid in resource.data.memberIds);
-      allow create: if signedIn()
-        && request.auth.uid in request.resource.data.memberIds;
-      allow update: if signedIn()
         && request.auth.uid in resource.data.memberIds;
+      allow create: if signedIn() && validChatCreate();
+      allow update: if signedIn()
+        && request.auth.uid in resource.data.memberIds
+        && validChatUpdate();
       allow delete: if false;
 
       match /messages/{messageId} {
-        allow read: if signedIn() && isMember(chatId);
-        allow create: if signedIn() && isMember(chatId)
-          && request.resource.data.authorId == request.auth.uid;
-        allow update: if signedIn() && isMember(chatId)
-          && (request.resource.data.text == resource.data.text
-              || resource.data.authorId == request.auth.uid);
+        allow read: if isMember(chatId);
+        allow create: if isMember(chatId) && validMessageCreate();
+        allow update: if isMember(chatId) && validMessageUpdate();
         allow delete: if false;
       }
     }
