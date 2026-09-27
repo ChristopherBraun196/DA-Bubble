@@ -7,7 +7,7 @@
 ![Firebase](https://img.shields.io/badge/Firebase-Auth%20%26%20Firestore-FFCA28?logo=firebase&logoColor=black)
 ![SCSS](https://img.shields.io/badge/SCSS-CC6699?logo=sass&logoColor=white)
 
-**Live-Demo** · folgt in Kürze
+**Live-Demo** · [dabubble-3272.developerakademie.net](https://dabubble-3272.developerakademie.net/)
 
 Eine Chat-Anwendung im Stil von Slack mit Channels, Direktnachrichten, Threads und
 Emoji-Reaktionen. Entstanden als Gruppenprojekt an der Developer Akademie.
