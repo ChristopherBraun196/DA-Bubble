@@ -91,3 +91,8 @@ src/app/
 - [Moritz Böhm](https://github.com/mlb27)
 - [Adrian Bieber](https://github.com/abieber23)
 - [Christopher Braun](https://github.com/ChristopherBraun196)
+
+## Lizenz
+
+Der Quellcode steht unter der [MIT-Lizenz](LICENSE).
+Design und Grafiken stammen von der Developer Akademie und sind davon ausgenommen.
