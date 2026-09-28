@@ -11,6 +11,7 @@ import {
 } from '@angular/core';
 import { ChatMessage } from '../../../core/models/message.model';
 import { ReactionEmoji } from '../../../core/models/reaction.model';
+import { AuthService } from '../../../core/services/auth.service';
 import { ReactionHistoryService } from '../../../core/services/reaction-history.service';
 import { AvatarFallback } from '../../../shared/avatar-fallback/avatar-fallback';
 import { EmojiPicker } from '../../../shared/emoji-picker/emoji-picker';
@@ -34,6 +35,7 @@ import { MessageReactions } from '../message-reactions/message-reactions';
  */
 export class MessageItem {
   protected readonly reactionHistory = inject(ReactionHistoryService);
+  private readonly auth = inject(AuthService);
 
   readonly message = input<ChatMessage | null>(null);
   readonly ownMessage = input(false);
@@ -47,6 +49,28 @@ export class MessageItem {
   protected readonly replyLabel = computed(() => {
     const count = this.message()?.replyCount || 0;
     return count === 1 ? '1 Antwort' : `${count} Antworten`;
+  });
+
+  /**
+   * Author name and avatar as they are right now.
+   *
+   * @remarks
+   * A message stores its author's name and photo as they were when it was
+   * sent. For the signed-in user the live profile wins, so renaming or picking
+   * a new avatar updates their own messages instead of leaving the old values
+   * behind. Everyone else keeps what the message carries.
+   */
+  protected readonly authorName = computed(() =>
+    this.writtenByCurrentUser() ? this.auth.displayName() : this.message()?.authorName || '',
+  );
+
+  protected readonly authorAvatar = computed(() =>
+    this.writtenByCurrentUser() ? this.auth.photoURL() : this.message()?.authorPhotoURL || '',
+  );
+
+  private readonly writtenByCurrentUser = computed(() => {
+    const authorId = this.message()?.authorId;
+    return !!authorId && authorId === this.auth.currentUser()?.uid;
   });
 
   protected readonly menuOpen = signal(false);

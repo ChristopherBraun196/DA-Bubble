@@ -52,7 +52,7 @@ export class UserService {
   async searchByName(term: string, maxResults = 8): Promise<UserSearchResult[]> {
     const search = term.trim().toLocaleLowerCase('de-DE');
 
-    if (search.length < 3) {
+    if (!search) {
       return [];
     }
     const users = await this.getCachedUsers();

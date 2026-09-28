@@ -1,10 +1,10 @@
 @if (message(); as message) {
   <article class="message" [class.message--own]="ownMessage()">
-    <img appAvatarFallback class="message__avatar" [src]="message.authorPhotoURL" alt="" />
+    <img appAvatarFallback class="message__avatar" [src]="authorAvatar()" alt="" />
 
     <div class="message__content">
       <div class="message__meta">
-        <strong class="message__author">{{ message.authorName }}</strong>
+        <strong class="message__author">{{ authorName() }}</strong>
         @if (message.createdAt; as createdAt) {
           <time class="message__time" [attr.datetime]="createdAt.toDate().toISOString()">
             {{ createdAt.toDate() | date: 'HH:mm' }} Uhr

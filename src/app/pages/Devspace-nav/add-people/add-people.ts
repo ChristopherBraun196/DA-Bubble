@@ -7,7 +7,7 @@ import { AvatarFallback } from '../../../shared/avatar-fallback/avatar-fallback'
 
 export type AddPeopleMode = 'all' | 'specific';
 
-const SEARCH_MIN_LENGTH = 3;
+const SEARCH_MIN_LENGTH = 1;
 
 @Component({
   imports: [AvatarFallback],
