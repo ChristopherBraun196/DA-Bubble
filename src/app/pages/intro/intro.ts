@@ -1,6 +1,7 @@
 import { afterNextRender, Component, OnDestroy, inject } from '@angular/core';
 import { Router } from '@angular/router';
 
+import { skipIntroOnce } from '../../core/guards/intro.guard';
 import { IntroAnimation } from './components/intro-animation/intro-animation';
 
 const LOGIN_FALLBACK_DELAY = 3500;
@@ -57,9 +58,16 @@ export class Intro implements OnDestroy {
     }
   }
 
-  /** Fallback that leaves the intro when the animation failed to finish. */
+  /**
+   * Fallback that leaves the intro when the animation failed to finish.
+   *
+   * @remarks
+   * The reload skips the intro once, because {@link introGuard} would
+   * otherwise send this very load back here.
+   */
   private forceLoginNavigation(): void {
     if (this.router.url !== '/login') {
+      skipIntroOnce();
       window.location.assign('/login');
     }
   }

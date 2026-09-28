@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 
 import { authGuard } from './core/guards/auth.guard';
+import { introGuard } from './core/guards/intro.guard';
 
 /**
  * Application routes.
@@ -8,6 +9,8 @@ import { authGuard } from './core/guards/auth.guard';
  * @remarks
  * Every page is lazily loaded. Only `main` is protected by
  * {@link authGuard}; the login flow and the legal pages stay public.
+ * {@link introGuard} keeps the intro in front of the login page, so it also
+ * plays when that page is opened or reloaded directly.
  */
 export const routes: Routes = [
   {
@@ -17,6 +20,7 @@ export const routes: Routes = [
   },
   {
     path: 'login',
+    canActivate: [introGuard],
     loadComponent: () => import('./pages/login/login/login').then((module) => module.Login),
   },
   {
