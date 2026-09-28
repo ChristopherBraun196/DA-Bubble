@@ -52,6 +52,9 @@ export class DirectMessageList {
 
   private readonly otherUsers = signal<DirectMessageUser[]>([]);
 
+  /** Guests have no conversations of their own to list. */
+  private readonly guestSession = computed(() => this.auth.currentUser()?.isAnonymous === true);
+
   private readonly directUserIds = computed(() => {
     const currentUserId = this.auth.currentUser()?.uid;
     return [
@@ -74,7 +77,15 @@ export class DirectMessageList {
   });
 
   constructor() {
-    effect(() => void this.loadUsers(this.directUserIds(), ++this.loadVersion));
+    effect(() => {
+      const version = ++this.loadVersion;
+
+      if (this.guestSession()) {
+        void this.loadEveryone(version);
+      } else {
+        void this.loadUsers(this.directUserIds(), version);
+      }
+    });
   }
 
   /**
@@ -88,8 +99,38 @@ export class DirectMessageList {
       this.otherUsers.set([]);
       return;
     }
+
+    await this.applyUsers(
+      Promise.all(userIds.map((userId) => this.userDirectory.findById(userId))),
+      version,
+    );
+  }
+
+  /**
+   * Loads everyone in the directory instead of just the own conversations.
+   *
+   * @param version - Guards against results of a superseded load.
+   *
+   * @remarks
+   * A guest has nobody to talk to yet, so the whole list is offered. Other
+   * guests are dropped in {@link DirectMessageList.toDirectMessageUsers}.
+   */
+  private async loadEveryone(version: number): Promise<void> {
+    await this.applyUsers(this.userDirectory.getAllUsers(), version);
+  }
+
+  /**
+   * Stores the resolved rows unless a newer load has started meanwhile.
+   *
+   * @param loading - The pending lookup.
+   * @param version - The load this result belongs to.
+   */
+  private async applyUsers(
+    loading: Promise<(UserSearchResult | null)[]>,
+    version: number,
+  ): Promise<void> {
     try {
-      const users = await Promise.all(userIds.map((userId) => this.userDirectory.findById(userId)));
+      const users = await loading;
       if (version === this.loadVersion) this.otherUsers.set(this.toDirectMessageUsers(users));
     } catch {
       if (version === this.loadVersion)
