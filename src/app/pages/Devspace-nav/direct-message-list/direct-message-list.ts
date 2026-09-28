@@ -2,7 +2,6 @@ import { Component, computed, effect, inject, input, output, signal } from '@ang
 
 import { UserSearchResult } from '../../../core/models/user.model';
 import { AuthService } from '../../../core/services/auth.service';
-import { ChatService } from '../../../core/services/chat.service';
 import { UserService } from '../../../core/services/user.service';
 import { UserListItem } from '../user-list-item/user-list-item';
 
@@ -22,15 +21,14 @@ export interface DirectMessageUser {
   templateUrl: './direct-message-list.html',
 })
 /**
- * Collapsible list of direct message conversations.
+ * Collapsible list of everyone the user can write to.
  *
  * @remarks
- * Shows only partners an actual conversation exists with, plus one temporary
- * entry for a person the user just started writing to.
+ * Lists the whole directory rather than just existing conversations, plus one
+ * temporary entry for a person the user just started writing to.
  */
 export class DirectMessageList {
   private readonly auth = inject(AuthService);
-  private readonly chats = inject(ChatService);
   private readonly userDirectory = inject(UserService);
   private loadVersion = 0;
 
@@ -52,22 +50,6 @@ export class DirectMessageList {
 
   private readonly otherUsers = signal<DirectMessageUser[]>([]);
 
-  /** Guests have no conversations of their own to list. */
-  private readonly guestSession = computed(() => this.auth.currentUser()?.isAnonymous === true);
-
-  private readonly directUserIds = computed(() => {
-    const currentUserId = this.auth.currentUser()?.uid;
-    return [
-      ...new Set(
-        this.chats
-          .chats()
-          .filter(({ type, hasMessages }) => type === 'direct' && hasMessages)
-          .flatMap(({ memberIds }) => memberIds)
-          .filter((userId) => userId !== currentUserId),
-      ),
-    ];
-  });
-
   protected readonly users = computed<DirectMessageUser[]>(() => {
     const currentUser = this.currentUser();
     const otherUsers = this.otherUsers();
@@ -78,42 +60,19 @@ export class DirectMessageList {
 
   constructor() {
     effect(() => {
-      const version = ++this.loadVersion;
-
-      if (this.guestSession()) {
-        void this.loadEveryone(version);
-      } else {
-        void this.loadUsers(this.directUserIds(), version);
-      }
+      this.auth.currentUser();
+      void this.loadEveryone(++this.loadVersion);
     });
   }
 
   /**
-   * Resolves the conversation partners behind the given ids.
-   *
-   * @param userIds - Ids of the people to load.
-   * @param version - Guards against results of a superseded load.
-   */
-  private async loadUsers(userIds: string[], version: number): Promise<void> {
-    if (!userIds.length) {
-      this.otherUsers.set([]);
-      return;
-    }
-
-    await this.applyUsers(
-      Promise.all(userIds.map((userId) => this.userDirectory.findById(userId))),
-      version,
-    );
-  }
-
-  /**
-   * Loads everyone in the directory instead of just the own conversations.
+   * Loads everyone in the directory.
    *
    * @param version - Guards against results of a superseded load.
    *
    * @remarks
-   * A guest has nobody to talk to yet, so the whole list is offered. Other
-   * guests are dropped in {@link DirectMessageList.toDirectMessageUsers}.
+   * The signed-in user and every guest are dropped in
+   * {@link DirectMessageList.toDirectMessageUsers}.
    */
   private async loadEveryone(version: number): Promise<void> {
     await this.applyUsers(this.userDirectory.getAllUsers(), version);
