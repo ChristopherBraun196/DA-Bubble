@@ -62,6 +62,7 @@ export class Shell {
     if (user) {
       void this.chats.connect(user.uid);
       this.users.watchDirectory();
+      void this.chats.joinGeneralChannel(user.uid);
     }
     this.watchViewport();
     this.followThreadRequests();

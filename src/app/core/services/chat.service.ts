@@ -22,6 +22,9 @@ import {
 import { FirebaseService } from '../firebase/firebase.service';
 import { Chat, ChatDocument } from '../models/chat.model';
 
+/** Fixed id of the channel every user joins automatically. */
+const GENERAL_CHANNEL_ID = 'allgemein';
+
 @Injectable({ providedIn: 'root' })
 /**
  * Keeps the signed-in user's chats in sync and provides channel operations.
@@ -98,6 +101,41 @@ export class ChatService {
         chat.id !== exceptId &&
         chat.name.trim().toLowerCase() === normalized,
     );
+  }
+
+  /**
+   * Adds the user to the shared "Allgemein" channel, creating it on first use.
+   *
+   * @param userId - The signed-in user's id.
+   */
+  async joinGeneralChannel(userId: string): Promise<void> {
+    const channelRef = doc(this.firebase.firestore, 'chats', GENERAL_CHANNEL_ID);
+    const snapshot = await getDoc(channelRef);
+
+    if (!snapshot.exists()) {
+      await setDoc(channelRef, this.createGeneralChannelDocument(userId));
+    } else if (!snapshot.data()['memberIds']?.includes(userId)) {
+      await updateDoc(channelRef, { memberIds: arrayUnion(userId), updatedAt: serverTimestamp() });
+    }
+  }
+
+  /**
+   * Assembles the "Allgemein" channel for its very first visitor.
+   *
+   * @param userId - The user creating it, who becomes the first member.
+   * @returns The document to store.
+   */
+  private createGeneralChannelDocument(userId: string): ChatDocument {
+    return {
+      type: 'channel',
+      name: 'Allgemein',
+      description: 'Der Channel für alle – hier landet jeder automatisch.',
+      createdBy: userId,
+      memberIds: [userId],
+      hasMessages: false,
+      createdAt: serverTimestamp() as Timestamp,
+      updatedAt: serverTimestamp() as Timestamp,
+    };
   }
 
   /**
