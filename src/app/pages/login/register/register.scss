@@ -122,10 +122,15 @@
     cursor: pointer;
     transition: background-color 100ms ease-out;
 
-    &:hover,
-    &:focus-visible {
+    &:hover:not(:disabled),
+    &:focus-visible:not(:disabled) {
       background-color: variables.$purple-secondary;
       outline: none;
+    }
+
+    &:disabled {
+      background-color: variables.$purple-light;
+      cursor: not-allowed;
     }
   }
 }

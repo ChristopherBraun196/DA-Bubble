@@ -100,7 +100,9 @@
         </div>
       </div>
 
-      <button class="register-card__submit" type="submit">Weiter</button>
+      <button class="register-card__submit" type="submit" [disabled]="!canContinue()">
+        Weiter
+      </button>
     </form>
   </section>
 

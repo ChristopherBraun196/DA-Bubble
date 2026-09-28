@@ -1,9 +1,12 @@
 import { Component, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { FirebaseError } from 'firebase/app';
+import { map } from 'rxjs';
 
 import { AuthService } from '../../../core/services/auth.service';
+import { emailAddress } from '../../../core/validators/email.validator';
 
 /** Messages for the Firebase error codes the login can run into. */
 const LOGIN_ERROR_MESSAGES: Record<string, string> = {
@@ -40,13 +43,25 @@ export class Login {
   form = new FormGroup({
     email: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required, Validators.email],
+      validators: [Validators.required, emailAddress],
     }),
     password: new FormControl('', {
       nonNullable: true,
       validators: [Validators.required],
     }),
   });
+
+  /**
+   * Whether the email field currently holds a valid address.
+   *
+   * @remarks
+   * Mirrors the control's status into a signal, because the app runs without
+   * zone.js and a plain template expression would not re-read it on typing.
+   */
+  protected readonly emailValid = toSignal(
+    this.form.controls.email.statusChanges.pipe(map((status) => status === 'VALID')),
+    { initialValue: this.form.controls.email.valid },
+  );
 
   /** Signs in with the credentials entered in the form. */
   protected async onSubmit(): Promise<void> {

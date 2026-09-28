@@ -346,6 +346,13 @@
         color 100ms ease-out,
         border-color 100ms ease-out,
         background-color 100ms ease-out;
+
+      &:disabled {
+        border-color: variables.$purple-light;
+        background-color: variables.$purple-light;
+        color: variables.$white;
+        cursor: not-allowed;
+      }
     }
 
     .btn-primary {
@@ -354,7 +361,7 @@
       background-color: variables.$purple-primary;
       color: variables.$white;
 
-      &:hover {
+      &:hover:not(:disabled) {
         background-color: variables.$purple-secondary;
       }
     }
@@ -365,7 +372,7 @@
       background-color: variables.$white;
       color: variables.$purple-primary;
 
-      &:hover {
+      &:hover:not(:disabled) {
         border-color: variables.$purple-primary;
         background-color: variables.$purple-primary;
         color: variables.$white;

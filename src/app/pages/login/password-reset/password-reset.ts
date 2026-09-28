@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { FirebaseError } from 'firebase/app';
 
 import { AuthService } from '../../../core/services/auth.service';
+import { emailAddress } from '../../../core/validators/email.validator';
 import { Header } from '../shared/header/header';
 
 @Component({
@@ -23,7 +24,7 @@ export class PasswordReset {
   protected readonly form = new FormGroup({
     email: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required, Validators.email],
+      validators: [Validators.required, emailAddress],
     }),
   });
 

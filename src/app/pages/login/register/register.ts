@@ -1,8 +1,11 @@
 import { afterNextRender, Component, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { map } from 'rxjs';
 
 import { RegistrationDraftService } from '../../../core/services/registration-draft.service';
+import { emailAddress } from '../../../core/validators/email.validator';
 import { Header } from '../shared/header/header';
 
 @Component({
@@ -30,7 +33,7 @@ export class Register {
     }),
     email: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required, Validators.email],
+      validators: [Validators.required, emailAddress],
     }),
     password: new FormControl('', {
       nonNullable: true,
@@ -41,6 +44,18 @@ export class Register {
       validators: [Validators.requiredTrue],
     }),
   });
+
+  /**
+   * Whether the email is valid and the privacy notice has been accepted.
+   *
+   * @remarks
+   * Mirrors the control statuses into a signal, because the app runs without
+   * zone.js and a plain template expression would not re-read them on input.
+   */
+  protected readonly canContinue = toSignal(
+    this.form.valueChanges.pipe(map(() => this.emailAndConsentValid())),
+    { initialValue: this.emailAndConsentValid() },
+  );
 
   constructor() {
     const draft = this.registrationDraft.draft();
@@ -67,6 +82,15 @@ export class Register {
 
     this.saveRegistrationDraft();
     void this.router.navigateByUrl('/choose-avatar');
+  }
+
+  /**
+   * Checks the two fields that gate the submit button.
+   *
+   * @returns True when the email is valid and the privacy notice is accepted.
+   */
+  private emailAndConsentValid(): boolean {
+    return this.form.controls.email.valid && this.form.controls.privacyAccepted.valid;
   }
 
   /** Whether the email field should be shown in its error state. */

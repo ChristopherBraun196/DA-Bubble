@@ -84,7 +84,9 @@
       </button>
 
       <div class="actions">
-        <button class="btn-primary" type="submit" [disabled]="loginPending()">Anmelden</button>
+        <button class="btn-primary" type="submit" [disabled]="loginPending() || !emailValid()">
+          Anmelden
+        </button>
         <button
           class="btn-secondary"
           type="button"
