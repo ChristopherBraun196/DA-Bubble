@@ -1,6 +1,23 @@
 @use '../../../../styles/variables' as variables;
 
 @mixin styles {
+  @media screen and (min-width: 769px) and (max-width: 1100px),
+    screen and (min-width: 769px) and (max-height: 850px) {
+    .login-shell {
+      &__topbar {
+        padding: 32px 40px;
+      }
+
+      &__footer {
+        bottom: 16px;
+      }
+
+      .login-formfield form {
+        transform: scale(0.78);
+      }
+    }
+  }
+
   @media screen and (min-width: 320px) and (max-width: 768px) {
     .login-shell {
       min-height: max(100svh, 932px);
