@@ -37,16 +37,26 @@ export class AuthService {
 
   private readonly profileRevision = signal(0);
 
-  /** Display name of the current user, falling back to "Gast" for anonymous sessions. */
+  /**
+   * Display name of the current user.
+   *
+   * @remarks
+   * A guest starts out as "Gast" but may rename themselves, so a stored name
+   * takes precedence over that fallback.
+   */
   readonly displayName = computed(() => {
     this.profileRevision();
     const user = this.currentUser();
 
-    if (!user || user.isAnonymous) {
+    if (!user) {
       return 'Gast';
     }
 
-    return user.displayName || user.email?.split('@')[0] || 'Nutzer';
+    if (user.displayName) {
+      return user.displayName;
+    }
+
+    return user.isAnonymous ? 'Gast' : user.email?.split('@')[0] || 'Nutzer';
   });
 
   /** Avatar URL of the current user, falling back to the guest placeholder. */
