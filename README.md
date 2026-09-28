@@ -1,60 +1,60 @@
 # DABubble
 
-**Echtzeit-Chat mit Angular 22 und Firebase**
+**Real-time chat with Angular 22 and Firebase**
 
 ![Angular](https://img.shields.io/badge/Angular-22-DD0031?logo=angular&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)
 ![Firebase](https://img.shields.io/badge/Firebase-Auth%20%26%20Firestore-FFCA28?logo=firebase&logoColor=black)
 ![SCSS](https://img.shields.io/badge/SCSS-CC6699?logo=sass&logoColor=white)
 
-**Live-Demo** · [dabubble-3272.developerakademie.net](https://dabubble-3272.developerakademie.net/)
+**Live demo** · [dabubble-3272.developerakademie.net](https://dabubble-3272.developerakademie.net/)
 
-Eine Chat-Anwendung im Stil von Slack mit Channels, Direktnachrichten, Threads und
-Emoji-Reaktionen. Entstanden als Gruppenprojekt an der Developer Akademie.
+A Slack-style chat application with channels, direct messages, threads and
+emoji reactions. Built as a group project at the Developer Akademie.
 
 ## Features
 
-- **Konto & Anmeldung**: Registrierung mit Avatar-Auswahl, Login per E-Mail, Google oder als Gast, Passwort zurücksetzen
-- **Channels**: anlegen, umbenennen, beschreiben, Mitglieder hinzufügen oder verlassen
-- **Direktnachrichten**: private Unterhaltungen mit jedem Mitglied
-- **Threads**: Antworten auf einzelne Nachrichten, in Channels und Direktnachrichten
-- **Reaktionen & Emojis**: Emoji-Picker beim Schreiben, Reaktionen mit Zähler und Übersicht, wer reagiert hat
-- **Erwähnungen**: `@` für Mitglieder, `#` für Channels, mit Autovervollständigung
-- **Suche**: durchsucht Nachrichten, Channels und Mitglieder
-- **Profil**: Name und Avatar nachträglich ändern
-- **Responsive**: optimiert bis 320 px Bildschirmbreite
+- **Account & sign-in**: registration with avatar selection, login via email, Google or as a guest, password reset
+- **Channels**: create, rename, describe, add members or leave
+- **Direct messages**: private conversations with any member
+- **Threads**: replies to individual messages, in channels and direct messages
+- **Reactions & emojis**: emoji picker while writing, reactions with a counter and an overview of who reacted
+- **Mentions**: `@` for members, `#` for channels, with autocomplete
+- **Search**: searches messages, channels and members
+- **Profile**: change name and avatar later on
+- **Responsive**: optimised down to 320 px screen width
 
-## Umgesetzt mit Angular
+## Built with Angular
 
-- **Standalone Components**: kein NgModule, jede Komponente bringt ihre Abhängigkeiten selbst mit
-- **Signals**: `signal`, `computed` und `effect` für den gesamten UI-State, `input()` und `output()` für die Kommunikation zwischen Komponenten
-- **Neue Control-Flow-Syntax**: `@if`, `@for` und `@switch` statt Strukturdirektiven
-- **Reactive Forms**: Validierung mit eigenen Fehlermeldungen unter den Feldern
-- **Lazy Loading**: jede Seite wird erst beim Aufruf geladen
-- **Route Guard**: der Workspace ist nur für angemeldete Nutzer erreichbar
-- **Server-Side Rendering**: statische Seiten werden vorgerendert, alles mit Firebase-Anbindung läuft im Browser
+- **Standalone components**: no NgModule, every component brings its own dependencies
+- **Signals**: `signal`, `computed` and `effect` for all UI state, `input()` and `output()` for communication between components
+- **New control flow syntax**: `@if`, `@for` and `@switch` instead of structural directives
+- **Reactive forms**: validation with custom error messages below the fields
+- **Lazy loading**: every page is loaded only when it is opened
+- **Route guard**: the workspace is reachable for signed-in users only
+- **Server-side rendering**: static pages are prerendered, everything tied to Firebase runs in the browser
 
-## Tech-Stack
+## Tech stack
 
-| Bereich      | Technologie                              |
-| ------------ | ---------------------------------------- |
-| Frontend     | Angular 22                               |
-| Sprache      | TypeScript (Strict Mode), HTML, SCSS     |
-| Backend      | Firebase Authentication, Cloud Firestore |
-| Tests        | Vitest                                   |
-| Formatierung | Prettier                                 |
+| Area       | Technology                               |
+| ---------- | ---------------------------------------- |
+| Frontend   | Angular 22                               |
+| Languages  | TypeScript (strict mode), HTML, SCSS     |
+| Backend    | Firebase Authentication, Cloud Firestore |
+| Tests      | Vitest                                   |
+| Formatting | Prettier                                 |
 
-## Code-Stil
+## Code style
 
-- Eine Funktion erfüllt genau eine Aufgabe
-- Höchstens 400 Zeilen pro TypeScript-Datei
-- camelCase für Variablen und Funktionen, PascalCase für Klassen, kebab-case für CSS-Klassen
-- CSS-Klassen nach BEM (`block__element--modifier`), SCSS mit Nesting und gemeinsamen Farbvariablen
-- Alle Klassen, Services und Methoden sind mit TSDoc dokumentiert
+- A function does exactly one thing
+- At most 400 lines per TypeScript file
+- camelCase for variables and functions, PascalCase for classes, kebab-case for CSS classes
+- CSS classes follow BEM (`block__element--modifier`), SCSS with nesting and shared colour variables
+- All classes, services and methods are documented with TSDoc
 
-## Lokal starten
+## Running locally
 
-**Voraussetzungen:** Node.js und ein eigenes Firebase-Projekt mit aktivierter Authentication (E-Mail, Google, Anonym) und Firestore.
+**Requirements:** Node.js and your own Firebase project with Authentication enabled (email, Google, anonymous) and Firestore.
 
 ```bash
 git clone https://github.com/ChristopherBraun196/DA-Bubble.git
@@ -62,28 +62,28 @@ cd DA-Bubble
 npm install
 ```
 
-Die Firebase-Konfiguration ist nicht im Repository enthalten. Kopiere die Vorlage und trage deine eigenen Zugangsdaten ein:
+The Firebase configuration is not part of the repository. Copy the template and fill in your own credentials:
 
 ```bash
 cp src/environments/environment.example.ts src/environments/environment.ts
 cp src/environments/environment.example.ts src/environments/environment.development.ts
 ```
 
-Danach starten:
+Then start it:
 
 ```bash
 npm start
 ```
 
-Die App öffnet sich unter `http://localhost:4200`.
+The app opens at `http://localhost:4200`.
 
-## Projektstruktur
+## Project structure
 
 ```
 src/app/
-├── core/       Services, Models und Guards für den Firebase-Zugriff
-├── pages/      Seiten und Komponenten, nach Feature gruppiert
-└── shared/     Wiederverwendbare Komponenten (Emoji-Picker, Mention-Dropdown, Avatar-Picker)
+├── core/       Services, models and guards for Firebase access
+├── pages/      Pages and components, grouped by feature
+└── shared/     Reusable components (emoji picker, mention dropdown, avatar picker)
 ```
 
 ## Team
@@ -92,7 +92,7 @@ src/app/
 - [Adrian Bieber](https://github.com/abieber23)
 - [Christopher Braun](https://github.com/ChristopherBraun196)
 
-## Lizenz
+## License
 
-Der Quellcode steht unter der [MIT-Lizenz](LICENSE).
-Design und Grafiken stammen von der Developer Akademie und sind davon ausgenommen.
+The source code is available under the [MIT License](LICENSE).
+Design and graphics come from the Developer Akademie and are excluded from it.
