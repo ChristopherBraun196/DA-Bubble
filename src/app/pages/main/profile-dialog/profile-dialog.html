@@ -43,6 +43,10 @@
         />
       </div>
 
+      @if (nameHasDigits()) {
+        <p class="profile__error">Der Name darf keine Zahlen enthalten.</p>
+      }
+
       @if (saveError()) {
         <p class="profile__error">{{ saveError() }}</p>
       }
@@ -51,7 +55,11 @@
         <button class="profile__button profile__button--ghost" type="button" (click)="cancelEdit()">
           Abbrechen
         </button>
-        <button class="profile__button profile__button--solid" type="submit" [disabled]="saving()">
+        <button
+          class="profile__button profile__button--solid"
+          type="submit"
+          [disabled]="saving() || !hasChanges()"
+        >
           {{ saving() ? 'Speichert …' : 'Speichern' }}
         </button>
       </div>

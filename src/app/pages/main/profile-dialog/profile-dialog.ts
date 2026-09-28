@@ -54,12 +54,23 @@ export class ProfileDialog {
   protected readonly saveError = signal('');
   protected readonly avatarDraft = signal('');
 
-  /** Starts empty; the current name is shown as the placeholder. */
+  /** Starts with the current name when editing begins. */
   protected readonly nameDraft = signal('');
 
-  /** Switches the name into edit mode with an empty draft. */
+  /** True once the name or avatar differs from what is saved, and the name is not empty. */
+  protected readonly hasChanges = computed(() => {
+    const name = this.nameDraft().trim();
+    return (
+      !!name && !/\d/.test(name) && (name !== this.name() || this.avatarDraft() !== this.avatar())
+    );
+  });
+
+  /** True while the typed name contains a digit. */
+  protected readonly nameHasDigits = computed(() => /\d/.test(this.nameDraft()));
+
+  /** Switches into edit mode, starting from the current name and avatar. */
   protected startEdit(): void {
-    this.nameDraft.set('');
+    this.nameDraft.set(this.name());
     this.saveError.set('');
     this.editing.set(true);
     this.avatarDraft.set(this.avatar());
@@ -111,7 +122,7 @@ export class ProfileDialog {
   private async persistChanges(): Promise<void> {
     const name = this.nameDraft().trim();
 
-    if (name) {
+    if (name && name !== this.name()) {
       await this.auth.updateDisplayName(name);
     }
 

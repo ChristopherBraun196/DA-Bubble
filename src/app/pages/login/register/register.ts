@@ -29,7 +29,7 @@ export class Register {
   protected readonly form = new FormGroup({
     name: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required, Validators.pattern(/\S/)],
+      validators: [Validators.required, Validators.pattern(/^(?=.*\S)\D*$/)],
     }),
     email: new FormControl('', {
       nonNullable: true,
@@ -115,6 +115,13 @@ export class Register {
     }
 
     return 'Bitte geben Sie ein Passwort ein.';
+  }
+
+  /** The message shown below the name field. */
+  protected nameErrorMessage(): string {
+    return /\d/.test(this.form.controls.name.value)
+      ? 'Der Name darf keine Zahlen enthalten.'
+      : 'Bitte schreiben Sie einen Namen.';
   }
 
   /** Hands the entered values to the draft service before navigating on. */
