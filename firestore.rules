@@ -8,9 +8,11 @@ service cloud.firestore {
     }
 
     function isMember(chatId) {
+      let chat = get(/databases/$(database)/documents/chats/$(chatId));
+
       return signedIn()
-        && request.auth.uid in
-          get(/databases/$(database)/documents/chats/$(chatId)).data.memberIds;
+        && chat != null
+        && request.auth.uid in chat.data.memberIds;
     }
 
     function changesOnly(fields) {

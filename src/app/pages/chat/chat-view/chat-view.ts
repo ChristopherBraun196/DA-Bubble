@@ -30,7 +30,10 @@ import { MessageEdit, MessageList, MessageReactionToggle } from '../message-list
  *
  * @remarks
  * Follows the active chat and rewires the message subscription whenever it
- * changes.
+ * changes. It waits for the chat to show up in the chat list first: a freshly
+ * created channel is made active before its document has reached the list
+ * snapshot, and subscribing that early makes the security rules reject the
+ * read.
  */
 export class ChatView {
   readonly searchTarget = input<MessageSearchResult | null>(null);
@@ -55,15 +58,15 @@ export class ChatView {
 
   constructor() {
     effect(() => {
-      const chatId = this.chats.activeChatId();
+      const chat = this.activeChat();
 
-      if (chatId) {
-        this.messages.connect(chatId, this.activeSearchTarget()?.createdAt ?? null);
+      if (chat) {
+        this.messages.connect(chat.id, this.activeSearchTarget()?.createdAt ?? null);
       } else {
         this.messages.disconnect();
       }
 
-      this.closeForeignThread(chatId);
+      this.closeForeignThread(this.chats.activeChatId());
     });
 
     this.destroyRef.onDestroy(() => this.messages.disconnect());

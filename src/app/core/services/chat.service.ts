@@ -262,8 +262,25 @@ export class ChatService {
     const chats = snapshot.docs.map((chatSnapshot) => this.mapChat(chatSnapshot));
     chats.sort((first, second) => this.toMillis(second.updatedAt) - this.toMillis(first.updatedAt));
     this.chatsState.set(chats);
-    this.ensureActiveChat(chats);
+    this.ensureActiveChat(chats, this.confirmedChatIds(snapshot));
     this.loading.set(false);
+  }
+
+  /**
+   * Collects the chats the server has acknowledged.
+   *
+   * @param snapshot - The incoming chat snapshot.
+   * @returns Ids of all chats that are not a pending local write.
+   *
+   * @remarks
+   * Firestore reports a new document locally before the server has stored it.
+   * The security rules only see the stored state, so anything still pending
+   * must not be opened yet.
+   */
+  private confirmedChatIds(snapshot: QuerySnapshot<DocumentData>): Set<string> {
+    const confirmed = snapshot.docs.filter(({ metadata }) => !metadata.hasPendingWrites);
+
+    return new Set(confirmed.map(({ id }) => id));
   }
 
   /** Surfaces a listener failure as a readable error message. */
@@ -303,13 +320,22 @@ export class ChatService {
     return data.updatedAt.toMillis() > data.createdAt.toMillis();
   }
 
-  /** Falls back to the first available chat when the active one disappeared. */
-  private ensureActiveChat(chats: Chat[]): void {
+  /**
+   * Falls back to the first available chat when the active one disappeared.
+   *
+   * @param chats - All chats from the current snapshot.
+   * @param confirmedIds - Chats the server already knows, see
+   * {@link ChatService.confirmedChatIds}.
+   */
+  private ensureActiveChat(chats: Chat[], confirmedIds: Set<string>): void {
     const activeChatStillExists = chats.some(({ id }) => id === this.activeChatIdState());
 
-    if (!activeChatStillExists) {
-      this.activeChatIdState.set(chats[0]?.id || null);
+    if (activeChatStillExists) {
+      return;
     }
+
+    const fallback = chats.find(({ id }) => confirmedIds.has(id));
+    this.activeChatIdState.set(fallback?.id || null);
   }
 
   /**
