@@ -61,6 +61,7 @@ export class Shell {
 
     if (user) {
       void this.chats.connect(user.uid);
+      this.users.watchDirectory();
     }
     this.watchViewport();
     this.followThreadRequests();
@@ -245,5 +246,6 @@ export class Shell {
   private disconnect(): void {
     this.chats.disconnect();
     this.thread.close();
+    this.users.stopWatchingDirectory();
   }
 }

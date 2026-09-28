@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { User } from 'firebase/auth';
 import {
   collection,
@@ -7,9 +7,11 @@ import {
   DocumentSnapshot,
   getDoc,
   getDocs,
+  onSnapshot,
   query,
   serverTimestamp,
   setDoc,
+  Unsubscribe,
   where,
 } from 'firebase/firestore';
 
@@ -28,6 +30,12 @@ export class UserService {
   private readonly firebase = inject(FirebaseService);
   private cachedUsers?: Promise<UserSearchResult[]>;
 
+  private unsubscribeFromDirectory?: Unsubscribe;
+  private readonly directoryState = signal<ReadonlyMap<string, UserSearchResult>>(new Map());
+
+  /** Live lookup of every user by uid, kept in sync with Firestore. */
+  readonly directory = this.directoryState.asReadonly();
+
   /**
    * Returns every known user, cached after the first call.
    *
@@ -40,6 +48,34 @@ export class UserService {
       .filter((userSnapshot) => userSnapshot.data()['isAnonymous'] !== true)
       .map((userSnapshot) => this.mapSearchResult(userSnapshot))
       .sort((first, second) => first.displayName.localeCompare(second.displayName, 'de'));
+  }
+
+  /**
+   * Starts following every user document so names and avatars update live.
+   *
+   * @remarks
+   * Safe to call repeatedly; only the first call opens a listener.
+   */
+  watchDirectory(): void {
+    if (this.unsubscribeFromDirectory) {
+      return;
+    }
+    const userRef = collection(this.firebase.firestore, 'users');
+    this.unsubscribeFromDirectory = onSnapshot(
+      userRef,
+      (snapshot) => {
+        const users = snapshot.docs.map((userSnapshot) => this.mapSearchResult(userSnapshot));
+        this.directoryState.set(new Map(users.map((user) => [user.uid, user])));
+      },
+      () => this.stopWatchingDirectory(),
+    );
+  }
+
+  /** Stops following the users, for example on sign-out. */
+  stopWatchingDirectory(): void {
+    this.unsubscribeFromDirectory?.();
+    this.unsubscribeFromDirectory = undefined;
+    this.directoryState.set(new Map());
   }
 
   /**
