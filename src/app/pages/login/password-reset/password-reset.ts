@@ -66,7 +66,6 @@ export class PasswordReset {
       await this.auth.sendPasswordReset(this.form.controls.email.getRawValue().trim());
       this.resetSent.set(true);
     } catch (error) {
-      console.error('Firebase password reset failed:', error);
       this.submitError.set(this.resolveResetErrorMessage(error));
     } finally {
       this.resetPending.set(false);

@@ -5,13 +5,13 @@
       overflow-y: auto;
 
       > app-header {
-        top: 199px;
+        top: 80px;
       }
     }
 
     .register-content {
       align-items: flex-start;
-      padding: 287px 16px 166px;
+      padding: 178px 16px 100px;
     }
 
     .register-card {
@@ -47,7 +47,7 @@
       }
 
       &__fields {
-        top: 133px;
+        top: 145px;
         inset-inline: 20px;
         gap: 29px;
         width: auto;
@@ -79,7 +79,7 @@
     }
 
     .privacy-consent {
-      top: 357px;
+      top: 372px;
       right: 20px;
       left: 20px;
 

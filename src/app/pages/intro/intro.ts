@@ -53,7 +53,6 @@ export class Intro implements OnDestroy {
         this.forceLoginNavigation();
       }
     } catch (error) {
-      console.error('Navigation to login failed:', error);
       this.forceLoginNavigation();
     }
   }

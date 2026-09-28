@@ -118,7 +118,6 @@ export class Login {
    * @param error - The caught error.
    */
   private showLoginError(error: unknown): void {
-    console.error('Firebase login failed:', error);
     this.loginError.set(true);
     this.loginErrorMessage.set(this.resolveLoginErrorMessage(error));
   }

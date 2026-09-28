@@ -35,9 +35,9 @@ export class ProfileDialog {
   );
 
   /** Guests may view their own profile but not change it. */
-  protected readonly canEdit = computed(
-    () => this.isOwnProfile() && this.auth.currentUser()?.isAnonymous === false,
-  );
+  // protected readonly canEdit = computed(
+  //   () => this.isOwnProfile() && this.auth.currentUser()?.isAnonymous === false,
+  // );
 
   protected readonly name = computed(() =>
     this.isOwnProfile() ? this.auth.displayName() : this.user()?.displayName || '',
