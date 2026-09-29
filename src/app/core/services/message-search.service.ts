@@ -73,17 +73,18 @@ export class MessageSearchService {
    *
    * @param chatId - The chat the message belongs to.
    * @param snapshot - The message document.
-   * @returns The search result, or `null` for messages without text or date.
+   * @returns The search result, or `null` for messages without a date.
    */
   private mapMessage(chatId: string, snapshot: QueryDocumentSnapshot): MessageSearchResult | null {
     const data = snapshot.data();
-    if (data['threadParentId'] || !(data['createdAt'] instanceof Timestamp)) return null;
+    if (!(data['createdAt'] instanceof Timestamp)) return null;
     return {
       chatId,
       messageId: snapshot.id,
       text: data['text'] || '',
       authorName: data['authorName'] || 'Unbekannter Nutzer',
       createdAt: data['createdAt'],
+      threadParentId: data['threadParentId'] || null,
     };
   }
 

@@ -258,26 +258,21 @@ export class Shell {
    *
    * @param message - The selected search hit.
    */
-  protected showSearchMessage(message: MessageSearchResult): void {
+  protected async showSearchMessage(message: MessageSearchResult): Promise<void> {
     const chat = this.chats.chats().find(({ id }) => id === message.chatId);
-    if (chat?.type === 'direct') {
-      void this.showSearchDirectMessage(message, chat.memberIds);
-      return;
-    }
-    this.showChannel(message.chatId);
-    this.searchTarget.set(message);
+    if (chat?.type === 'direct') await this.openSearchDirectChat(chat.memberIds);
+    else await this.devspaceNav()?.selectChannel(message.chatId);
+    const parentId = message.threadParentId;
+    this.searchTarget.set(parentId ? { ...message, messageId: parentId } : message);
+    if (parentId) this.thread.open(message.chatId, parentId);
   }
 
   /**
-   * Opens the direct conversation a search hit belongs to and marks the message.
+   * Opens the direct conversation a search hit belongs to.
    *
-   * @param message - The selected search hit.
    * @param memberIds - Participants of the direct chat.
    */
-  private async showSearchDirectMessage(
-    message: MessageSearchResult,
-    memberIds: string[],
-  ): Promise<void> {
+  private async openSearchDirectChat(memberIds: string[]): Promise<void> {
     const currentUserId = this.auth.currentUser()?.uid;
     if (!currentUserId) return;
     const partnerId = memberIds.find((id) => id !== currentUserId) || currentUserId;
@@ -285,7 +280,6 @@ export class Shell {
     const navigation = this.devspaceNav();
     if (navigation) navigation.selectUser(user);
     else this.showDirectMessage(user);
-    this.searchTarget.set(message);
   }
 
   /**

@@ -13,4 +13,6 @@ export interface MessageSearchResult {
   text: string;
   authorName: string;
   createdAt: Timestamp;
+  /** Id of the message whose thread holds this reply, or `null` for top-level messages. */
+  threadParentId: string | null;
 }
