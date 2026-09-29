@@ -61,10 +61,7 @@ export class WorkspaceSearch {
   private readonly searchableIds = computed(() =>
     this.chats
       .chats()
-      .filter(
-        (chat) =>
-          chat.type === 'channel' && chat.memberIds?.includes(this.auth.currentUser()?.uid || ''),
-      )
+      .filter((chat) => chat.memberIds?.includes(this.auth.currentUser()?.uid || ''))
       .map((chat) => chat.id)
       .sort()
       .join(','),
@@ -114,14 +111,27 @@ export class WorkspaceSearch {
    * @returns The row, carrying author and excerpt.
    */
   private messageEntry(message: MessageSearchResult): MentionEntry {
-    const channel = this.chats.chats().find((chat) => chat.id === message.chatId);
     return {
       id: `message:${message.chatId}/${message.messageId}`,
       icon: '↳',
       label: this.messageExcerpt(message.text),
       searchText: message.text,
-      description: `${message.authorName} · #${channel?.name || ''} · ${message.createdAt.toDate().toLocaleDateString('de-DE')}`,
+      description: `${message.authorName} · ${this.chatLabel(message.chatId)} · ${message.createdAt.toDate().toLocaleDateString('de-DE')}`,
     };
+  }
+
+  /**
+   * Names the chat a hit comes from.
+   *
+   * @param chatId - The chat the message belongs to.
+   * @returns `#channel` for channels, `@partner` for direct messages.
+   */
+  private chatLabel(chatId: string): string {
+    const chat = this.chats.chats().find(({ id }) => id === chatId);
+    if (chat?.type === 'channel') return `#${chat.name}`;
+    const uid = this.auth.currentUser()?.uid || '';
+    const partnerId = chat?.memberIds?.find((id) => id !== uid) || uid;
+    return `@${this.users.directory().get(partnerId)?.displayName || 'Direktnachricht'}`;
   }
 
   /**

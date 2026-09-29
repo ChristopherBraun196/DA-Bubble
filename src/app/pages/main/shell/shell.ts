@@ -259,7 +259,32 @@ export class Shell {
    * @param message - The selected search hit.
    */
   protected showSearchMessage(message: MessageSearchResult): void {
+    const chat = this.chats.chats().find(({ id }) => id === message.chatId);
+    if (chat?.type === 'direct') {
+      void this.showSearchDirectMessage(message, chat.memberIds);
+      return;
+    }
     this.showChannel(message.chatId);
+    this.searchTarget.set(message);
+  }
+
+  /**
+   * Opens the direct conversation a search hit belongs to and marks the message.
+   *
+   * @param message - The selected search hit.
+   * @param memberIds - Participants of the direct chat.
+   */
+  private async showSearchDirectMessage(
+    message: MessageSearchResult,
+    memberIds: string[],
+  ): Promise<void> {
+    const currentUserId = this.auth.currentUser()?.uid;
+    if (!currentUserId) return;
+    const partnerId = memberIds.find((id) => id !== currentUserId) || currentUserId;
+    const user = await this.resolveDirectUser(partnerId, currentUserId);
+    const navigation = this.devspaceNav();
+    if (navigation) navigation.selectUser(user);
+    else this.showDirectMessage(user);
     this.searchTarget.set(message);
   }
 

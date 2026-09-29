@@ -38,7 +38,7 @@
           (directMessageSelected)="openDirectMessage($event)"
         />
       } @else if (activeDirectUser(); as user) {
-        <app-direct-message-view [user]="user" />
+        <app-direct-message-view [user]="user" [searchTarget]="searchTarget()" />
       } @else {
         <app-chat-view
           [searchTarget]="searchTarget()"

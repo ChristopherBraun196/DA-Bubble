@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 
 import { AppUser } from '../../../core/models/user.model';
+import { MessageSearchResult } from '../../../core/models/message-search.model';
 import { AuthService } from '../../../core/services/auth.service';
 import { ChatService } from '../../../core/services/chat.service';
 import { MessageService } from '../../../core/services/message.service';
@@ -44,6 +45,7 @@ export class DirectMessageView {
   private connectionVersion = 0;
 
   readonly user = input.required<DirectMessageUser>();
+  readonly searchTarget = input<MessageSearchResult | null>(null);
   protected readonly messageInput = viewChild(MessageInput);
   protected readonly chatId = signal<string | null>(null);
   protected readonly loadingChat = signal(false);
@@ -56,6 +58,10 @@ export class DirectMessageView {
   protected readonly isCurrentUser = computed(() => this.user().isCurrentUser === true);
   protected readonly placeholder = computed(
     () => `Nachricht an ${this.displayName().replace(' (Du)', '')}`,
+  );
+
+  protected readonly activeSearchTarget = computed(() =>
+    this.searchTarget()?.chatId === this.chatId() ? this.searchTarget() : null,
   );
 
   constructor() {
