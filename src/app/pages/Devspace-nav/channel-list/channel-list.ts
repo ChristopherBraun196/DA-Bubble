@@ -9,7 +9,7 @@ import { CreateChannel } from '../create-channel/create-channel';
   styleUrl: './channel-list.scss',
   templateUrl: './channel-list.html',
 })
-/** Collapsible list of the channels the user belongs to. */
+/** Collapsible list of all public channels in the workspace. */
 export class ChannelList {
   private readonly chatService = inject(ChatService);
 

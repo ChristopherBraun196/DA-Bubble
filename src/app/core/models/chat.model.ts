@@ -18,7 +18,7 @@ export interface Chat {
   description: string;
   /** UID of the user who created the chat. */
   createdBy: string;
-  /** UIDs of all members; determines access and visibility. */
+  /** UIDs of all members; determines access to the channel messages. */
   memberIds: string[];
   /** Controls whether an empty direct message shows up in the sidebar. */
   hasMessages: boolean;

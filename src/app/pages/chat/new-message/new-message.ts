@@ -117,6 +117,7 @@ export class NewMessage {
    * @param text - The message body.
    */
   private async sendChannelMessage(channelId: string, text: string): Promise<void> {
+    if (!(await this.chats.selectChat(channelId))) return;
     await this.messages.sendMessage(channelId, text);
     this.channelSelected.emit(channelId);
   }
