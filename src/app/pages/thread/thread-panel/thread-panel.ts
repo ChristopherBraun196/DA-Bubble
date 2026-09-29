@@ -1,4 +1,13 @@
-import { Component, computed, inject, input, output, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { AuthService } from '../../../core/services/auth.service';
 import { ChatService } from '../../../core/services/chat.service';
 import { MessageService } from '../../../core/services/message.service';
@@ -33,6 +42,7 @@ export class ThreadPanel {
   protected readonly thread = inject(ThreadService);
   private readonly chats = inject(ChatService);
   private readonly messages = inject(MessageService);
+  private readonly messageInput = viewChild(MessageInput);
 
   protected readonly sending = signal(false);
   protected readonly currentUserId = computed(() => this.auth.currentUser()?.uid || null);
@@ -50,6 +60,21 @@ export class ThreadPanel {
     }
     return count === 1 ? '1 Antwort' : `${count} Antworten`;
   });
+
+  constructor() {
+    this.focusOpenedThread();
+  }
+
+  /** Moves the cursor into the reply field whenever another thread is opened. */
+  private focusOpenedThread(): void {
+    effect(() => {
+      const messageId = this.thread.target()?.messageId;
+      if (!messageId) return;
+      requestAnimationFrame(() => {
+        if (this.thread.target()?.messageId === messageId) this.messageInput()?.focus();
+      });
+    });
+  }
 
   /**
    * Sends a reply into the open thread.
