@@ -45,16 +45,10 @@ export class Register {
     }),
   });
 
-  /**
-   * Whether the email is valid and the privacy notice has been accepted.
-   *
-   * @remarks
-   * Mirrors the control statuses into a signal, because the app runs without
-   * zone.js and a plain template expression would not re-read them on input.
-   */
+  /** Keeps the continue button disabled until the complete form is valid. */
   protected readonly canContinue = toSignal(
-    this.form.valueChanges.pipe(map(() => this.emailAndConsentValid())),
-    { initialValue: this.emailAndConsentValid() },
+    this.form.statusChanges.pipe(map((status) => status === 'VALID')),
+    { initialValue: this.form.valid },
   );
 
   constructor() {
@@ -82,15 +76,6 @@ export class Register {
 
     this.saveRegistrationDraft();
     void this.router.navigateByUrl('/choose-avatar');
-  }
-
-  /**
-   * Checks the two fields that gate the submit button.
-   *
-   * @returns True when the email is valid and the privacy notice is accepted.
-   */
-  private emailAndConsentValid(): boolean {
-    return this.form.controls.email.valid && this.form.controls.privacyAccepted.valid;
   }
 
   /** Whether the email field should be shown in its error state. */

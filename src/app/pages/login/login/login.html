@@ -50,7 +50,11 @@
           (form.get('password')?.invalid && form.get('password')?.touched) || loginError()
         "
       >
-        <img class="input-pill__icon input-pill__icon--password" src="/assets/icons/lock.svg" alt="" />
+        <img
+          class="input-pill__icon input-pill__icon--password"
+          src="/assets/icons/lock.svg"
+          alt=""
+        />
         <input
           formControlName="password"
           type="password"
@@ -84,7 +88,7 @@
       </button>
 
       <div class="actions">
-        <button class="btn-primary" type="submit" [disabled]="loginPending() || !emailValid()">
+        <button class="btn-primary" type="submit" [disabled]="loginPending() || !formValid()">
           Anmelden
         </button>
         <button
