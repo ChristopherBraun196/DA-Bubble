@@ -12,10 +12,12 @@ import {
 import { ChatMessage } from '../../../core/models/message.model';
 import { ReactionEmoji } from '../../../core/models/reaction.model';
 import { AuthService } from '../../../core/services/auth.service';
+import { DirectMessageRequestService } from '../../../core/services/direct-message-request.service';
 import { ReactionHistoryService } from '../../../core/services/reaction-history.service';
 import { UserService } from '../../../core/services/user.service';
 import { AvatarFallback } from '../../../shared/avatar-fallback/avatar-fallback';
 import { EmojiPicker } from '../../../shared/emoji-picker/emoji-picker';
+import { splitMentions } from '../../../shared/utils/mention-parts';
 import { MessageReactions } from '../message-reactions/message-reactions';
 
 @Component({
@@ -39,6 +41,8 @@ export class MessageItem {
   private readonly auth = inject(AuthService);
 
   private readonly users = inject(UserService);
+  private readonly directMessages = inject(DirectMessageRequestService);
+
   readonly message = input<ChatMessage | null>(null);
   readonly ownMessage = input(false);
   readonly currentUserId = input<string | null>(null);
@@ -84,6 +88,11 @@ export class MessageItem {
     return !!authorId && authorId === this.auth.currentUser()?.uid;
   });
 
+  /** The message text split into plain text and clickable mentions. */
+  protected readonly textParts = computed(() =>
+    splitMentions(this.message()?.text ?? '', [...this.users.directory().values()]),
+  );
+
   protected readonly menuOpen = signal(false);
   protected readonly reactionPickerOpen = signal(false);
   protected readonly editEmojiOpen = signal(false);
@@ -94,6 +103,15 @@ export class MessageItem {
   private readonly reactionPickerWrap = viewChild<ElementRef<HTMLElement>>('reactionPickerWrap');
   private readonly editEmojiWrap = viewChild<ElementRef<HTMLElement>>('editEmojiWrap');
   private readonly editField = viewChild<ElementRef<HTMLTextAreaElement>>('editField');
+
+  /**
+   * Opens the direct conversation with a mentioned user.
+   *
+   * @param userId - The mentioned user.
+   */
+  protected openMention(userId: string): void {
+    this.directMessages.open(userId);
+  }
 
   /** Opens or closes the message's action menu. */
   protected toggleMenu(): void {

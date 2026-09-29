@@ -1,5 +1,15 @@
 import { MessageSearchResult } from '../../../core/models/message-search.model';
-import { Component, computed, DestroyRef, effect, inject, signal, viewChild } from '@angular/core';
+import {
+  Component,
+  computed,
+  DestroyRef,
+  effect,
+  inject,
+  signal,
+  untracked,
+  viewChild,
+} from '@angular/core';
+import { DirectMessageRequestService } from '../../../core/services/direct-message-request.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { AppUser } from '../../../core/models/user.model';
 import { UserSearchResult } from '../../../core/models/user.model';
@@ -38,6 +48,8 @@ export class Shell {
   private readonly chats = inject(ChatService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly users = inject(UserService);
+  private readonly directMessageRequests = inject(DirectMessageRequestService);
+
   private directRestoreVersion = 0;
 
   protected readonly thread = inject(ThreadService);
@@ -70,7 +82,16 @@ export class Shell {
     this.followThreadRequests();
     this.followActiveDirectUser();
     this.restoreActiveDirectChat();
+    this.followMentionRequests();
     this.destroyRef.onDestroy(() => this.disconnect());
+  }
+
+  /** Opens the direct conversation whenever a mention in a message is clicked. */
+  private followMentionRequests(): void {
+    effect(() => {
+      const request = this.directMessageRequests.request();
+      if (request) untracked(() => void this.openDirectChat([request.userId]));
+    });
   }
 
   /** Switches to the thread pane on small screens whenever a thread is opened. */
@@ -260,7 +281,7 @@ export class Shell {
    */
   protected async showSearchMessage(message: MessageSearchResult): Promise<void> {
     const chat = this.chats.chats().find(({ id }) => id === message.chatId);
-    if (chat?.type === 'direct') await this.openSearchDirectChat(chat.memberIds);
+    if (chat?.type === 'direct') await this.openDirectChat(chat.memberIds);
     else await this.devspaceNav()?.selectChannel(message.chatId);
     const parentId = message.threadParentId;
     this.searchTarget.set(parentId ? { ...message, messageId: parentId } : message);
@@ -268,11 +289,11 @@ export class Shell {
   }
 
   /**
-   * Opens the direct conversation a search hit belongs to.
+   * Opens the direct conversation with the other participant.
    *
    * @param memberIds - Participants of the direct chat.
    */
-  private async openSearchDirectChat(memberIds: string[]): Promise<void> {
+  private async openDirectChat(memberIds: string[]): Promise<void> {
     const currentUserId = this.auth.currentUser()?.uid;
     if (!currentUserId) return;
     const partnerId = memberIds.find((id) => id !== currentUserId) || currentUserId;

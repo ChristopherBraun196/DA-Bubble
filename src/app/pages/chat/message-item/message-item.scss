@@ -1,3 +1,5 @@
+@use '../../../../styles/variables' as variables;
+
 :host {
   display: block;
   margin-inline: -40px;
@@ -101,6 +103,28 @@ app-message-reactions {
   overflow-wrap: anywhere;
   white-space: pre-wrap;
   transition: background-color 150ms ease;
+}
+
+.message__mention {
+  padding: 0;
+  border: none;
+  background: none;
+  color: #535af1;
+  font: inherit;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    color 150ms ease,
+    transform 150ms ease;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+
+  .message--own & {
+    color: white;
+  }
 }
 
 .message__thread {

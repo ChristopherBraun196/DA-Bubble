@@ -61,7 +61,17 @@
           </div>
         </div>
       } @else {
-        <p class="message__bubble">{{ message.text }}</p>
+        <p class="message__bubble">
+          @for (part of textParts(); track $index) {
+            @if (part.userId; as userId) {
+              <button class="message__mention" type="button" (click)="openMention(userId)">
+                {{ part.text }}
+              </button>
+            } @else {
+              <span>{{ part.text }}</span>
+            }
+          }
+        </p>
         <app-message-reactions
           [reactions]="message.reactions"
           [currentUserId]="currentUserId()"
