@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
+import { Component, computed, inject, input, output, signal } from '@angular/core';
 
 import { UserSearchResult } from '../../../core/models/user.model';
 import { AuthService } from '../../../core/services/auth.service';
@@ -30,16 +30,14 @@ export interface DirectMessageUser {
 export class DirectMessageList {
   private readonly auth = inject(AuthService);
   private readonly userDirectory = inject(UserService);
-  private loadVersion = 0;
 
   readonly activeUserId = input<string | null>(null);
   readonly temporaryUser = input<DirectMessageUser | null>(null);
   readonly userSelected = output<DirectMessageUser>();
 
   protected readonly expanded = signal(true);
-  protected readonly error = signal('');
 
-  /** Der eingeloggte User steht immer an erster Stelle. */
+  /** The signed-in user is always listed first. */
   private readonly currentUser = computed<DirectMessageUser>(() => ({
     id: this.auth.currentUser()?.uid ?? 'me',
     name: `${this.auth.displayName()} (Du)`,
@@ -48,7 +46,10 @@ export class DirectMessageList {
     isCurrentUser: true,
   }));
 
-  private readonly otherUsers = signal<DirectMessageUser[]>([]);
+  /** Everyone else from the live user directory, updated whenever a profile changes. */
+  private readonly otherUsers = computed(() =>
+    this.toDirectMessageUsers([...this.userDirectory.directory().values()]),
+  );
 
   protected readonly users = computed<DirectMessageUser[]>(() => {
     const currentUser = this.currentUser();
@@ -58,47 +59,8 @@ export class DirectMessageList {
     return [currentUser, ...temporaryUsers, ...otherUsers];
   });
 
-  constructor() {
-    effect(() => {
-      this.auth.currentUser();
-      void this.loadEveryone(++this.loadVersion);
-    });
-  }
-
   /**
-   * Loads everyone in the directory.
-   *
-   * @param version - Guards against results of a superseded load.
-   *
-   * @remarks
-   * The signed-in user and every guest are dropped in
-   * {@link DirectMessageList.toDirectMessageUsers}.
-   */
-  private async loadEveryone(version: number): Promise<void> {
-    await this.applyUsers(this.userDirectory.getAllUsers(), version);
-  }
-
-  /**
-   * Stores the resolved rows unless a newer load has started meanwhile.
-   *
-   * @param loading - The pending lookup.
-   * @param version - The load this result belongs to.
-   */
-  private async applyUsers(
-    loading: Promise<(UserSearchResult | null)[]>,
-    version: number,
-  ): Promise<void> {
-    try {
-      const users = await loading;
-      if (version === this.loadVersion) this.otherUsers.set(this.toDirectMessageUsers(users));
-    } catch {
-      if (version === this.loadVersion)
-        this.error.set('Die Nutzerliste konnte nicht geladen werden.');
-    }
-  }
-
-  /**
-   * Maps loaded users into list rows, leaving out the signed-in user and guests.
+   * Maps loaded users into list rows, leaving out the signed-in user and inactive guests.
    *
    * @param users - The resolved conversation partners.
    * @returns The rows to render.
@@ -108,13 +70,17 @@ export class DirectMessageList {
 
     return users
       .filter((user): user is UserSearchResult => !!user)
-      .filter(({ uid, displayName }) => uid !== currentUserId && !this.isGuest(displayName))
-      .map(({ uid, displayName, photoURL }) => ({
+      .filter(
+        ({ uid, isAnonymous, lastSeenAt }) =>
+          uid !== currentUserId && (!isAnonymous || this.userDirectory.isOnline(lastSeenAt)),
+      )
+      .map(({ uid, displayName, photoURL, lastSeenAt }) => ({
         id: uid,
         name: displayName,
         avatar: photoURL,
-        online: false,
-      }));
+        online: this.userDirectory.isOnline(lastSeenAt),
+      }))
+      .sort((first, second) => first.name.localeCompare(second.name, 'de'));
   }
 
   /** Returns the freshly selected partner when no conversation exists yet. */
@@ -125,16 +91,6 @@ export class DirectMessageList {
   ): DirectMessageUser[] {
     const alreadyVisible = persistedUsers.some(({ id }) => id === user?.id);
     return user && user.id !== currentUserId && !alreadyVisible ? [user] : [];
-  }
-
-  /**
-   * Detects guest accounts by their name.
-   *
-   * @param displayName - The stored display name.
-   * @returns True for anonymous sessions.
-   */
-  private isGuest(displayName: string): boolean {
-    return displayName.trim().toLocaleLowerCase('de-DE') === 'gast';
   }
 
   /** Collapses or expands the list. */

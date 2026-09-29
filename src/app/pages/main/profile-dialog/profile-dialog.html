@@ -43,6 +43,10 @@
         />
       </div>
 
+      @if (nameHasDigits()) {
+        <p class="profile__error">Der Name darf keine Zahlen enthalten.</p>
+      }
+
       @if (saveError()) {
         <p class="profile__error">{{ saveError() }}</p>
       }
@@ -51,7 +55,11 @@
         <button class="profile__button profile__button--ghost" type="button" (click)="cancelEdit()">
           Abbrechen
         </button>
-        <button class="profile__button profile__button--solid" type="submit" [disabled]="saving()">
+        <button
+          class="profile__button profile__button--solid"
+          type="submit"
+          [disabled]="saving() || !hasChanges()"
+        >
           {{ saving() ? 'Speichert …' : 'Speichern' }}
         </button>
       </div>
@@ -59,15 +67,14 @@
   } @else {
     <div class="profile__row">
       <p class="profile__name">{{ name() }}</p>
-      <!-- @if (canEdit()) { Bewusst drinnen gelassen -->
       @if (isOwnProfile()) {
         <button class="profile__edit" type="button" (click)="startEdit()">Bearbeiten</button>
       }
     </div>
 
-    <p class="profile__status">
+    <p class="profile__status" [class.profile__status--offline]="!online()">
       <span class="profile__dot"></span>
-      Aktiv
+      {{ online() ? 'Aktiv' : 'Abwesend' }}
     </p>
 
     <div class="profile__mail">

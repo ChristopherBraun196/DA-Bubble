@@ -13,6 +13,7 @@ import { ChatMessage } from '../../../core/models/message.model';
 import { ReactionEmoji } from '../../../core/models/reaction.model';
 import { AuthService } from '../../../core/services/auth.service';
 import { ReactionHistoryService } from '../../../core/services/reaction-history.service';
+import { UserService } from '../../../core/services/user.service';
 import { AvatarFallback } from '../../../shared/avatar-fallback/avatar-fallback';
 import { EmojiPicker } from '../../../shared/emoji-picker/emoji-picker';
 import { MessageReactions } from '../message-reactions/message-reactions';
@@ -37,6 +38,7 @@ export class MessageItem {
   protected readonly reactionHistory = inject(ReactionHistoryService);
   private readonly auth = inject(AuthService);
 
+  private readonly users = inject(UserService);
   readonly message = input<ChatMessage | null>(null);
   readonly ownMessage = input(false);
   readonly currentUserId = input<string | null>(null);
@@ -56,16 +58,25 @@ export class MessageItem {
    *
    * @remarks
    * A message stores its author's name and photo as they were when it was
-   * sent. For the signed-in user the live profile wins, so renaming or picking
-   * a new avatar updates their own messages instead of leaving the old values
-   * behind. Everyone else keeps what the message carries.
+   * sent. The live values win: the signed-in user's own profile, and for
+   * everyone else the user directory. The stored values only remain as a
+   * fallback, for example when the author's account was deleted.
    */
   protected readonly authorName = computed(() =>
-    this.writtenByCurrentUser() ? this.auth.displayName() : this.message()?.authorName || '',
+    this.writtenByCurrentUser()
+      ? this.auth.displayName()
+      : this.liveAuthor()?.displayName || this.message()?.authorName || '',
   );
 
   protected readonly authorAvatar = computed(() =>
-    this.writtenByCurrentUser() ? this.auth.photoURL() : this.message()?.authorPhotoURL || '',
+    this.writtenByCurrentUser()
+      ? this.auth.photoURL()
+      : this.liveAuthor()?.photoURL || this.message()?.authorPhotoURL || '',
+  );
+
+  /** The author's current profile from the live user directory. */
+  private readonly liveAuthor = computed(() =>
+    this.users.directory().get(this.message()?.authorId ?? ''),
   );
 
   private readonly writtenByCurrentUser = computed(() => {

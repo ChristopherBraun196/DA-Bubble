@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { User } from 'firebase/auth';
 import {
   collection,
@@ -7,14 +7,21 @@ import {
   DocumentSnapshot,
   getDoc,
   getDocs,
+  onSnapshot,
   query,
   serverTimestamp,
   setDoc,
+  Timestamp,
+  Unsubscribe,
+  updateDoc,
   where,
 } from 'firebase/firestore';
 
 import { FirebaseService } from '../firebase/firebase.service';
 import { AppUser, UserSearchResult } from '../models/user.model';
+
+const PRESENCE_HEARTBEAT_MS = 45_000;
+const ONLINE_TIMEOUT_MS = 120_000;
 
 @Injectable({ providedIn: 'root' })
 /**
@@ -28,6 +35,74 @@ export class UserService {
   private readonly firebase = inject(FirebaseService);
   private cachedUsers?: Promise<UserSearchResult[]>;
 
+  private unsubscribeFromDirectory?: Unsubscribe;
+  private readonly directoryState = signal<ReadonlyMap<string, UserSearchResult>>(new Map());
+  private readonly presenceNowState = signal(Date.now());
+  private presenceTimerId?: number;
+  private presenceUserId = '';
+
+  /** Live lookup of every user by uid, kept in sync with Firestore. */
+  readonly directory = this.directoryState.asReadonly();
+
+  /** Starts keeping the signed-in user's last-seen timestamp fresh. */
+  startPresence(userId: string): void {
+    if (!this.firebase.isBrowser || !userId || this.presenceUserId === userId) {
+      return;
+    }
+    this.stopPresence();
+    this.presenceUserId = userId;
+    this.refreshPresence();
+    document.addEventListener('visibilitychange', this.refreshPresenceWhenVisible);
+    this.presenceTimerId = window.setInterval(() => this.refreshPresence(), PRESENCE_HEARTBEAT_MS);
+  }
+
+  /** Stops the local heartbeat without writing after authentication ended. */
+  stopPresence(): void {
+    if (this.presenceTimerId !== undefined) {
+      window.clearInterval(this.presenceTimerId);
+      this.presenceTimerId = undefined;
+    }
+    if (this.firebase.isBrowser) {
+      document.removeEventListener('visibilitychange', this.refreshPresenceWhenVisible);
+    }
+    this.presenceUserId = '';
+  }
+
+  /** Marks a deliberate logout as offline immediately. */
+  async markOffline(userId: string): Promise<void> {
+    if (!this.firebase.isBrowser || !userId) {
+      return;
+    }
+    await updateDoc(doc(this.firebase.firestore, 'users', userId), {
+      lastSeenAt: Timestamp.fromMillis(0),
+    });
+    this.presenceNowState.set(Date.now());
+  }
+
+  /** Reports whether a last-seen timestamp is still inside the online window. */
+  isOnline(lastSeenAt: Timestamp | null | undefined): boolean {
+    const now = this.presenceNowState();
+    return !!lastSeenAt && now - lastSeenAt.toMillis() < ONLINE_TIMEOUT_MS;
+  }
+
+  /** Refreshes presence as soon as a background tab becomes visible again. */
+  private readonly refreshPresenceWhenVisible = (): void => {
+    if (document.visibilityState === 'visible') {
+      this.refreshPresence();
+    }
+  };
+
+  /** Advances the local clock and sends the current timestamp to Firestore. */
+  private refreshPresence(): void {
+    this.presenceNowState.set(Date.now());
+    if (!this.presenceUserId) {
+      return;
+    }
+    void updateDoc(doc(this.firebase.firestore, 'users', this.presenceUserId), {
+      lastSeenAt: serverTimestamp(),
+    }).catch(() => undefined);
+  }
+
   /**
    * Returns every known user, cached after the first call.
    *
@@ -40,6 +115,34 @@ export class UserService {
       .filter((userSnapshot) => userSnapshot.data()['isAnonymous'] !== true)
       .map((userSnapshot) => this.mapSearchResult(userSnapshot))
       .sort((first, second) => first.displayName.localeCompare(second.displayName, 'de'));
+  }
+
+  /**
+   * Starts following every user document so names and avatars update live.
+   *
+   * @remarks
+   * Safe to call repeatedly; only the first call opens a listener.
+   */
+  watchDirectory(): void {
+    if (this.unsubscribeFromDirectory) {
+      return;
+    }
+    const userRef = collection(this.firebase.firestore, 'users');
+    this.unsubscribeFromDirectory = onSnapshot(
+      userRef,
+      (snapshot) => {
+        const users = snapshot.docs.map((userSnapshot) => this.mapSearchResult(userSnapshot));
+        this.directoryState.set(new Map(users.map((user) => [user.uid, user])));
+      },
+      () => this.stopWatchingDirectory(),
+    );
+  }
+
+  /** Stops following the users, for example on sign-out. */
+  stopWatchingDirectory(): void {
+    this.unsubscribeFromDirectory?.();
+    this.unsubscribeFromDirectory = undefined;
+    this.directoryState.set(new Map());
   }
 
   /**
@@ -129,6 +232,8 @@ export class UserService {
       uid: snapshot.id,
       displayName: data.displayName || 'Unbekannter Nutzer',
       photoURL: data.photoURL || '/img/Profile_Guest.png',
+      isAnonymous: Boolean(data.isAnonymous),
+      lastSeenAt: data.lastSeenAt instanceof Timestamp ? data.lastSeenAt : null,
     };
   }
 

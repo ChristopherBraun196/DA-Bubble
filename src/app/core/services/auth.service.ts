@@ -215,6 +215,11 @@ export class AuthService {
 
   /** Signs the current user out and clears guest data where applicable. */
   async logout(): Promise<void> {
+    const userId = this.currentUser()?.uid;
+    this.users.stopPresence();
+    if (userId) {
+      await this.users.markOffline(userId).catch(() => undefined);
+    }
     await signOut(this.firebase.auth);
   }
 

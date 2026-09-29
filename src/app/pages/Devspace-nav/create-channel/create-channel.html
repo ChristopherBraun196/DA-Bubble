@@ -1,11 +1,6 @@
 <div class="create-channel__backdrop" (click)="closed.emit()">
   @if (step() === 'people') {
-    <app-add-people
-      [chatId]="createdChannelId()"
-      [sourceChannelName]="sourceChannelName"
-      [sourceMemberIds]="sourceMemberIds"
-      (closed)="closed.emit()"
-    />
+    <app-add-people [chatId]="createdChannelId()" (closed)="closed.emit()" />
   } @else {
     <div
       class="create-channel"

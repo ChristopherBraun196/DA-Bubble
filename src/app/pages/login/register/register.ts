@@ -29,7 +29,7 @@ export class Register {
   protected readonly form = new FormGroup({
     name: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.required, Validators.pattern(/\S/)],
+      validators: [Validators.required, Validators.pattern(/^(?=.*\S)\D*$/)],
     }),
     email: new FormControl('', {
       nonNullable: true,
@@ -45,16 +45,10 @@ export class Register {
     }),
   });
 
-  /**
-   * Whether the email is valid and the privacy notice has been accepted.
-   *
-   * @remarks
-   * Mirrors the control statuses into a signal, because the app runs without
-   * zone.js and a plain template expression would not re-read them on input.
-   */
+  /** Keeps the continue button disabled until the complete form is valid. */
   protected readonly canContinue = toSignal(
-    this.form.valueChanges.pipe(map(() => this.emailAndConsentValid())),
-    { initialValue: this.emailAndConsentValid() },
+    this.form.statusChanges.pipe(map((status) => status === 'VALID')),
+    { initialValue: this.form.valid },
   );
 
   constructor() {
@@ -84,15 +78,6 @@ export class Register {
     void this.router.navigateByUrl('/choose-avatar');
   }
 
-  /**
-   * Checks the two fields that gate the submit button.
-   *
-   * @returns True when the email is valid and the privacy notice is accepted.
-   */
-  private emailAndConsentValid(): boolean {
-    return this.form.controls.email.valid && this.form.controls.privacyAccepted.valid;
-  }
-
   /** Whether the email field should be shown in its error state. */
   protected emailHasError(): boolean {
     return this.form.controls.email.invalid && this.form.controls.email.touched;
@@ -115,6 +100,13 @@ export class Register {
     }
 
     return 'Bitte geben Sie ein Passwort ein.';
+  }
+
+  /** The message shown below the name field. */
+  protected nameErrorMessage(): string {
+    return /\d/.test(this.form.controls.name.value)
+      ? 'Der Name darf keine Zahlen enthalten.'
+      : 'Bitte schreiben Sie einen Namen.';
   }
 
   /** Hands the entered values to the draft service before navigating on. */

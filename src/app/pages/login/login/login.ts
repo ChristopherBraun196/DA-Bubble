@@ -51,16 +51,10 @@ export class Login {
     }),
   });
 
-  /**
-   * Whether the email field currently holds a valid address.
-   *
-   * @remarks
-   * Mirrors the control's status into a signal, because the app runs without
-   * zone.js and a plain template expression would not re-read it on typing.
-   */
-  protected readonly emailValid = toSignal(
-    this.form.controls.email.statusChanges.pipe(map((status) => status === 'VALID')),
-    { initialValue: this.form.controls.email.valid },
+  /** Keeps the submit button disabled until both credentials are valid. */
+  protected readonly formValid = toSignal(
+    this.form.statusChanges.pipe(map((status) => status === 'VALID')),
+    { initialValue: this.form.valid },
   );
 
   /** Signs in with the credentials entered in the form. */

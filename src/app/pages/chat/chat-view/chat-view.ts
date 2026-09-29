@@ -9,6 +9,7 @@ import {
   output,
   signal,
   untracked,
+  viewChild,
 } from '@angular/core';
 import { AppUser } from '../../../core/models/user.model';
 import { AuthService } from '../../../core/services/auth.service';
@@ -44,6 +45,7 @@ export class ChatView {
   protected readonly messages = inject(MessageService);
   private readonly thread = inject(ThreadService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly messageInput = viewChild(MessageInput);
 
   protected readonly activeChat = computed(() =>
     this.chats.chats().find(({ id }) => id === this.chats.activeChatId()),
@@ -69,7 +71,19 @@ export class ChatView {
       this.closeForeignThread(this.chats.activeChatId());
     });
 
+    this.focusActiveChannel();
     this.destroyRef.onDestroy(() => this.messages.disconnect());
+  }
+
+  /** Moves the cursor into the input whenever another channel is opened. */
+  private focusActiveChannel(): void {
+    effect(() => {
+      const chatId = this.chats.activeChatId();
+      if (!chatId) return;
+      requestAnimationFrame(() => {
+        if (this.chats.activeChatId() === chatId) this.messageInput()?.focus();
+      });
+    });
   }
 
   /**

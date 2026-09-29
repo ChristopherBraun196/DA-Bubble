@@ -2,6 +2,7 @@ import { Component, computed, inject, input, output, signal } from '@angular/cor
 
 import { AppUser } from '../../../core/models/user.model';
 import { AuthService } from '../../../core/services/auth.service';
+import { UserService } from '../../../core/services/user.service';
 import { AvatarFallback } from '../../../shared/avatar-fallback/avatar-fallback';
 import { AvatarPicker } from '../../../shared/avatar-picker/avatar-picker';
 
@@ -24,6 +25,7 @@ const SAVE_ERROR_MESSAGE =
  */
 export class ProfileDialog {
   private readonly auth = inject(AuthService);
+  private readonly users = inject(UserService);
 
   readonly user = input<AppUser | null>(null);
   readonly closed = output<void>();
@@ -34,11 +36,6 @@ export class ProfileDialog {
     () => !this.user() || this.user()?.uid === this.auth.currentUser()?.uid,
   );
 
-  /** Guests may view their own profile but not change it. */
-  // protected readonly canEdit = computed(
-  //   () => this.isOwnProfile() && this.auth.currentUser()?.isAnonymous === false,
-  // );
-
   protected readonly name = computed(() =>
     this.isOwnProfile() ? this.auth.displayName() : this.user()?.displayName || '',
   );
@@ -48,18 +45,35 @@ export class ProfileDialog {
   protected readonly email = computed(() =>
     this.isOwnProfile() ? this.auth.email() : this.user()?.email || null,
   );
+  protected readonly online = computed(() => {
+    if (this.isOwnProfile()) return true;
+    const user = this.user();
+    const lastSeenAt = this.users.directory().get(user?.uid || '')?.lastSeenAt ?? user?.lastSeenAt;
+    return this.users.isOnline(lastSeenAt);
+  });
 
   protected readonly editing = signal(false);
   protected readonly saving = signal(false);
   protected readonly saveError = signal('');
   protected readonly avatarDraft = signal('');
 
-  /** Starts empty; the current name is shown as the placeholder. */
+  /** Starts with the current name when editing begins. */
   protected readonly nameDraft = signal('');
 
-  /** Switches the name into edit mode with an empty draft. */
+  /** True once the name or avatar differs from what is saved, and the name is not empty. */
+  protected readonly hasChanges = computed(() => {
+    const name = this.nameDraft().trim();
+    return (
+      !!name && !/\d/.test(name) && (name !== this.name() || this.avatarDraft() !== this.avatar())
+    );
+  });
+
+  /** True while the typed name contains a digit. */
+  protected readonly nameHasDigits = computed(() => /\d/.test(this.nameDraft()));
+
+  /** Switches into edit mode, starting from the current name and avatar. */
   protected startEdit(): void {
-    this.nameDraft.set('');
+    this.nameDraft.set(this.name());
     this.saveError.set('');
     this.editing.set(true);
     this.avatarDraft.set(this.avatar());
@@ -111,7 +125,7 @@ export class ProfileDialog {
   private async persistChanges(): Promise<void> {
     const name = this.nameDraft().trim();
 
-    if (name) {
+    if (name && name !== this.name()) {
       await this.auth.updateDisplayName(name);
     }
 

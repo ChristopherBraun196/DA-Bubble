@@ -105,6 +105,14 @@
   margin: 0;
   color: #92c83e;
   font-size: 20px;
+
+  &--offline {
+    color: #686868;
+
+    .profile__dot {
+      background-color: #686868;
+    }
+  }
 }
 
 .profile__dot {

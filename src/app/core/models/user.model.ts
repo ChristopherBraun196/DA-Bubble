@@ -11,6 +11,8 @@ export interface UserSearchResult {
   uid: string;
   displayName: string;
   photoURL: string;
+  isAnonymous: boolean;
+  lastSeenAt: Timestamp | null;
 }
 
 /**

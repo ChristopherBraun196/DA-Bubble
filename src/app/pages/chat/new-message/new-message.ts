@@ -117,6 +117,7 @@ export class NewMessage {
    * @param text - The message body.
    */
   private async sendChannelMessage(channelId: string, text: string): Promise<void> {
+    if (!(await this.chats.selectChat(channelId))) return;
     await this.messages.sendMessage(channelId, text);
     this.channelSelected.emit(channelId);
   }
@@ -183,11 +184,12 @@ export class NewMessage {
   private toDirectMessageUser(entry: MentionEntry): DirectMessageUser {
     const userId = entry.id.slice(5);
     const isCurrentUser = userId === this.auth.currentUser()?.uid;
+    const lastSeenAt = this.users.directory().get(userId)?.lastSeenAt;
     return {
       id: userId,
       name: `${entry.label}${isCurrentUser ? ' (Du)' : ''}`,
       avatar: entry.avatar || '/img/Profile_Guest.png',
-      online: isCurrentUser,
+      online: isCurrentUser || this.users.isOnline(lastSeenAt),
       isCurrentUser,
     };
   }

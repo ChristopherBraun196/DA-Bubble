@@ -2,6 +2,7 @@ import { MessageSearchResult } from '../../../core/models/message-search.model';
 import { Component, computed, DestroyRef, effect, inject, signal, viewChild } from '@angular/core';
 import { AuthService } from '../../../core/services/auth.service';
 import { AppUser } from '../../../core/models/user.model';
+import { UserSearchResult } from '../../../core/models/user.model';
 import { ChatService } from '../../../core/services/chat.service';
 import { ThreadService } from '../../../core/services/thread.service';
 import { UserService } from '../../../core/services/user.service';
@@ -61,9 +62,13 @@ export class Shell {
 
     if (user) {
       void this.chats.connect(user.uid);
+      this.users.watchDirectory();
+      this.users.startPresence(user.uid);
+      void this.chats.joinGeneralChannel(user.uid);
     }
     this.watchViewport();
     this.followThreadRequests();
+    this.followActiveDirectUser();
     this.restoreActiveDirectChat();
     this.destroyRef.onDestroy(() => this.disconnect());
   }
@@ -84,6 +89,32 @@ export class Shell {
       if (activeChat?.type === 'direct' && !this.activeDirectUser()) {
         void this.restoreDirectMessage(activeChat.id, activeChat.memberIds, version);
       }
+    });
+  }
+
+  /** Keeps the open direct-message header in sync with live profile and presence data. */
+  private followActiveDirectUser(): void {
+    effect(() => {
+      const selected = this.activeDirectUser();
+      const liveUser = selected && this.users.directory().get(selected.id);
+      if (selected && liveUser) this.syncActiveDirectUser(selected, liveUser);
+    });
+  }
+
+  /** Applies changed directory values to the currently open direct message. */
+  private syncActiveDirectUser(selected: DirectMessageUser, liveUser: UserSearchResult): void {
+    if (selected.isCurrentUser) return;
+    const online = this.users.isOnline(liveUser.lastSeenAt);
+    const unchanged =
+      selected.name === liveUser.displayName &&
+      selected.avatar === liveUser.photoURL &&
+      selected.online === online;
+    if (unchanged) return;
+    this.activeDirectUser.set({
+      ...selected,
+      name: liveUser.displayName,
+      avatar: liveUser.photoURL,
+      online,
     });
   }
 
@@ -125,7 +156,7 @@ export class Shell {
         id: userId,
         name: user?.displayName || 'Unbekannter Nutzer',
         avatar: user?.photoURL || '/img/Profile_Guest.png',
-        online: false,
+        online: this.users.isOnline(user?.lastSeenAt),
       };
     } catch {
       return this.unknownDirectUser(userId);
@@ -209,7 +240,7 @@ export class Shell {
       id: user.uid,
       name: user.displayName,
       avatar: user.photoURL,
-      online: true,
+      online: this.users.isOnline(user.lastSeenAt),
     });
   }
 
@@ -245,5 +276,7 @@ export class Shell {
   private disconnect(): void {
     this.chats.disconnect();
     this.thread.close();
+    this.users.stopPresence();
+    this.users.stopWatchingDirectory();
   }
 }

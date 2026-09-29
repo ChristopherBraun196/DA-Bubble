@@ -15,7 +15,7 @@ export type DevspaceSelection = { kind: 'channel'; id: string } | { kind: 'user'
   styleUrl: './devspace-nav.scss',
   templateUrl: './devspace-nav.html',
 })
-/** Sidebar listing the user's channels and direct message conversations. */
+/** Sidebar listing public channels and the user's direct conversations. */
 export class DevspaceNav {
   private readonly chats = inject(ChatService);
 
@@ -55,12 +55,12 @@ export class DevspaceNav {
    *
    * @param id - Id of the channel to show.
    */
-  public selectChannel(id: string): void {
+  public async selectChannel(id: string): Promise<void> {
+    if (!(await this.chats.selectChat(id))) return;
     this.temporaryUser.set(null);
     this.composingChanged.emit(false);
     this.directMessageSelected.emit(null);
     this.selection.set({ kind: 'channel', id });
-    this.chats.selectChat(id);
     this.navigated.emit();
   }
 

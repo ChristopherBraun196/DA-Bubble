@@ -25,17 +25,17 @@ export interface ChannelMember {
 export function toChannelMembers(
   members: AppUser[],
   currentUserId: string | null,
+  isOnline: (member: AppUser) => boolean = (member) => member.uid === currentUserId,
 ): ChannelMember[] {
   return [...members]
     .sort(
-      (first, second) =>
-        Number(second.uid === currentUserId) - Number(first.uid === currentUserId),
+      (first, second) => Number(second.uid === currentUserId) - Number(first.uid === currentUserId),
     )
     .map((member) => ({
       id: member.uid,
       name: member.uid === currentUserId ? `${member.displayName} (Du)` : member.displayName,
       avatar: member.photoURL,
-      online: member.uid === currentUserId,
+      online: isOnline(member),
       user: member,
     }));
 }

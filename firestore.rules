@@ -122,6 +122,18 @@ service cloud.firestore {
         && request.resource.data.description is string
         && request.resource.data.hasMessages is bool;
     }
+    function joinsPublicChannel() {
+      let changedFields = request.resource.data.diff(resource.data).affectedKeys();
+      let oldMembers = resource.data.memberIds.toSet();
+      let newMembers = request.resource.data.memberIds.toSet();
+
+      return resource.data.type == 'channel'
+        && changedFields.hasOnly(['memberIds', 'updatedAt'])
+        && request.resource.data.memberIds is list
+        && newMembers.size() == request.resource.data.memberIds.size()
+        && newMembers.difference(oldMembers) == [request.auth.uid].toSet()
+        && oldMembers.difference(newMembers).size() == 0;
+    }
 
     function validMessageCreate() {
       return request.resource.data.keys().hasOnly([
@@ -196,13 +208,17 @@ service cloud.firestore {
 
     match /chats/{chatId} {
       allow get: if signedIn()
-        && (resource == null || request.auth.uid in resource.data.memberIds);
+        && (resource == null
+        || resource.data.type == 'channel'
+        || request.auth.uid in resource.data.memberIds);
+
       allow list: if signedIn()
-        && request.auth.uid in resource.data.memberIds;
+        && (resource.data.type == 'channel'
+        || request.auth.uid in resource.data.memberIds);
       allow create: if signedIn() && validChatCreate();
       allow update: if signedIn()
-        && request.auth.uid in resource.data.memberIds
-        && validChatUpdate();
+        && ((request.auth.uid in resource.data.memberIds && validChatUpdate())
+        || joinsPublicChannel());
       allow delete: if false;
 
       match /messages/{messageId} {

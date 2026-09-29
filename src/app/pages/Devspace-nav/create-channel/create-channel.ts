@@ -35,19 +35,8 @@ export class CreateChannel {
   /** Id of the channel just created; step 2 adds the members to it. */
   protected readonly createdChannelId = signal('');
 
-  /** The channel that was active when the dialog opened, source for "All members of …". */
-  protected readonly sourceChannelName: string;
-  protected readonly sourceMemberIds: string[];
-
   /** The channel name is required; the button stays disabled until it is set. */
   protected readonly canCreate = computed(() => this.channelName().trim().length > 0);
-
-  constructor() {
-    const activeChat = this.chats.chats().find(({ id }) => id === this.chats.activeChatId());
-
-    this.sourceChannelName = activeChat?.name || '';
-    this.sourceMemberIds = activeChat?.memberIds || [];
-  }
 
   /**
    * Tracks what is typed into the name field.

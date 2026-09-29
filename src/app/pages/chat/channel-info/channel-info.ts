@@ -37,9 +37,14 @@ export class ChannelInfo {
    * The chat header keeps the subscription open, so this card only reads the
    * rows it already holds.
    */
-  protected readonly members = computed<ChannelMember[]>(() =>
-    toChannelMembers(this.channelMembers.members(), this.auth.currentUser()?.uid || null),
-  );
+  protected readonly members = computed<ChannelMember[]>(() => {
+    const currentUserId = this.auth.currentUser()?.uid || null;
+    return toChannelMembers(
+      this.channelMembers.members(),
+      currentUserId,
+      (member) => member.uid === currentUserId || this.users.isOnline(member.lastSeenAt),
+    );
+  });
 
   private readonly activeChat = computed(() =>
     this.chats.chats().find(({ id }) => id === this.chats.activeChatId()),
