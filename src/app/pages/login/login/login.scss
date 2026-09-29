@@ -348,9 +348,7 @@
         background-color 100ms ease-out;
 
       &:disabled {
-        border-color: variables.$purple-light;
         background-color: variables.$purple-light;
-        color: variables.$white;
         cursor: not-allowed;
       }
     }
