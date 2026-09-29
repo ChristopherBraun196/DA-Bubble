@@ -67,7 +67,6 @@
   } @else {
     <div class="profile__row">
       <p class="profile__name">{{ name() }}</p>
-      <!-- @if (canEdit()) { Bewusst drinnen gelassen -->
       @if (isOwnProfile()) {
         <button class="profile__edit" type="button" (click)="startEdit()">Bearbeiten</button>
       }

@@ -34,8 +34,15 @@
 
     @if (panel() === 'menu') {
       <div class="topbar__menu">
-        <button class="topbar__menu-item" type="button" (click)="openProfile()">Profil</button>
-        <button class="topbar__menu-item" type="button" (click)="logout()">Log out</button>
+        <span class="topbar__menu-handle" aria-hidden="true"></span>
+        <button class="topbar__menu-item" type="button" (click)="openProfile()">
+          <span class="material-symbols-outlined topbar__menu-icon">account_circle</span>
+          <span>Profil</span>
+        </button>
+        <button class="topbar__menu-item" type="button" (click)="logout()">
+          <span class="material-symbols-outlined topbar__menu-icon">logout</span>
+          <span>Log out</span>
+        </button>
       </div>
     }
 
