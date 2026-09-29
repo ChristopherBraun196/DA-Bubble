@@ -180,6 +180,14 @@
   }
 }
 
+@media (min-width: 600px) {
+  .topbar__profile {
+    max-height: calc(100dvh - 112px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+}
+
 @media (max-width: 869px) {
   .topbar app-workspace-search {
     display: none;
