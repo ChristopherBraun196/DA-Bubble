@@ -60,7 +60,7 @@ export class DirectMessageList {
   });
 
   /**
-   * Maps loaded users into list rows, leaving out the signed-in user and guests.
+   * Maps loaded users into list rows, leaving out the signed-in user and inactive guests.
    *
    * @param users - The resolved conversation partners.
    * @returns The rows to render.
@@ -70,12 +70,15 @@ export class DirectMessageList {
 
     return users
       .filter((user): user is UserSearchResult => !!user)
-      .filter(({ uid, displayName }) => uid !== currentUserId && !this.isGuest(displayName))
-      .map(({ uid, displayName, photoURL }) => ({
+      .filter(
+        ({ uid, isAnonymous, lastSeenAt }) =>
+          uid !== currentUserId && (!isAnonymous || this.userDirectory.isOnline(lastSeenAt)),
+      )
+      .map(({ uid, displayName, photoURL, lastSeenAt }) => ({
         id: uid,
         name: displayName,
         avatar: photoURL,
-        online: false,
+        online: this.userDirectory.isOnline(lastSeenAt),
       }))
       .sort((first, second) => first.name.localeCompare(second.name, 'de'));
   }
@@ -88,16 +91,6 @@ export class DirectMessageList {
   ): DirectMessageUser[] {
     const alreadyVisible = persistedUsers.some(({ id }) => id === user?.id);
     return user && user.id !== currentUserId && !alreadyVisible ? [user] : [];
-  }
-
-  /**
-   * Detects guest accounts by their name.
-   *
-   * @param displayName - The stored display name.
-   * @returns True for anonymous sessions.
-   */
-  private isGuest(displayName: string): boolean {
-    return displayName.trim().toLocaleLowerCase('de-DE') === 'gast';
   }
 
   /** Collapses or expands the list. */

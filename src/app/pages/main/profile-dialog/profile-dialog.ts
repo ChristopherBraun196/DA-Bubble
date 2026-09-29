@@ -2,6 +2,7 @@ import { Component, computed, inject, input, output, signal } from '@angular/cor
 
 import { AppUser } from '../../../core/models/user.model';
 import { AuthService } from '../../../core/services/auth.service';
+import { UserService } from '../../../core/services/user.service';
 import { AvatarFallback } from '../../../shared/avatar-fallback/avatar-fallback';
 import { AvatarPicker } from '../../../shared/avatar-picker/avatar-picker';
 
@@ -24,6 +25,7 @@ const SAVE_ERROR_MESSAGE =
  */
 export class ProfileDialog {
   private readonly auth = inject(AuthService);
+  private readonly users = inject(UserService);
 
   readonly user = input<AppUser | null>(null);
   readonly closed = output<void>();
@@ -48,6 +50,12 @@ export class ProfileDialog {
   protected readonly email = computed(() =>
     this.isOwnProfile() ? this.auth.email() : this.user()?.email || null,
   );
+  protected readonly online = computed(() => {
+    if (this.isOwnProfile()) return true;
+    const user = this.user();
+    const lastSeenAt = this.users.directory().get(user?.uid || '')?.lastSeenAt ?? user?.lastSeenAt;
+    return this.users.isOnline(lastSeenAt);
+  });
 
   protected readonly editing = signal(false);
   protected readonly saving = signal(false);

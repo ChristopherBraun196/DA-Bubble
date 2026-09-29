@@ -73,9 +73,9 @@
       }
     </div>
 
-    <p class="profile__status">
+    <p class="profile__status" [class.profile__status--offline]="!online()">
       <span class="profile__dot"></span>
-      Aktiv
+      {{ online() ? 'Aktiv' : 'Abwesend' }}
     </p>
 
     <div class="profile__mail">
