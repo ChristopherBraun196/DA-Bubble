@@ -19,16 +19,14 @@ const SEARCH_MIN_LENGTH = 1;
  * Invite step of the channel creation flow.
  *
  * @remarks
- * Either copies the members of the channel the dialog was opened from, or
- * lets the user pick people individually.
+ * Either adds every registered member of the workspace, or lets the user pick
+ * people individually.
  */
 export class AddPeople {
   private readonly chats = inject(ChatService);
   private readonly users = inject(UserService);
 
   readonly chatId = input.required<string>();
-  readonly sourceChannelName = input('');
-  readonly sourceMemberIds = input<string[]>([]);
 
   readonly closed = output<void>();
 
@@ -132,7 +130,7 @@ export class AddPeople {
     this.adding.set(true);
     this.addError.set('');
     try {
-      await this.chats.addMembers(this.chatId(), this.memberIdsToAdd());
+      await this.chats.addMembers(this.chatId(), await this.memberIdsToAdd());
       this.closed.emit();
     } catch {
       this.addError.set('Die Mitglieder konnten nicht hinzugefügt werden. Versuch es noch einmal.');
@@ -146,7 +144,10 @@ export class AddPeople {
    *
    * @returns The member ids to add to the channel.
    */
-  private memberIdsToAdd(): string[] {
-    return this.mode() === 'all' ? this.sourceMemberIds() : this.selected().map(({ uid }) => uid);
+  private async memberIdsToAdd(): Promise<string[]> {
+    if (this.mode() === 'specific') {
+      return this.selected().map(({ uid }) => uid);
+    }
+    return (await this.users.getAllUsers()).map(({ uid }) => uid);
   }
 }
